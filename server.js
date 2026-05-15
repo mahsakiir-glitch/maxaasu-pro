@@ -16,6 +16,9 @@ const crypto = require('crypto');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Required for Render.com reverse proxy
+app.set('trust proxy', 1);
+
 // ── Environment Variables ──────────────────
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
 const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || JWT_SECRET + '_admin';
@@ -45,8 +48,8 @@ app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false 
 app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 
-const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, message: { error: 'Too many attempts' } });
-const apiLimiter = rateLimit({ windowMs: 1 * 60 * 1000, max: 200, message: { error: 'Rate limit exceeded' } });
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, message: { error: 'Too many attempts' }, standardHeaders: true, legacyHeaders: false, trustProxy: true });
+const apiLimiter = rateLimit({ windowMs: 1 * 60 * 1000, max: 200, message: { error: 'Rate limit exceeded' }, standardHeaders: true, legacyHeaders: false, trustProxy: true });
 app.use('/api/v1/auth', authLimiter);
 app.use('/api/v1', apiLimiter);
 
