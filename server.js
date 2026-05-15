@@ -30,7 +30,6 @@ console.log('SUPABASE_SERVICE_KEY:', SUPABASE_KEY ? 'Set ✓' : 'MISSING ✗');
 if (!SUPABASE_URL || !SUPABASE_KEY) {
   console.error('FATAL: SUPABASE_URL and SUPABASE_SERVICE_KEY environment variables are required!');
   console.error('Set them in Render Dashboard > Environment');
-  // Don't exit - let it start so Render doesn't crash loop
 }
 
 let supabase;
@@ -131,7 +130,7 @@ async function setupDefaultAdmin() {
   try {
     const { data, error } = await supabase.from('admin_users').select('id').limit(1);
     if (error) {
-      console.log('Admin table check error (table may not exist yet):', error.message);
+      console.log('Admin table check error:', error.message);
       return;
     }
     if (!data || data.length === 0) {
@@ -144,8 +143,6 @@ async function setupDefaultAdmin() {
       } else {
         console.log('Default admin created: admin / Admin@2024 / PIN: 12345678');
       }
-    } else {
-      console.log('Admin user already exists');
     }
   } catch (e) {
     console.error('Admin setup error:', e.message);
@@ -157,10 +154,10 @@ setupDefaultAdmin();
 // PUBLIC API ROUTES
 // ══════════════════════════════════════════════════
 
-// ── Auth: Login ────────────────────────────
+// ── Auth: Login (8-Digit PIN Verification) ──
 app.post('/api/v1/auth/login', async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, pin } = req.body;
     if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
 
     const { data: admin, error } = await supabase
@@ -173,6 +170,13 @@ app.post('/api/v1/auth/login', async (req, res) => {
 
     const valid = await bcrypt.compare(password, admin.password_hash);
     if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
+
+    // PIN VERIFICATION - 8 Digit PIN required on login
+    if (pin && pin.length === 8) {
+      if (admin.pin !== pin) return res.status(401).json({ error: 'Invalid PIN' });
+    } else {
+      return res.status(400).json({ error: '8-digit PIN required' });
+    }
 
     const token = jwt.sign(
       { id: admin.id, username: admin.username, role: 'admin' },
@@ -253,7 +257,6 @@ app.get('/api/v1/stream/:videoId', async (req, res) => {
 
     const resolvedUrl = resolveVideoUrl(video);
 
-    // Increment views (fire and forget)
     supabase.from('videos')
       .update({ views: (video.views || 0) + 1 })
       .eq('id', video.id)
@@ -277,7 +280,6 @@ app.get('/api/v1/categories', async (req, res) => {
     if (error) throw error;
     res.json(data || []);
   } catch (e) {
-    console.error('Categories error:', e.message);
     res.status(500).json({ error: 'Failed to fetch categories' });
   }
 });
@@ -293,7 +295,6 @@ app.get('/api/v1/posts', async (req, res) => {
     if (error) throw error;
     res.json(data || []);
   } catch (e) {
-    console.error('Posts error:', e.message);
     res.status(500).json({ error: 'Failed to fetch posts' });
   }
 });
@@ -309,7 +310,6 @@ app.get('/api/v1/audio', async (req, res) => {
     if (error) throw error;
     res.json(data || []);
   } catch (e) {
-    console.error('Audio error:', e.message);
     res.status(500).json({ error: 'Failed to fetch audio' });
   }
 });
@@ -372,7 +372,6 @@ app.get('/api/v1/settings', async (req, res) => {
     (data || []).forEach(function(item) { settings[item.key] = item.value; });
     res.json(settings);
   } catch (e) {
-    console.error('Settings error:', e.message);
     res.status(500).json({ error: 'Failed to fetch settings' });
   }
 });
@@ -381,34 +380,17 @@ app.get('/api/v1/settings', async (req, res) => {
 app.post('/api/v1/contacts', async (req, res) => {
   try {
     const { alias_name, contact_method, message_type, message } = req.body;
-
-    if (!alias_name || !message_type || !message) {
-      return res.status(400).json({ error: 'Alias, type, and message are required' });
-    }
-    if (!['suggestion', 'report', 'broken_video', 'new_request'].includes(message_type)) {
-      return res.status(400).json({ error: 'Invalid message type' });
-    }
-    if (message.length > 2000) {
-      return res.status(400).json({ error: 'Message too long' });
-    }
-
+    if (!alias_name || !message_type || !message) return res.status(400).json({ error: 'Required fields missing' });
+    
     const { data, error } = await supabase
       .from('contacts')
-      .insert({
-        alias_name: alias_name,
-        contact_method: contact_method || '',
-        message_type: message_type,
-        message: message
-      })
-      .select()
-      .single();
+      .insert({ alias_name, contact_method, message_type, message })
+      .select().single();
 
     if (error) throw error;
-    console.log('Contact submitted:', alias_name);
     res.json({ success: true, id: data.id });
   } catch (e) {
-    console.error('Contact error:', e.message);
-    res.status(500).json({ error: 'Failed to submit message' });
+    res.status(500).json({ error: 'Failed to submit' });
   }
 });
 
@@ -416,7 +398,7 @@ app.post('/api/v1/contacts', async (req, res) => {
 // ADMIN API ROUTES (All Protected)
 // ══════════════════════════════════════════════════
 
-// ── Admin Videos ───────────────────────────
+// Videos
 app.get('/api/v1/admin/videos', authenticateToken, async (req, res) => {
   try {
     const { data, error } = await supabase.from('videos').select('*').order('created_at', { ascending: false });
@@ -427,24 +409,10 @@ app.get('/api/v1/admin/videos', authenticateToken, async (req, res) => {
 
 app.post('/api/v1/admin/videos', authenticateToken, async (req, res) => {
   try {
-    const { title, description, url, video_type, thumbnail, category_id, is_featured, is_published, duration } = req.body;
-    if (!title || !url) return res.status(400).json({ error: 'Title and URL required' });
-
-    const { data, error } = await supabase.from('videos').insert({
-      title: title,
-      description: description || '',
-      url: url,
-      video_type: video_type || 'mp4',
-      thumbnail: thumbnail || '',
-      category_id: category_id || null,
-      is_featured: is_featured || false,
-      is_published: is_published !== false,
-      duration: duration || '0:00'
-    }).select().single();
-
+    const { data, error } = await supabase.from('videos').insert(req.body).select().single();
     if (error) throw error;
     res.json(data);
-  } catch (e) { console.error('Add video error:', e.message); res.status(500).json({ error: 'Failed to add video' }); }
+  } catch (e) { res.status(500).json({ error: 'Failed' }); }
 });
 
 app.put('/api/v1/admin/videos/:id', authenticateToken, async (req, res) => {
@@ -452,7 +420,7 @@ app.put('/api/v1/admin/videos/:id', authenticateToken, async (req, res) => {
     const { data, error } = await supabase.from('videos').update(req.body).eq('id', req.params.id).select().single();
     if (error) throw error;
     res.json(data);
-  } catch (e) { res.status(500).json({ error: 'Failed to update' }); }
+  } catch (e) { res.status(500).json({ error: 'Failed' }); }
 });
 
 app.delete('/api/v1/admin/videos/:id', authenticateToken, async (req, res) => {
@@ -460,10 +428,10 @@ app.delete('/api/v1/admin/videos/:id', authenticateToken, async (req, res) => {
     const { error } = await supabase.from('videos').delete().eq('id', req.params.id);
     if (error) throw error;
     res.json({ success: true });
-  } catch (e) { res.status(500).json({ error: 'Failed to delete' }); }
+  } catch (e) { res.status(500).json({ error: 'Failed' }); }
 });
 
-// ── Admin Categories ───────────────────────
+// Categories
 app.get('/api/v1/admin/categories', authenticateToken, async (req, res) => {
   try {
     const { data, error } = await supabase.from('categories').select('*').order('order_index');
@@ -474,14 +442,7 @@ app.get('/api/v1/admin/categories', authenticateToken, async (req, res) => {
 
 app.post('/api/v1/admin/categories', authenticateToken, async (req, res) => {
   try {
-    const { name, description, icon, order_index } = req.body;
-    if (!name) return res.status(400).json({ error: 'Name required' });
-    const { data, error } = await supabase.from('categories').insert({
-      name: name,
-      description: description || '',
-      icon: icon || 'fa-folder',
-      order_index: order_index || 0
-    }).select().single();
+    const { data, error } = await supabase.from('categories').insert(req.body).select().single();
     if (error) throw error;
     res.json(data);
   } catch (e) { res.status(500).json({ error: 'Failed' }); }
@@ -503,7 +464,7 @@ app.delete('/api/v1/admin/categories/:id', authenticateToken, async (req, res) =
   } catch (e) { res.status(500).json({ error: 'Failed' }); }
 });
 
-// ── Admin Posts ────────────────────────────
+// Posts
 app.get('/api/v1/admin/posts', authenticateToken, async (req, res) => {
   try {
     const { data, error } = await supabase.from('posts').select('*').order('created_at', { ascending: false });
@@ -514,23 +475,7 @@ app.get('/api/v1/admin/posts', authenticateToken, async (req, res) => {
 
 app.post('/api/v1/admin/posts', authenticateToken, async (req, res) => {
   try {
-    const { title, content, author, image_url, is_published } = req.body;
-    if (!title || !content) return res.status(400).json({ error: 'Title and content required' });
-    const { data, error } = await supabase.from('posts').insert({
-      title: title,
-      content: content,
-      author: author || 'Maxaas.u Official',
-      image_url: image_url || '',
-      is_published: is_published !== false
-    }).select().single();
-    if (error) throw error;
-    res.json(data);
-  } catch (e) { res.status(500).json({ error: 'Failed' }); }
-});
-
-app.put('/api/v1/admin/posts/:id', authenticateToken, async (req, res) => {
-  try {
-    const { data, error } = await supabase.from('posts').update(req.body).eq('id', req.params.id).select().single();
+    const { data, error } = await supabase.from('posts').insert(req.body).select().single();
     if (error) throw error;
     res.json(data);
   } catch (e) { res.status(500).json({ error: 'Failed' }); }
@@ -538,13 +483,12 @@ app.put('/api/v1/admin/posts/:id', authenticateToken, async (req, res) => {
 
 app.delete('/api/v1/admin/posts/:id', authenticateToken, async (req, res) => {
   try {
-    const { error } = await supabase.from('posts').delete().eq('id', req.params.id);
-    if (error) throw error;
+    await supabase.from('posts').delete().eq('id', req.params.id);
     res.json({ success: true });
   } catch (e) { res.status(500).json({ error: 'Failed' }); }
 });
 
-// ── Admin Audio ────────────────────────────
+// Audio
 app.get('/api/v1/admin/audio', authenticateToken, async (req, res) => {
   try {
     const { data, error } = await supabase.from('audio_tracks').select('*').order('created_at', { ascending: false });
@@ -555,25 +499,7 @@ app.get('/api/v1/admin/audio', authenticateToken, async (req, res) => {
 
 app.post('/api/v1/admin/audio', authenticateToken, async (req, res) => {
   try {
-    const { title, artist, url, cover_url, duration, category, is_published } = req.body;
-    if (!title || !url) return res.status(400).json({ error: 'Title and URL required' });
-    const { data, error } = await supabase.from('audio_tracks').insert({
-      title: title,
-      artist: artist || 'Unknown',
-      url: url,
-      cover_url: cover_url || '',
-      duration: duration || '0:00',
-      category: category || 'General',
-      is_published: is_published !== false
-    }).select().single();
-    if (error) throw error;
-    res.json(data);
-  } catch (e) { res.status(500).json({ error: 'Failed' }); }
-});
-
-app.put('/api/v1/admin/audio/:id', authenticateToken, async (req, res) => {
-  try {
-    const { data, error } = await supabase.from('audio_tracks').update(req.body).eq('id', req.params.id).select().single();
+    const { data, error } = await supabase.from('audio_tracks').insert(req.body).select().single();
     if (error) throw error;
     res.json(data);
   } catch (e) { res.status(500).json({ error: 'Failed' }); }
@@ -581,13 +507,12 @@ app.put('/api/v1/admin/audio/:id', authenticateToken, async (req, res) => {
 
 app.delete('/api/v1/admin/audio/:id', authenticateToken, async (req, res) => {
   try {
-    const { error } = await supabase.from('audio_tracks').delete().eq('id', req.params.id);
-    if (error) throw error;
+    await supabase.from('audio_tracks').delete().eq('id', req.params.id);
     res.json({ success: true });
   } catch (e) { res.status(500).json({ error: 'Failed' }); }
 });
 
-// ── Admin Contacts (Inbox) ─────────────────
+// Contacts Inbox
 app.get('/api/v1/admin/contacts', authenticateToken, async (req, res) => {
   try {
     const { data, error } = await supabase.from('contacts').select('*').order('created_at', { ascending: false });
@@ -596,40 +521,17 @@ app.get('/api/v1/admin/contacts', authenticateToken, async (req, res) => {
   } catch (e) { res.status(500).json({ error: 'Failed' }); }
 });
 
-app.put('/api/v1/admin/contacts/:id', authenticateToken, async (req, res) => {
-  try {
-    const updates = {};
-    if (req.body.is_read !== undefined) updates.is_read = req.body.is_read;
-    if (req.body.admin_response !== undefined) updates.admin_response = req.body.admin_response;
-    const { data, error } = await supabase.from('contacts').update(updates).eq('id', req.params.id).select().single();
-    if (error) throw error;
-    res.json(data);
-  } catch (e) { res.status(500).json({ error: 'Failed' }); }
-});
-
-app.delete('/api/v1/admin/contacts/:id', authenticateToken, async (req, res) => {
-  try {
-    const { error } = await supabase.from('contacts').delete().eq('id', req.params.id);
-    if (error) throw error;
-    res.json({ success: true });
-  } catch (e) { res.status(500).json({ error: 'Failed' }); }
-});
-
-// ── Admin Settings ─────────────────────────
+// Settings Update
 app.put('/api/v1/admin/settings', authenticateToken, async (req, res) => {
   try {
     for (const [key, value] of Object.entries(req.body)) {
-      await supabase.from('settings').upsert({
-        key: key,
-        value: value,
-        updated_at: new Date().toISOString()
-      });
+      await supabase.from('settings').upsert({ key, value, updated_at: new Date().toISOString() });
     }
     res.json({ success: true });
   } catch (e) { res.status(500).json({ error: 'Failed' }); }
 });
 
-// ── Admin Credentials ──────────────────────
+// Update Credentials
 app.put('/api/v1/admin/credentials', authenticateToken, async (req, res) => {
   try {
     const { pin, new_username, new_password, new_pin } = req.body;
@@ -643,37 +545,19 @@ app.put('/api/v1/admin/credentials', authenticateToken, async (req, res) => {
     if (new_password) updates.password_hash = await bcrypt.hash(new_password, 12);
     if (new_pin) updates.pin = new_pin;
 
-    if (Object.keys(updates).length === 0) return res.status(400).json({ error: 'No changes specified' });
-
     const { error } = await supabase.from('admin_users').update(updates).eq('id', req.admin.id);
     if (error) throw error;
 
-    let newToken = undefined;
-    if (new_username) {
-      newToken = jwt.sign(
-        { id: req.admin.id, username: new_username, role: 'admin' },
-        ADMIN_JWT_SECRET,
-        { expiresIn: '24h' }
-      );
-    }
-
-    res.json({ success: true, token: newToken });
-  } catch (e) {
-    console.error('Credentials error:', e.message);
-    res.status(500).json({ error: 'Failed to update credentials' });
-  }
+    res.json({ success: true });
+  } catch (e) { res.status(500).json({ error: 'Failed' }); }
 });
 
-// ══════════════════════════════════════════════════
-// SPA FALLBACK - Must be LAST route!
-// ══════════════════════════════════════════════════
+// SPA Fallback
 app.get('*', function(req, res) {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// ── Start Server ───────────────────────────
+// Server Start
 app.listen(PORT, function() {
   console.log('=== Maxaas.u Pro Server RUNNING on port ' + PORT + ' ===');
-  console.log('Frontend: http://localhost:' + PORT);
-  console.log('API: http://localhost:' + PORT + '/api/v1/settings');
 });
