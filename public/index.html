@@ -2,2484 +2,590 @@
 <html lang="so">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Maxaas.u — Admin Dashboard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maxaas.u</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<script>
+tailwind.config={darkMode:'class',theme:{extend:{colors:{brand:{50:'#EEF2FF',100:'#E0E7FF',200:'#C7D2FE',300:'#A5B4FC',400:'#818CF8',500:'#6366F1',600:'#4F46E5',700:'#4338CA',800:'#3730A3',900:'#312E81'}},fontFamily:{sans:['Inter','sans-serif'],serif:['Playfair Display','serif']}}}}
+</script>
 <style>
-:root {
-  --bg: #0f0f0f;
-  --bg2: #161616;
-  --bg3: #1f1f1f;
-  --bg4: #2a2a2a;
-  --surface: #212121;
-  --surface2: #2d2d2d;
-  --border: #333;
-  --border2: #404040;
-  --red: #ff0000;
-  --red2: #cc0000;
-  --red-glow: rgba(255,0,0,0.15);
-  --text: #f1f1f1;
-  --text2: #aaa;
-  --text3: #666;
-  --accent: #ff4444;
-  --green: #00c853;
-  --blue: #2979ff;
-  --yellow: #ffd600;
-  --sidebar-w: 240px;
-  --header-h: 56px;
-  --radius: 10px;
-  --radius-sm: 6px;
-  --shadow: 0 4px 24px rgba(0,0,0,.5);
-  --font: 'Outfit', sans-serif;
-  --mono: 'JetBrains Mono', monospace;
-  --transition: 0.2s cubic-bezier(.4,0,.2,1);
+:root{
+  --bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;
+  --tx:#0F172A;--tx2:#475569;--tx3:#94A3B8;--tx4:#64748B;
+  --bd:#E2E8F0;--bd2:#CBD5E1;
+  --card:#FFFFFF;--card-h:#F8FAFC;
+  --inp:#FFFFFF;--inp-bd:#CBD5E1;
+  --nav:rgba(255,255,255,0.88);
+  --glow:rgba(99,102,241,0.08);
+  --glass:rgba(255,255,255,0.72);--glass-bd:rgba(0,0,0,0.06);
+  --shadow:0 1px 3px rgba(0,0,0,0.06);
+  --shadow-lg:0 10px 40px rgba(0,0,0,0.07);
+  --accent:#6366F1;--accent-h:#4F46E5;--accent-bg:#EEF2FF;--accent-tx:#4338CA;
+  --badge-r:rgba(239,68,68,0.1);--badge-rt:#DC2626;
+  --badge-g:rgba(16,185,129,0.1);--badge-gt:#059669;
+  --badge-a:rgba(245,158,11,0.1);--badge-at:#D97706;
+  --badge-i:rgba(99,102,241,0.1);--badge-it:#4F46E5;
+  --player-bg:#000;
 }
+.dark{
+  --bg:#0F172A;--bg2:#1E293B;--bg3:#334155;--bg4:#475569;
+  --tx:#F8FAFC;--tx2:#CBD5E1;--tx3:#64748B;--tx4:#94A3B8;
+  --bd:#334155;--bd2:#475569;
+  --card:#1E293B;--card-h:#334155;
+  --inp:rgba(15,23,42,0.6);--inp-bd:rgba(148,163,184,0.15);
+  --nav:rgba(15,23,42,0.88);
+  --glow:rgba(99,102,241,0.15);
+  --glass:rgba(30,41,59,0.6);--glass-bd:rgba(148,163,184,0.08);
+  --shadow:0 1px 3px rgba(0,0,0,0.3);
+  --shadow-lg:0 10px 40px rgba(0,0,0,0.4);
+  --accent:#818CF8;--accent-h:#6366F1;--accent-bg:rgba(99,102,241,0.12);--accent-tx:#A5B4FC;
+  --badge-r:rgba(239,68,68,0.15);--badge-rt:#FCA5A5;
+  --badge-g:rgba(16,185,129,0.15);--badge-gt:#6EE7B7;
+  --badge-a:rgba(245,158,11,0.15);--badge-at:#FCD34D;
+  --badge-i:rgba(99,102,241,0.15);--badge-it:#A5B4FC;
+  --player-bg:#000;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);overflow-x:hidden;transition:background .3s,color .3s}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg3)}
+::-webkit-scrollbar-thumb{background:var(--tx3);border-radius:3px}
+a{color:inherit;text-decoration:none}
 
-* { margin:0; padding:0; box-sizing:border-box; }
-
-body {
-  font-family: var(--font);
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* ══════════════════ HEADER ══════════════════ */
-.header {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: var(--header-h);
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 16px;
-  z-index: 200;
-  backdrop-filter: blur(12px);
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-}
-
-.menu-btn {
-  width: 40px; height: 40px;
-  border: none;
-  background: transparent;
-  color: var(--text);
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  transition: background var(--transition);
-  flex-shrink: 0;
-}
-.menu-btn:hover { background: var(--bg4); }
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  flex-shrink: 0;
-}
-.logo-icon {
-  width: 32px; height: 32px;
-  background: var(--red);
-  border-radius: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  color: #fff;
-}
-.logo-text {
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--text);
-  letter-spacing: -0.5px;
-}
-.logo-text span { color: var(--red); }
-
-.header-search {
-  flex: 1;
-  max-width: 520px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 40px;
-  overflow: hidden;
-  transition: border-color var(--transition);
-}
-.header-search:focus-within { border-color: var(--blue); }
-.header-search input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  padding: 8px 16px;
-  color: var(--text);
-  font-family: var(--font);
-  font-size: 14px;
-  outline: none;
-}
-.header-search input::placeholder { color: var(--text3); }
-.search-btn {
-  width: 56px; height: 38px;
-  background: var(--bg4);
-  border: none;
-  border-left: 1px solid var(--border);
-  color: var(--text2);
-  cursor: pointer;
-  font-size: 14px;
-  transition: background var(--transition);
-}
-.search-btn:hover { background: var(--bg3); color: var(--text); }
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: auto;
-}
-
-.icon-btn {
-  width: 40px; height: 40px;
-  border: none;
-  background: transparent;
-  color: var(--text2);
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  transition: all var(--transition);
-  position: relative;
-  flex-shrink: 0;
-}
-.icon-btn:hover { background: var(--bg4); color: var(--text); }
-
-.badge {
-  position: absolute;
-  top: 6px; right: 6px;
-  width: 8px; height: 8px;
-  background: var(--red);
-  border-radius: 50%;
-  border: 2px solid var(--bg2);
-}
-
-.avatar {
-  width: 32px; height: 32px;
-  background: linear-gradient(135deg, var(--red), #ff6b6b);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-/* ══════════════════ SIDEBAR ══════════════════ */
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.6);
-  z-index: 150;
-  opacity: 0;
-  transition: opacity var(--transition);
-}
-.sidebar-overlay.show { opacity: 1; }
-
-.sidebar {
-  position: fixed;
-  top: var(--header-h);
-  left: 0;
-  bottom: 0;
-  width: var(--sidebar-w);
-  background: var(--bg2);
-  border-right: 1px solid var(--border);
-  overflow-y: auto;
-  overflow-x: hidden;
-  z-index: 100;
-  transition: transform var(--transition), width var(--transition);
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
-}
-.sidebar::-webkit-scrollbar { width: 4px; }
-.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-.sidebar.collapsed { width: 72px; }
-
-.sidebar-section {
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-}
-.sidebar-section:last-child { border-bottom: none; }
-
-.section-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 8px 20px 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  transition: opacity var(--transition);
-}
-.sidebar.collapsed .section-label { opacity: 0; }
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 10px 16px;
-  cursor: pointer;
-  border-radius: var(--radius-sm);
-  margin: 2px 8px;
-  transition: all var(--transition);
-  text-decoration: none;
-  color: var(--text2);
-  font-size: 14px;
-  font-weight: 500;
-  white-space: nowrap;
-  position: relative;
-  overflow: hidden;
-}
-.nav-item:hover { background: var(--bg4); color: var(--text); }
-.nav-item.active {
-  background: var(--red-glow);
-  color: var(--text);
-}
-.nav-item.active::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 20%; bottom: 20%;
-  width: 3px;
-  background: var(--red);
-  border-radius: 0 2px 2px 0;
-}
-.nav-icon {
-  width: 20px;
-  text-align: center;
-  font-size: 15px;
-  flex-shrink: 0;
-}
-.nav-label {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: opacity var(--transition);
-}
-.sidebar.collapsed .nav-label { opacity: 0; pointer-events: none; }
-
-.nav-badge {
-  background: var(--red);
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 10px;
-  min-width: 18px;
-  text-align: center;
-}
-.sidebar.collapsed .nav-badge { display: none; }
-
-/* Rename inline input */
-.nav-rename-input {
-  flex: 1;
-  background: var(--bg3);
-  border: 1px solid var(--blue);
-  border-radius: 4px;
-  color: var(--text);
-  font-family: var(--font);
-  font-size: 13px;
-  padding: 2px 6px;
-  outline: none;
-  max-width: 120px;
-}
-
-/* ══════════════════ MAIN ══════════════════ */
-.main {
-  margin-left: var(--sidebar-w);
-  padding-top: var(--header-h);
-  transition: margin-left var(--transition);
-  min-height: 100vh;
-}
-.main.collapsed { margin-left: 72px; }
-
-/* ══════════════════ CONTENT AREA ══════════════════ */
-.page { display: none; padding: 24px; animation: fadeIn .25s ease; }
-.page.active { display: block; }
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ══════════════════ PAGE HEADER ══════════════════ */
-.page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.page-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: -0.5px;
-}
-.page-subtitle {
-  font-size: 13px;
-  color: var(--text3);
-  margin-top: 2px;
-}
-
-/* ══════════════════ STATS CARDS ══════════════════ */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 28px;
-}
-
-.stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-  position: relative;
-  overflow: hidden;
-  transition: border-color var(--transition), transform var(--transition);
-  cursor: default;
-}
-.stat-card:hover { border-color: var(--border2); transform: translateY(-2px); }
-
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-}
-.stat-card.red::before { background: var(--red); }
-.stat-card.blue::before { background: var(--blue); }
-.stat-card.green::before { background: var(--green); }
-.stat-card.yellow::before { background: var(--yellow); }
-
-.stat-icon {
-  width: 40px; height: 40px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  margin-bottom: 14px;
-}
-.stat-icon.red { background: rgba(255,0,0,.12); color: var(--red); }
-.stat-icon.blue { background: rgba(41,121,255,.12); color: var(--blue); }
-.stat-icon.green { background: rgba(0,200,83,.12); color: var(--green); }
-.stat-icon.yellow { background: rgba(255,214,0,.12); color: var(--yellow); }
-
-.stat-value {
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--text);
-  line-height: 1;
-  font-family: var(--mono);
-}
-.stat-label {
-  font-size: 12px;
-  color: var(--text3);
-  margin-top: 6px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: .5px;
-}
-.stat-change {
-  position: absolute;
-  top: 16px; right: 16px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--green);
-}
-
-/* ══════════════════ TABLE CARD ══════════════════ */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  margin-bottom: 20px;
-}
-
-.card-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.card-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  border-radius: var(--radius-sm);
-  font-family: var(--font);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: all var(--transition);
-  white-space: nowrap;
-}
-.btn-primary { background: var(--red); color: #fff; }
-.btn-primary:hover { background: var(--red2); transform: translateY(-1px); }
-.btn-secondary { background: var(--bg4); color: var(--text2); border: 1px solid var(--border); }
-.btn-secondary:hover { background: var(--bg3); color: var(--text); }
-.btn-ghost { background: transparent; color: var(--text3); padding: 6px 10px; }
-.btn-ghost:hover { color: var(--text); background: var(--bg4); }
-.btn-danger { background: rgba(255,0,0,.1); color: #ff4444; border: 1px solid rgba(255,0,0,.2); }
-.btn-danger:hover { background: rgba(255,0,0,.2); }
-.btn-sm { padding: 5px 10px; font-size: 12px; }
-.btn-icon { width: 32px; height: 32px; padding: 0; justify-content: center; }
-
-.table-wrap { overflow-x: auto; }
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-thead tr { border-bottom: 1px solid var(--border); }
-thead th {
-  padding: 10px 16px;
-  text-align: left;
-  color: var(--text3);
-  font-weight: 600;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: .5px;
-  white-space: nowrap;
-}
-tbody tr {
-  border-bottom: 1px solid rgba(255,255,255,.04);
-  transition: background var(--transition);
-}
-tbody tr:last-child { border-bottom: none; }
-tbody tr:hover { background: var(--bg4); }
-td { padding: 12px 16px; color: var(--text2); vertical-align: middle; }
-td.text-main { color: var(--text); font-weight: 500; }
-td .mono { font-family: var(--mono); font-size: 12px; }
-
-.thumb {
-  width: 80px; height: 45px;
-  object-fit: cover;
-  border-radius: 4px;
-  background: var(--bg4);
-}
-.thumb-placeholder {
-  width: 80px; height: 45px;
-  background: var(--bg4);
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text3);
-  font-size: 18px;
-}
-
-.tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-}
-.tag-red { background: rgba(255,0,0,.12); color: #ff6666; }
-.tag-blue { background: rgba(41,121,255,.12); color: #6699ff; }
-.tag-green { background: rgba(0,200,83,.12); color: #66ffaa; }
-.tag-gray { background: var(--bg4); color: var(--text3); }
-.tag-yellow { background: rgba(255,214,0,.12); color: #ffd600; }
-
-.actions-cell {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-/* ══════════════════ SEARCH BAR (TABLE) ══════════════════ */
-.table-search {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 6px 12px;
-  min-width: 200px;
-}
-.table-search input {
-  background: transparent;
-  border: none;
-  color: var(--text);
-  font-family: var(--font);
-  font-size: 13px;
-  outline: none;
-  width: 100%;
-}
-.table-search input::placeholder { color: var(--text3); }
-
-/* ══════════════════ MODALS ══════════════════ */
-.modal-backdrop {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.75);
-  z-index: 500;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  backdrop-filter: blur(4px);
-}
-.modal-backdrop.open { display: flex; }
-
-.modal {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  width: 100%;
-  max-width: 520px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: var(--shadow);
-  animation: modalIn .2s ease;
-}
-@keyframes modalIn {
-  from { opacity: 0; transform: scale(.96) translateY(8px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-.modal-header {
-  padding: 20px 20px 16px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.modal-title { font-size: 16px; font-weight: 700; }
-.modal-close {
-  width: 32px; height: 32px;
-  border: none;
-  background: var(--bg4);
-  color: var(--text2);
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all var(--transition);
-}
-.modal-close:hover { background: var(--border); color: var(--text); }
-
-.modal-body { padding: 20px; }
-.modal-footer {
-  padding: 16px 20px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-/* ══════════════════ FORM ══════════════════ */
-.form-group { margin-bottom: 16px; }
-.form-label {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text2);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: .5px;
-}
-.form-control {
-  width: 100%;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 10px 12px;
-  color: var(--text);
-  font-family: var(--font);
-  font-size: 14px;
-  outline: none;
-  transition: border-color var(--transition);
-}
-.form-control:focus { border-color: var(--red); }
-.form-control::placeholder { color: var(--text3); }
-textarea.form-control { resize: vertical; min-height: 80px; }
-select.form-control { cursor: pointer; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.form-check {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  color: var(--text2);
-}
-.form-check input[type=checkbox] { accent-color: var(--red); width: 15px; height: 15px; cursor: pointer; }
-
-/* ══════════════════ RENAME MODAL ══════════════════ */
-.rename-list { display: flex; flex-direction: column; gap: 10px; }
-.rename-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-}
-.rename-item-icon {
-  width: 36px; height: 36px;
-  background: var(--bg4);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text3);
-  font-size: 14px;
-  flex-shrink: 0;
-}
-.rename-item-info { flex: 1; min-width: 0; }
-.rename-item-label {
-  font-size: 11px;
-  color: var(--text3);
-  margin-bottom: 4px;
-  text-transform: uppercase;
-  letter-spacing: .5px;
-}
-.rename-item-input {
-  width: 100%;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text);
-  font-family: var(--font);
-  font-size: 13px;
-  font-weight: 500;
-  padding: 5px 8px;
-  outline: none;
-  transition: border-color var(--transition);
-}
-.rename-item-input:focus { border-color: var(--blue); }
-
-/* ══════════════════ TOAST ══════════════════ */
-.toasts {
-  position: fixed;
-  bottom: 20px; right: 20px;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  pointer-events: none;
-}
-.toast {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 12px 16px;
-  font-size: 13px;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: var(--shadow);
-  animation: toastIn .25s ease;
-  pointer-events: all;
-  max-width: 320px;
-}
-.toast.success { border-left: 3px solid var(--green); }
-.toast.error { border-left: 3px solid var(--red); }
-.toast.info { border-left: 3px solid var(--blue); }
-@keyframes toastIn {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-/* ══════════════════ EMPTY STATE ══════════════════ */
-.empty {
-  text-align: center;
-  padding: 48px 24px;
-  color: var(--text3);
-}
-.empty i { font-size: 40px; margin-bottom: 12px; opacity: .4; }
-.empty p { font-size: 14px; }
-
-/* ══════════════════ ANALYTICS ══════════════════ */
-.bar-chart {
-  display: flex;
-  align-items: flex-end;
-  gap: 6px;
-  height: 100px;
-  padding: 0 4px;
-}
-.bar {
-  flex: 1;
-  background: var(--red-glow);
-  border-radius: 4px 4px 0 0;
-  border: 1px solid rgba(255,0,0,.2);
-  position: relative;
-  cursor: pointer;
-  transition: background var(--transition);
-  min-height: 4px;
-}
-.bar:hover { background: rgba(255,0,0,.3); }
-.bar::after {
-  content: attr(data-label);
-  position: absolute;
-  bottom: -18px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 10px;
-  color: var(--text3);
-  white-space: nowrap;
-}
-
-/* ══════════════════ TOOLTIP ══════════════════ */
-[data-tooltip] {
-  position: relative;
-}
-[data-tooltip]::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 6px);
-  transform: translateX(-50%);
-  background: var(--bg4);
-  color: var(--text);
-  font-size: 11px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .15s;
-  z-index: 999;
-}
-[data-tooltip]:hover::after { opacity: 1; }
-
-/* ══════════════════ LOGIN PAGE ══════════════════ */
-#login-page {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: var(--bg);
-  z-index: 1000;
-  align-items: center;
-  justify-content: center;
-}
-#login-page.show { display: flex; }
-
-.login-card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 40px;
-  width: 100%;
-  max-width: 380px;
-  box-shadow: 0 20px 60px rgba(0,0,0,.6);
-}
-.login-logo {
-  text-align: center;
-  margin-bottom: 28px;
-}
-.login-logo-icon {
-  width: 56px; height: 56px;
-  background: var(--red);
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  color: #fff;
-  margin: 0 auto 12px;
-}
-.login-title {
-  font-size: 22px;
-  font-weight: 800;
-  text-align: center;
-  margin-bottom: 4px;
-}
-.login-sub {
-  text-align: center;
-  color: var(--text3);
-  font-size: 13px;
-  margin-bottom: 28px;
-}
-.login-error {
-  background: rgba(255,0,0,.1);
-  border: 1px solid rgba(255,0,0,.3);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-  font-size: 13px;
-  color: #ff6666;
-  margin-bottom: 16px;
-  display: none;
-}
-.login-error.show { display: block; }
-
-/* ══════════════════ MOBILE RESPONSIVE ══════════════════ */
-@media (max-width: 768px) {
-  :root { --sidebar-w: 280px; }
-  
-  .sidebar {
-    transform: translateX(-100%);
-    top: var(--header-h);
-    z-index: 160;
-    width: var(--sidebar-w) !important;
-  }
-  .sidebar.mobile-open { transform: translateX(0); }
-  .sidebar-overlay { display: block; }
-  
-  .main { margin-left: 0 !important; }
-  .main.collapsed { margin-left: 0 !important; }
-  
-  .header-search { display: none; }
-  
-  .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-  
-  .page { padding: 16px; }
-  
-  .form-row { grid-template-columns: 1fr; }
-  
-  .page-header { margin-bottom: 16px; }
-  
-  .table-wrap table { min-width: 600px; }
-  
-  .card-header { flex-direction: column; align-items: stretch; }
-  .card-header .btn { justify-content: center; }
-}
-
-@media (max-width: 480px) {
-  .stats-grid { grid-template-columns: 1fr; }
-  .login-card { padding: 28px 20px; margin: 16px; }
-  .page { padding: 12px; }
-}
-
-/* ══════════════════ SCROLLBAR ══════════════════ */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--border2); }
-
-/* ══════════════════ LOADING ══════════════════ */
-.spinner {
-  width: 20px; height: 20px;
-  border: 2px solid var(--border);
-  border-top-color: var(--red);
-  border-radius: 50%;
-  animation: spin .6s linear infinite;
-  display: inline-block;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.skeleton {
-  background: linear-gradient(90deg, var(--bg3) 25%, var(--bg4) 50%, var(--bg3) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.2s infinite;
-  border-radius: 4px;
-}
-@keyframes shimmer { to { background-position: -200% 0; } }
-
-/* ══════════════════ SWITCH TOGGLE ══════════════════ */
-.switch {
-  position: relative;
-  width: 36px; height: 20px;
-  flex-shrink: 0;
-}
-.switch input { opacity: 0; width: 0; height: 0; }
-.switch-slider {
-  position: absolute;
-  inset: 0;
-  background: var(--bg4);
-  border-radius: 20px;
-  cursor: pointer;
-  transition: background var(--transition);
-}
-.switch-slider::before {
-  content: '';
-  position: absolute;
-  height: 14px; width: 14px;
-  left: 3px; top: 3px;
-  background: #fff;
-  border-radius: 50%;
-  transition: transform var(--transition);
-}
-.switch input:checked + .switch-slider { background: var(--green); }
-.switch input:checked + .switch-slider::before { transform: translateX(16px); }
-
-/* ══════════════════ HEADER MOBILE SEARCH ══════════════════ */
-.mobile-search-btn { display: none; }
-@media (max-width: 768px) { .mobile-search-btn { display: flex; } }
-
-/* Divider */
-.divider {
-  height: 1px;
-  background: var(--border);
-  margin: 16px 0;
-}
-
-/* ══════════════════ ACTIVE PAGE INDICATOR ══════════════════ */
-.breadcrumb {
-  font-size: 12px;
-  color: var(--text3);
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.breadcrumb span { color: var(--text2); }
-
-/* Right-click context menu */
-.ctx-menu {
-  position: fixed;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 4px;
-  z-index: 9999;
-  min-width: 160px;
-  box-shadow: var(--shadow);
-  display: none;
-  animation: fadeIn .12s ease;
-}
-.ctx-menu.show { display: block; }
-.ctx-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 13px;
-  color: var(--text2);
-  transition: all var(--transition);
-}
-.ctx-item:hover { background: var(--bg4); color: var(--text); }
-.ctx-item.danger { color: #ff4444; }
-.ctx-item.danger:hover { background: rgba(255,0,0,.1); }
+.nav-bar{background:var(--nav);backdrop-filter:blur(16px);border-bottom:1px solid var(--glass-bd);transition:all .3s}
+.glass{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--glass-bd);transition:background .3s,border-color .3s}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;transition:all .4s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow)}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.card:hover .card-play{opacity:1}
+.card-play{opacity:0;transition:opacity .3s}
+.line-sep{height:1px;background:linear-gradient(to right,transparent,var(--bd2),transparent)}
+.text-accent{color:var(--accent)}
+.bg-accent{background:var(--accent)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.03em}
+.badge-i{background:var(--badge-i);color:var(--badge-it)}
+.badge-g{background:var(--badge-g);color:var(--badge-gt)}
+.badge-a{background:var(--badge-a);color:var(--badge-at)}
+.badge-r{background:var(--badge-r);color:var(--badge-rt)}
+.inp{background:var(--inp);border:1px solid var(--inp-bd);border-radius:8px;padding:10px 14px;color:var(--tx);font-size:14px;width:100%;transition:border-color .2s,box-shadow .2s}
+.inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.inp::placeholder{color:var(--tx3)}
+textarea.inp{resize:vertical;min-height:80px}
+select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.btn{padding:10px 24px;border-radius:8px;font-weight:500;font-size:14px;border:none;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-p{background:var(--accent);color:#fff}
+.btn-p:hover:not(:disabled){background:var(--accent-h);transform:translateY(-1px);box-shadow:0 8px 25px var(--glow)}
+.btn-s{background:var(--bg3);color:var(--tx2);border:1px solid var(--bd)}
+.btn-s:hover{background:var(--bg4);color:var(--tx)}
+.btn-d{background:var(--badge-r);color:var(--badge-rt);border:1px solid rgba(239,68,68,.15)}
+.btn-d:hover{background:rgba(239,68,68,.2)}
+.btn-sm{padding:6px 14px;font-size:12px}
+.thumb{position:relative;overflow:hidden;border-radius:10px;aspect-ratio:16/9;background:var(--bg3)}
+.thumb img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
+.thumb:hover img{transform:scale(1.05)}
+.audio-cover{position:relative;overflow:hidden;border-radius:12px;aspect-ratio:1/1;background:var(--bg3)}
+.audio-cover img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.audio-cover:hover img{transform:scale(1.05)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeOut{to{opacity:0;transform:translateY(-8px)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.animate-in{animation:fadeUp .5s ease forwards}
+.toast-in{animation:fadeUp .3s ease forwards}
+.toast-out{animation:fadeOut .3s ease forwards}
+.pulse-dot{animation:pulse 2s ease-in-out infinite}
+#audioBar{position:fixed;bottom:0;left:0;right:0;z-index:90;transform:translateY(100%);transition:transform .4s cubic-bezier(.4,0,.2,1);background:var(--card);border-top:1px solid var(--bd)}
+#audioBar.show{transform:translateY(0)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-bg.show{display:flex}
+.modal-box{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:28px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;animation:fadeUp .3s ease}
+.admin-link{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:8px;color:var(--tx3);font-size:14px;transition:all .2s;cursor:pointer}
+.admin-link:hover{background:var(--bg3);color:var(--tx)}
+.admin-link.on{background:var(--accent-bg);color:var(--accent)}
+.yt-embed{position:relative;overflow:hidden;border-radius:16px;aspect-ratio:16/9;background:#000;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.yt-embed iframe,.yt-embed video{position:absolute;inset:0;width:100%;height:100%;border:none}
+.yt-embed .fallback{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.7);color:#fff;gap:12px;z-index:2}
+.theme-toggle{width:48px;height:26px;border-radius:13px;background:var(--bg4);position:relative;cursor:pointer;transition:background .2s;border:1px solid var(--bd)}
+.theme-toggle .dot{width:20px;height:20px;border-radius:50%;background:var(--accent);position:absolute;top:2px;left:2px;transition:transform .2s;display:flex;align-items:center;justify-content:center}
+.dark .theme-toggle .dot{transform:translateX(22px)}
+@media(max-width:768px){.modal-box{padding:20px;margin:8px}}
 </style>
 </head>
 <body>
 
-<!-- ═══ LOGIN ═══ -->
-<div id="login-page" class="show">
-  <div class="login-card">
-    <div class="login-logo">
-      <div class="login-logo-icon"><i class="fab fa-youtube"></i></div>
-      <div class="login-title">Maxaas.u</div>
-      <div class="login-sub">Admin Dashboard — Gal heskeega</div>
-    </div>
-    <div id="login-error" class="login-error"></div>
-    <div class="form-group">
-      <label class="form-label">Username</label>
-      <input class="form-control" id="l-user" type="text" placeholder="admin" autocomplete="username">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Password</label>
-      <input class="form-control" id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password">
-    </div>
-    <div class="form-group">
-      <label class="form-label">PIN (8 digits)</label>
-      <input class="form-control" id="l-pin" type="text" placeholder="00000000" maxlength="8" autocomplete="off">
-    </div>
-    <button class="btn btn-primary" style="width:100%; justify-content:center; padding:12px;" onclick="doLogin()">
-      <i class="fas fa-sign-in-alt"></i> Gal
-    </button>
-  </div>
+<div id="toastBox" class="fixed top-4 right-4 z-[200] flex flex-col gap-2 pointer-events-none" style="max-width:380px"></div>
+
+<nav id="mainNav" class="nav-bar fixed top-0 left-0 right-0 z-50">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+<a href="#/" class="flex items-center gap-2.5 group">
+<div class="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-lg shadow-brand-500/20">
+<span class="iconify text-white text-lg" data-icon="mdi:play-circle"></span>
 </div>
-
-<!-- ═══ HEADER ═══ -->
-<header class="header">
-  <div class="header-left">
-    <button class="menu-btn" onclick="toggleSidebar()" aria-label="Toggle menu">
-      <i class="fas fa-bars"></i>
-    </button>
-    <a href="#" class="logo">
-      <div class="logo-icon"><i class="fab fa-youtube"></i></div>
-      <div class="logo-text">Maxaas<span>.u</span></div>
-    </a>
-  </div>
-
-  <div class="header-search">
-    <input type="text" placeholder="Raadi video, post, audio..." id="global-search">
-    <button class="search-btn"><i class="fas fa-search"></i></button>
-  </div>
-
-  <div class="header-right">
-    <button class="icon-btn mobile-search-btn" onclick="toggleMobileSearch()" data-tooltip="Raadi">
-      <i class="fas fa-search"></i>
-    </button>
-    <button class="icon-btn" data-tooltip="Notifications" onclick="showPage('messages')">
-      <i class="fas fa-bell"></i>
-      <div class="badge" id="notif-badge"></div>
-    </button>
-    <button class="icon-btn" data-tooltip="Settings" onclick="showPage('settings')">
-      <i class="fas fa-cog"></i>
-    </button>
-    <div class="avatar" id="header-avatar" onclick="showPage('security')">A</div>
-  </div>
-</header>
-
-<!-- ═══ SIDEBAR OVERLAY (mobile) ═══ -->
-<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
-
-<!-- ═══ SIDEBAR ═══ -->
-<nav class="sidebar" id="sidebar">
-  <div class="sidebar-section">
-    <div class="section-label" id="lbl-main">Ugu Weyn</div>
-    <a class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
-      <div class="nav-icon"><i class="fas fa-th-large"></i></div>
-      <div class="nav-label" id="navlbl-dashboard">Dashboard</div>
-    </a>
-    <a class="nav-item" onclick="showPage('analytics')" id="nav-analytics">
-      <div class="nav-icon"><i class="fas fa-chart-bar"></i></div>
-      <div class="nav-label" id="navlbl-analytics">Analytics</div>
-    </a>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="section-label" id="lbl-content">Content</div>
-    <a class="nav-item" onclick="showPage('videos')" id="nav-videos">
-      <div class="nav-icon"><i class="fas fa-play-circle"></i></div>
-      <div class="nav-label" id="navlbl-videos">Videos</div>
-    </a>
-    <a class="nav-item" onclick="showPage('audio')" id="nav-audio">
-      <div class="nav-icon"><i class="fas fa-music"></i></div>
-      <div class="nav-label" id="navlbl-audio">Audio</div>
-    </a>
-    <a class="nav-item" onclick="showPage('posts')" id="nav-posts">
-      <div class="nav-icon"><i class="fas fa-newspaper"></i></div>
-      <div class="nav-label" id="navlbl-posts">Posts</div>
-    </a>
-    <a class="nav-item" onclick="showPage('categories')" id="nav-categories">
-      <div class="nav-icon"><i class="fas fa-folder"></i></div>
-      <div class="nav-label" id="navlbl-categories">Categories</div>
-    </a>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="section-label" id="lbl-manage">Manage</div>
-    <a class="nav-item" onclick="showPage('messages')" id="nav-messages">
-      <div class="nav-icon"><i class="fas fa-envelope"></i></div>
-      <div class="nav-label" id="navlbl-messages">Messages</div>
-      <div class="nav-badge" id="msg-badge" style="display:none"></div>
-    </a>
-    <a class="nav-item" onclick="showPage('settings')" id="nav-settings">
-      <div class="nav-icon"><i class="fas fa-sliders-h"></i></div>
-      <div class="nav-label" id="navlbl-settings">Settings</div>
-    </a>
-    <a class="nav-item" onclick="showPage('security')" id="nav-security">
-      <div class="nav-icon"><i class="fas fa-shield-alt"></i></div>
-      <div class="nav-label" id="navlbl-security">Security</div>
-    </a>
-  </div>
-
-  <div class="sidebar-section">
-    <a class="nav-item" onclick="openRenameModal()" id="nav-rename" style="color:var(--blue)">
-      <div class="nav-icon"><i class="fas fa-edit"></i></div>
-      <div class="nav-label">Rename Menu</div>
-    </a>
-    <a class="nav-item" onclick="doLogout()" style="color:#ff4444">
-      <div class="nav-icon"><i class="fas fa-sign-out-alt"></i></div>
-      <div class="nav-label">Logout</div>
-    </a>
-  </div>
+<span class="text-lg font-bold tracking-tight" style="color:var(--tx)">Maxaas<span class="text-accent">.u</span></span>
+</a>
+<div class="hidden md:flex items-center gap-1" id="deskNav"></div>
+<div class="flex items-center gap-3">
+<div class="theme-toggle" id="themeToggle" title="Dark/Light mode"><div class="dot"><span class="iconify text-white text-xs" data-icon="mdi:white-balance-sunny" id="themeIcon"></span></div></div>
+<button id="adminBtn" class="w-8 h-8 rounded-lg flex items-center justify-center transition" style="color:var(--tx3)" title="Admin"><span class="iconify text-lg" data-icon="mdi:shield-crown-outline"></span></button>
+<button id="mobMenuBtn" class="md:hidden w-8 h-8 rounded-lg flex items-center justify-center" style="color:var(--tx3)"><span class="iconify text-xl" data-icon="mdi:menu"></span></button>
+</div>
+</div>
+<div id="mobMenu" class="md:hidden hidden px-4 pb-4 pt-2" style="border-top:1px solid var(--bd)"><div id="mobNavLinks" class="flex flex-col gap-1"></div></div>
 </nav>
 
-<!-- ═══ MAIN ═══ -->
-<main class="main" id="main">
+<main id="app" class="min-h-screen pt-16"></main>
 
-  <!-- DASHBOARD PAGE -->
-  <div class="page active" id="page-dashboard">
-    <div class="page-header">
-      <div>
-        <div class="breadcrumb"><i class="fas fa-th-large"></i> <span id="title-dashboard">Dashboard</span></div>
-        <div class="page-title">Ku Soo Dhowow, <span id="admin-name">Admin</span> 👋</div>
-        <div class="page-subtitle">Halkan ayaad maamuli kartaa dhammaan waxyaabaha</div>
-      </div>
-      <button class="btn btn-primary" onclick="refreshDashboard()">
-        <i class="fas fa-sync-alt"></i> Cusboonaysii
-      </button>
-    </div>
-
-    <div class="stats-grid">
-      <div class="stat-card red">
-        <div class="stat-icon red"><i class="fas fa-eye"></i></div>
-        <div class="stat-value" id="stat-views">—</div>
-        <div class="stat-label">Wadarta Views</div>
-        <div class="stat-change">+12%</div>
-      </div>
-      <div class="stat-card blue">
-        <div class="stat-icon blue"><i class="fas fa-play-circle"></i></div>
-        <div class="stat-value" id="stat-videos">—</div>
-        <div class="stat-label">Videos</div>
-      </div>
-      <div class="stat-card green">
-        <div class="stat-icon green"><i class="fas fa-envelope"></i></div>
-        <div class="stat-value" id="stat-messages">—</div>
-        <div class="stat-label">Farriin Cusub</div>
-      </div>
-      <div class="stat-card yellow">
-        <div class="stat-icon yellow"><i class="fas fa-video"></i></div>
-        <div class="stat-value" id="stat-week">—</div>
-        <div class="stat-label">Usbuuca Videos</div>
-      </div>
-    </div>
-
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title"><i class="fas fa-fire" style="color:var(--red)"></i> Top Videos</div>
-        </div>
-        <div id="top-videos-list">
-          <div style="padding:20px;text-align:center;color:var(--text3)"><div class="spinner"></div></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title"><i class="fas fa-chart-line" style="color:var(--blue)"></i> Views Chart</div>
-        </div>
-        <div style="padding:24px 16px 36px">
-          <div class="bar-chart" id="bar-chart">
-            <!-- Generated by JS -->
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ANALYTICS PAGE -->
-  <div class="page" id="page-analytics">
-    <div class="page-header">
-      <div>
-        <div class="breadcrumb"><i class="fas fa-chart-bar"></i> <span id="title-analytics">Analytics</span></div>
-        <div class="page-title">Analytics</div>
-      </div>
-    </div>
-    <div class="stats-grid" id="analytics-stats">
-      <div class="stat-card red">
-        <div class="stat-icon red"><i class="fas fa-eye"></i></div>
-        <div class="stat-value" id="a-views">—</div>
-        <div class="stat-label">Total Views</div>
-      </div>
-      <div class="stat-card blue">
-        <div class="stat-icon blue"><i class="fas fa-video"></i></div>
-        <div class="stat-value" id="a-videos">—</div>
-        <div class="stat-label">Videos</div>
-      </div>
-      <div class="stat-card green">
-        <div class="stat-icon green"><i class="fas fa-envelope-open"></i></div>
-        <div class="stat-value" id="a-unread">—</div>
-        <div class="stat-label">Unread Msgs</div>
-      </div>
-      <div class="stat-card yellow">
-        <div class="stat-icon yellow"><i class="fas fa-calendar-week"></i></div>
-        <div class="stat-value" id="a-week">—</div>
-        <div class="stat-label">This Week</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><div class="card-title">Top Performing Videos</div></div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>#</th><th>Title</th><th>Views</th><th>Qiimaha</th></tr>
-          </thead>
-          <tbody id="analytics-table"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- VIDEOS PAGE -->
-  <div class="page" id="page-videos">
-    <div class="page-header">
-      <div>
-        <div class="breadcrumb"><i class="fas fa-play-circle"></i> <span id="title-videos">Videos</span></div>
-        <div class="page-title">Maamul Videos</div>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <div class="table-search">
-          <i class="fas fa-search" style="color:var(--text3)"></i>
-          <input type="text" placeholder="Raadi video..." id="video-search" oninput="filterVideos()">
-        </div>
-        <button class="btn btn-primary" onclick="openVideoModal()">
-          <i class="fas fa-plus"></i> Ku dar
-        </button>
-      </div>
-    </div>
-    <div class="card">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Thumbnail</th><th>Cinwaan</th><th>Nooc</th><th>Views</th><th>Status</th><th>Waxqabad</th></tr>
-          </thead>
-          <tbody id="videos-table"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- AUDIO PAGE -->
-  <div class="page" id="page-audio">
-    <div class="page-header">
-      <div>
-        <div class="breadcrumb"><i class="fas fa-music"></i> <span id="title-audio">Audio</span></div>
-        <div class="page-title">Maamul Audio</div>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <div class="table-search">
-          <i class="fas fa-search" style="color:var(--text3)"></i>
-          <input type="text" placeholder="Raadi audio..." id="audio-search" oninput="filterAudio()">
-        </div>
-        <button class="btn btn-primary" onclick="openAudioModal()">
-          <i class="fas fa-plus"></i> Ku dar
-        </button>
-      </div>
-    </div>
-    <div class="card">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Cinwaan</th><th>Fannaanka</th><th>Nooc</th><th>Views</th><th>Status</th><th>Waxqabad</th></tr>
-          </thead>
-          <tbody id="audio-table"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- POSTS PAGE -->
-  <div class="page" id="page-posts">
-    <div class="page-header">
-      <div>
-        <div class="breadcrumb"><i class="fas fa-newspaper"></i> <span id="title-posts">Posts</span></div>
-        <div class="page-title">Maamul Posts</div>
-      </div>
-      <button class="btn btn-primary" onclick="openPostModal()">
-        <i class="fas fa-plus"></i> Post Cusub
-      </button>
-    </div>
-    <div class="card">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Cinwaan</th><th>Qore</th><th>Status</th><th>Taariikh</th><th>Waxqabad</th></tr>
-          </thead>
-          <tbody id="posts-table"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- CATEGORIES PAGE -->
-  <div class="page" id="page-categories">
-    <div class="page-header">
-      <div>
-        <div class="breadcrumb"><i class="fas fa-folder"></i> <span id="title-categories">Categories</span></div>
-        <div class="page-title">Maamul Categories</div>
-      </div>
-      <button class="btn btn-primary" onclick="openCatModal()">
-        <i class="fas fa-plus"></i> Category Cusub
-      </button>
-    </div>
-    <div class="card">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Icon</th><th>Magac</th><th>Sharaxaad</th><th>Order</th><th>Waxqabad</th></tr>
-          </thead>
-          <tbody id="categories-table"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- MESSAGES PAGE -->
-  <div class="page" id="page-messages">
-    <div class="page-header">
-      <div>
-        <div class="breadcrumb"><i class="fas fa-envelope"></i> <span id="title-messages">Messages</span></div>
-        <div class="page-title">Farriimaha</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Magac</th><th>Xiriir</th><th>Farriin</th><th>Taariikh</th><th>Status</th><th>Waxqabad</th></tr>
-          </thead>
-          <tbody id="messages-table"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- SETTINGS PAGE -->
-  <div class="page" id="page-settings">
-    <div class="page-header">
-      <div>
-        <div class="breadcrumb"><i class="fas fa-sliders-h"></i> <span id="title-settings">Settings</span></div>
-        <div class="page-title">Site Settings</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><div class="card-title">Guud</div></div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label">Site Name</label>
-          <input class="form-control" id="s-name" placeholder="Maxaas.u">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Sharaxaad</label>
-          <textarea class="form-control" id="s-desc" rows="3" placeholder="Maxaas.u — Platform..."></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Logo URL</label>
-          <input class="form-control" id="s-logo" placeholder="https://...">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Contact Email</label>
-          <input class="form-control" id="s-email" placeholder="admin@example.com">
-        </div>
-        <button class="btn btn-primary" onclick="saveSettings()">
-          <i class="fas fa-save"></i> Kaydi
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SECURITY PAGE -->
-  <div class="page" id="page-security">
-    <div class="page-header">
-      <div>
-        <div class="breadcrumb"><i class="fas fa-shield-alt"></i> <span id="title-security">Security</span></div>
-        <div class="page-title">Security & Credentials</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><div class="card-title">Bedel Macluumaadka</div></div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label">PIN Hadda (Xaqiijin)</label>
-          <input class="form-control" id="sec-pin" type="text" maxlength="8" placeholder="8 digits">
-        </div>
-        <div class="divider"></div>
-        <div class="form-group">
-          <label class="form-label">Username Cusub</label>
-          <input class="form-control" id="sec-user" placeholder="admin">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Password Cusub</label>
-          <input class="form-control" id="sec-pass" type="password" placeholder="8+ characters">
-        </div>
-        <div class="form-group">
-          <label class="form-label">PIN Cusub (8 digits)</label>
-          <input class="form-control" id="sec-newpin" type="text" maxlength="8" placeholder="00000000">
-        </div>
-        <button class="btn btn-primary" onclick="saveCredentials()">
-          <i class="fas fa-save"></i> Kaydi
-        </button>
-      </div>
-    </div>
-  </div>
-
-</main>
-
-<!-- ═══════════ MODALS ═══════════ -->
-
-<!-- Video Modal -->
-<div class="modal-backdrop" id="video-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title" id="video-modal-title">Video Cusub</div>
-      <button class="modal-close" onclick="closeModal('video-modal')"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="v-id">
-      <div class="form-group">
-        <label class="form-label">Cinwaan *</label>
-        <input class="form-control" id="v-title" placeholder="Video title...">
-      </div>
-      <div class="form-group">
-        <label class="form-label">URL *</label>
-        <input class="form-control" id="v-url" placeholder="https://... or youtube.com/watch?v=...">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Thumbnail URL</label>
-        <input class="form-control" id="v-thumb" placeholder="https://...">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Sharaxaad</label>
-        <textarea class="form-control" id="v-desc" rows="2" placeholder="..."></textarea>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Nooc</label>
-          <select class="form-control" id="v-type">
-            <option value="mp4">MP4</option>
-            <option value="youtube">YouTube</option>
-            <option value="hls">HLS</option>
-            <option value="archive">Archive.org</option>
-            <option value="ipfs">IPFS</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Muddo</label>
-          <input class="form-control" id="v-dur" placeholder="10:30">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Order Index</label>
-          <input class="form-control" id="v-order" type="number" value="0">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Category</label>
-          <select class="form-control" id="v-cat">
-            <option value="">-- Xulo --</option>
-          </select>
-        </div>
-      </div>
-      <div style="display:flex;gap:20px;flex-wrap:wrap">
-        <label class="form-check">
-          <input type="checkbox" id="v-featured"> Featured
-        </label>
-        <label class="form-check">
-          <input type="checkbox" id="v-published" checked> Published
-        </label>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('video-modal')">Jooji</button>
-      <button class="btn btn-primary" onclick="saveVideo()"><i class="fas fa-save"></i> Kaydi</button>
-    </div>
-  </div>
+<div id="audioBar">
+<div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
+<button onclick="apPrev()" class="hidden sm:block" style="color:var(--tx3)"><span class="iconify text-xl" data-icon="mdi:skip-previous"></span></button>
+<button onclick="apToggle()" class="w-10 h-10 rounded-full flex items-center justify-center shadow-lg" style="background:var(--accent);color:#fff;box-shadow:0 4px 15px var(--glow)"><span class="iconify text-xl" data-icon="mdi:play" id="apIcon"></span></button>
+<button onclick="apNext()" class="hidden sm:block" style="color:var(--tx3)"><span class="iconify text-xl" data-icon="mdi:skip-next"></span></button>
+<div class="flex-1 min-w-0"><p class="text-sm font-medium truncate" style="color:var(--tx)" id="apTitle">—</p><p class="text-xs truncate" style="color:var(--tx3)" id="apArtist">—</p></div>
+<div class="hidden sm:flex items-center gap-2 text-xs" style="color:var(--tx3)"><span id="apCur">0:00</span><input type="range" id="apSeek" min="0" max="100" value="0" class="w-24 h-1 accent-brand-500 cursor-pointer"><span id="apDur">0:00</span></div>
+<button onclick="apClose()" style="color:var(--tx3)"><span class="iconify text-lg" data-icon="mdi:close"></span></button>
+</div>
+<audio id="audioEl" preload="auto"></audio>
 </div>
 
-<!-- Audio Modal -->
-<div class="modal-backdrop" id="audio-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title" id="audio-modal-title">Audio Cusub</div>
-      <button class="modal-close" onclick="closeModal('audio-modal')"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="a-id">
-      <div class="form-group">
-        <label class="form-label">Cinwaan *</label>
-        <input class="form-control" id="a-title" placeholder="Audio title...">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Fannaanka</label>
-        <input class="form-control" id="a-artist" placeholder="Artist name">
-      </div>
-      <div class="form-group">
-        <label class="form-label">URL *</label>
-        <input class="form-control" id="a-url" placeholder="https://...">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Cover URL</label>
-        <input class="form-control" id="a-cover" placeholder="https://...">
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Nooc</label>
-          <select class="form-control" id="a-type">
-            <option value="mp3">MP3</option>
-            <option value="ogg">OGG</option>
-            <option value="aac">AAC</option>
-            <option value="hls">HLS</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Muddo</label>
-          <input class="form-control" id="a-dur" placeholder="3:45">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Category</label>
-          <input class="form-control" id="a-cat" placeholder="Music, Podcast...">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Website URL</label>
-          <input class="form-control" id="a-web" placeholder="https://...">
-        </div>
-      </div>
-      <label class="form-check">
-        <input type="checkbox" id="a-published" checked> Published
-      </label>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('audio-modal')">Jooji</button>
-      <button class="btn btn-primary" onclick="saveAudio()"><i class="fas fa-save"></i> Kaydi</button>
-    </div>
-  </div>
-</div>
-
-<!-- Post Modal -->
-<div class="modal-backdrop" id="post-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title" id="post-modal-title">Post Cusub</div>
-      <button class="modal-close" onclick="closeModal('post-modal')"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="p-id">
-      <div class="form-group">
-        <label class="form-label">Cinwaan *</label>
-        <input class="form-control" id="p-title" placeholder="Post title...">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Content *</label>
-        <textarea class="form-control" id="p-content" rows="5" placeholder="Post content..."></textarea>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Qore</label>
-          <input class="form-control" id="p-author" placeholder="Maxaas.u">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Image URL</label>
-          <input class="form-control" id="p-img" placeholder="https://...">
-        </div>
-      </div>
-      <label class="form-check">
-        <input type="checkbox" id="p-published" checked> Published
-      </label>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('post-modal')">Jooji</button>
-      <button class="btn btn-primary" onclick="savePost()"><i class="fas fa-save"></i> Kaydi</button>
-    </div>
-  </div>
-</div>
-
-<!-- Category Modal -->
-<div class="modal-backdrop" id="cat-modal">
-  <div class="modal" style="max-width:400px">
-    <div class="modal-header">
-      <div class="modal-title" id="cat-modal-title">Category Cusub</div>
-      <button class="modal-close" onclick="closeModal('cat-modal')"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="c-id">
-      <div class="form-group">
-        <label class="form-label">Magac *</label>
-        <input class="form-control" id="c-name" placeholder="Category name...">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Sharaxaad</label>
-        <input class="form-control" id="c-desc" placeholder="...">
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Icon (FA class)</label>
-          <input class="form-control" id="c-icon" placeholder="fa-folder">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Order</label>
-          <input class="form-control" id="c-order" type="number" value="0">
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('cat-modal')">Jooji</button>
-      <button class="btn btn-primary" onclick="saveCat()"><i class="fas fa-save"></i> Kaydi</button>
-    </div>
-  </div>
-</div>
-
-<!-- RENAME MENU MODAL -->
-<div class="modal-backdrop" id="rename-modal">
-  <div class="modal" style="max-width:460px">
-    <div class="modal-header">
-      <div class="modal-title"><i class="fas fa-edit" style="color:var(--blue)"></i> Rename Menu Items</div>
-      <button class="modal-close" onclick="closeModal('rename-modal')"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="modal-body">
-      <p style="color:var(--text3);font-size:13px;margin-bottom:16px">Badel magacyada menu-ga si aad u hesho kii aad doonto.</p>
-      <div class="rename-list" id="rename-list"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('rename-modal')">Jooji</button>
-      <button class="btn btn-primary" onclick="applyRename()"><i class="fas fa-check"></i> Apply</button>
-    </div>
-  </div>
-</div>
-
-<!-- Message View Modal -->
-<div class="modal-backdrop" id="msg-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Farriin</div>
-      <button class="modal-close" onclick="closeModal('msg-modal')"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="modal-body" id="msg-modal-body"></div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('msg-modal')">Xir</button>
-    </div>
-  </div>
-</div>
-
-<!-- Confirm Delete Modal -->
-<div class="modal-backdrop" id="confirm-modal">
-  <div class="modal" style="max-width:380px">
-    <div class="modal-header">
-      <div class="modal-title" style="color:#ff4444"><i class="fas fa-trash"></i> Tirtir</div>
-      <button class="modal-close" onclick="closeModal('confirm-modal')"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="modal-body">
-      <p style="color:var(--text2);font-size:14px" id="confirm-text">Miyaad hubtaa inaad tirtirto?</p>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('confirm-modal')">Jooji</button>
-      <button class="btn btn-danger" id="confirm-btn">Tirtir</button>
-    </div>
-  </div>
-</div>
-
-<!-- TOASTS -->
-<div class="toasts" id="toasts"></div>
-
-<!-- Context menu -->
-<div class="ctx-menu" id="ctx-menu">
-  <div class="ctx-item" id="ctx-rename"><i class="fas fa-edit"></i> Rename</div>
-  <div class="ctx-item" id="ctx-edit"><i class="fas fa-pencil-alt"></i> Edit</div>
-  <div class="ctx-item danger" id="ctx-delete"><i class="fas fa-trash"></i> Delete</div>
-</div>
+<div id="modalBg" class="modal-bg"><div class="modal-box" id="modalBox"></div></div>
 
 <script>
-/* ═══════════════════════════════════════════
-   STATE
-═══════════════════════════════════════════ */
-const API = '';
-let state = {
-  loggedIn: false,
-  adminName: 'Admin',
-  sidebarCollapsed: false,
-  videos: [], audio: [], posts: [], categories: [], messages: [],
-  menuLabels: JSON.parse(localStorage.getItem('menuLabels') || 'null') || {
-    dashboard: 'Dashboard',
-    analytics: 'Analytics',
-    videos: 'Videos',
-    audio: 'Audio',
-    posts: 'Posts',
-    categories: 'Categories',
-    messages: 'Messages',
-    settings: 'Settings',
-    security: 'Security'
-  }
-};
-
-/* ═══════════════════════════════════════════
-   INIT
-═══════════════════════════════════════════ */
-window.addEventListener('DOMContentLoaded', () => {
-  applyMenuLabels();
-  checkSession();
-  window.addEventListener('resize', handleResize);
-  document.addEventListener('click', () => hideCtxMenu());
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      document.querySelectorAll('.modal-backdrop.open').forEach(m => m.classList.remove('open'));
-      hideCtxMenu();
-      closeSidebar();
-    }
-  });
-});
-
-async function checkSession() {
-  try {
-    const r = await fetch(API + '/api/v1/admin/analytics', { credentials: 'include' });
-    if (r.ok) { enterApp(); }
-    else { showLogin(); }
-  } catch { showLogin(); }
-}
-
-function showLogin() {
-  document.getElementById('login-page').classList.add('show');
-}
-function hideLogin() {
-  document.getElementById('login-page').classList.remove('show');
-}
-
-async function doLogin() {
-  const u = document.getElementById('l-user').value.trim();
-  const p = document.getElementById('l-pass').value;
-  const pin = document.getElementById('l-pin').value.trim();
-  const errEl = document.getElementById('login-error');
-  errEl.classList.remove('show');
-
-  if (!u || !p || !pin) { errEl.textContent = 'Dhammaan xogta buuxi'; errEl.classList.add('show'); return; }
-
-  try {
-    const r = await fetch(API + '/api/v1/auth/login', {
-      method: 'POST', credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: u, password: p, pin })
-    });
-    const d = await r.json();
-    if (!r.ok) { errEl.textContent = d.error || 'Khalad'; errEl.classList.add('show'); return; }
-    state.adminName = d.username || u;
-    enterApp();
-  } catch { errEl.textContent = 'Server khalad ah'; errEl.classList.add('show'); }
-}
-
-function enterApp() {
-  hideLogin();
-  state.loggedIn = true;
-  document.getElementById('admin-name').textContent = state.adminName;
-  document.getElementById('header-avatar').textContent = state.adminName[0].toUpperCase();
-  loadAll();
-}
-
-async function doLogout() {
-  await fetch(API + '/api/v1/auth/logout', { method: 'POST', credentials: 'include' });
-  state.loggedIn = false;
-  showLogin();
-  toast('Logout successful', 'info');
-}
-
-/* Enter on login inputs */
-['l-user','l-pass','l-pin'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
-});
-
-/* ═══════════════════════════════════════════
-   SIDEBAR
-═══════════════════════════════════════════ */
-function toggleSidebar() {
-  if (window.innerWidth <= 768) {
-    const s = document.getElementById('sidebar');
-    const ov = document.getElementById('overlay');
-    if (s.classList.contains('mobile-open')) {
-      s.classList.remove('mobile-open');
-      ov.classList.remove('show');
-    } else {
-      s.classList.add('mobile-open');
-      ov.classList.add('show');
-    }
-  } else {
-    state.sidebarCollapsed = !state.sidebarCollapsed;
-    document.getElementById('sidebar').classList.toggle('collapsed', state.sidebarCollapsed);
-    document.getElementById('main').classList.toggle('collapsed', state.sidebarCollapsed);
-  }
-}
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('mobile-open');
-  document.getElementById('overlay').classList.remove('show');
-}
-function handleResize() {
-  if (window.innerWidth > 768) {
-    document.getElementById('overlay').classList.remove('show');
-    document.getElementById('sidebar').classList.remove('mobile-open');
-  }
-}
-
-/* ═══════════════════════════════════════════
-   PAGES
-═══════════════════════════════════════════ */
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + name)?.classList.add('active');
-  document.getElementById('nav-' + name)?.classList.add('active');
-  if (window.innerWidth <= 768) closeSidebar();
-  // Breadcrumb
-  const lbl = state.menuLabels[name] || name;
-  const el = document.getElementById('title-' + name);
-  if (el) el.textContent = lbl;
-}
-
-/* ═══════════════════════════════════════════
-   RENAME MENU
-═══════════════════════════════════════════ */
-const RENAME_KEYS = [
-  { key: 'dashboard', icon: 'fa-th-large', label: 'Dashboard' },
-  { key: 'analytics', icon: 'fa-chart-bar', label: 'Analytics' },
-  { key: 'videos', icon: 'fa-play-circle', label: 'Videos' },
-  { key: 'audio', icon: 'fa-music', label: 'Audio' },
-  { key: 'posts', icon: 'fa-newspaper', label: 'Posts' },
-  { key: 'categories', icon: 'fa-folder', label: 'Categories' },
-  { key: 'messages', icon: 'fa-envelope', label: 'Messages' },
-  { key: 'settings', icon: 'fa-sliders-h', label: 'Settings' },
-  { key: 'security', icon: 'fa-shield-alt', label: 'Security' }
+/* ═══════════ STATE ═══════════ */
+const S={page:'',params:{},videos:[],categories:[],posts:[],audio:[],settings:{},admin:null,adminTab:'dashboard',audioQ:[],audioI:-1,audioOn:false,mobOpen:false,theme:'light'};
+const NAV_DEF=[
+  {key:'home',icon:'mdi:home',defaultLabel:'Bogga Hore',href:'#/'},
+  {key:'videos',icon:'mdi:video',defaultLabel:'Fiidyowyada',href:'#/videos'},
+  {key:'audio',icon:'mdi:music',defaultLabel:'Heesaha',href:'#/audio'},
+  {key:'posts',icon:'mdi:newspaper',defaultLabel:'Qoraallada',href:'#/posts'},
+  {key:'contact',icon:'mdi:message',defaultLabel:'Nala Xiriir',href:'#/contact'}
 ];
 
-function openRenameModal() {
-  const list = document.getElementById('rename-list');
-  list.innerHTML = RENAME_KEYS.map(item => `
-    <div class="rename-item">
-      <div class="rename-item-icon"><i class="fas ${item.icon}"></i></div>
-      <div class="rename-item-info">
-        <div class="rename-item-label">${item.label}</div>
-        <input class="rename-item-input" data-key="${item.key}" value="${state.menuLabels[item.key] || item.label}" placeholder="${item.label}">
+/* ═══════════ HELPERS ═══════════ */
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+const esc=s=>{const d=document.createElement('div');d.textContent=s;return d.innerHTML};
+const api=async(u,o={})=>{try{const r=await fetch(u,{headers:{'Content-Type':'application/json',...o.headers},...o});if(r.status===401&&S.admin){S.admin=null;toast('Fadlan soo geli mar kale','error');nav('/admin')}const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Khalad');return d}catch(e){throw e}};
+function toast(m,t='info'){const c=$('#toastBox');const cls={info:'border-l-4 border-brand-400',error:'border-l-4 border-red-400',success:'border-l-4 border-emerald-400'};const ico={info:'mdi:information',error:'mdi:alert-circle',success:'mdi:check-circle'};const e=document.createElement('div');e.className=`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg toast-in ${cls[t]||cls.info}`;e.style.cssText=`background:var(--card);color:var(--tx);border:1px solid var(--bd)`;e.innerHTML=`<span class="iconify text-lg" data-icon="${ico[t]||ico.info}"></span><span class="text-sm">${esc(m)}</span>`;c.appendChild(e);setTimeout(()=>{e.classList.replace('toast-in','toast-out');setTimeout(()=>e.remove(),300)},3500)}
+function fmtDate(d){return d?new Date(d).toLocaleDateString('so-KE',{year:'numeric',month:'short',day:'numeric'}):''}
+function fmtV(n){if(!n)return'0';if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return String(n)}
+function fmtT(s){return(!s||s==='0:00')?'0:00':s}
+function sec2t(s){if(!s||isNaN(s))return'0:00';const m=Math.floor(s/60),ss=Math.floor(s%60);return m+':'+String(ss).padStart(2,'0')}
+function thumb(v){return v.thumbnail||`https://picsum.photos/seed/${v.id}/640/360`}
+function cover(a){return a.cover_url||`https://picsum.photos/seed/audio${a.id}/400/400`}
+function navLabel(key){return S.settings['nav_'+key]||NAV_DEF.find(n=>n.key===key)?.defaultLabel||key}
+
+/* ═══════════ THEME ═══════════ */
+function initTheme(){const s=localStorage.getItem('theme');if(s==='dark'||(!s&&window.matchMedia('(prefers-color-scheme:dark)').matches)){S.theme='dark';document.documentElement.classList.add('dark');$('#themeIcon').setAttribute('data-icon','mdi:moon-waning-crescent')}else{S.theme='light';document.documentElement.classList.remove('dark');$('#themeIcon').setAttribute('data-icon','mdi:white-balance-sunny')}}
+function toggleTheme(){S.theme=S.theme==='dark'?'light':'dark';if(S.theme==='dark'){document.documentElement.classList.add('dark');$('#themeIcon').setAttribute('data-icon','mdi:moon-waning-crescent')}else{document.documentElement.classList.remove('dark');$('#themeIcon').setAttribute('data-icon','mdi:white-balance-sunny')}localStorage.setItem('theme',S.theme)}
+ $('#themeToggle').onclick=toggleTheme;
+initTheme();
+
+/* ═══════════ ROUTER ═══════════ */
+function nav(p){window.location.hash=p}
+function parseRoute(){const h=window.location.hash.slice(1)||'/';const R=[{re:/^\/$/,page:'home'},{re:/^\/videos$/,page:'videos'},{re:/^\/videos\/(.+)$/,page:'videoDetail'},{re:/^\/audio$/,page:'audio'},{re:/^\/posts$/,page:'posts'},{re:/^\/posts\/(.+)$/,page:'postDetail'},{re:/^\/contact$/,page:'contact'},{re:/^\/admin$/,page:'admin'}];for(const r of R){const m=h.match(r.re);if(m)return{page:r.page,params:m[1]?{id:m[1]}:{}}}return{page:'home',params:{}}}
+async function router(){const{page,params}=parseRoute();S.page=page;S.params=params;updateNav();closeMob();const a=$('#app');a.style.opacity='0';a.style.transform='translateY(12px)';try{switch(page){case'home':await rHome();break;case'videos':await rVideos();break;case'videoDetail':await rVideoDetail(params.id);break;case'audio':await rAudio();break;case'posts':await rPosts();break;case'postDetail':await rPostDetail(params.id);break;case'contact':rContact();break;case'admin':await rAdmin();break;default:await rHome()}}catch{a.innerHTML=`<div class="flex flex-col items-center justify-center min-h-[60vh] gap-4"><span class="iconify text-5xl" style="color:var(--tx3)" data-icon="mdi:alert-circle-outline"></span><p style="color:var(--tx3)">Khalad ayaa dhacay</p><button class="btn btn-p btn-sm" onclick="nav('/')">Bogga Hore</button></div>`}requestAnimationFrame(()=>{a.style.opacity='1';a.style.transform='translateY(0)'});window.scrollTo(0,0)}
+
+/* ═══════════ NAV ═══════════ */
+function updateNav(){const ch=window.location.hash;$('#deskNav').innerHTML=NAV_DEF.map(n=>`<a href="${n.href}" class="px-3 py-2 rounded-lg text-sm font-medium transition" style="color:${ch===n.href?'var(--accent)':'var(--tx2)'}" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">${navLabel(n.key)}</a>`).join('');$('#mobNavLinks').innerHTML=NAV_DEF.map(n=>`<a href="${n.href}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition" style="color:${ch===n.href?'var(--accent)':'var(--tx3)'}"><span class="iconify text-lg" data-icon="${n.icon}"></span>${navLabel(n.key)}</a>`).join('')}
+function closeMob(){S.mobOpen=false;$('#mobMenu').classList.add('hidden')}
+ $('#mobMenuBtn').onclick=()=>{S.mobOpen=!S.mobOpen;$('#mobMenu').classList.toggle('hidden',!S.mobOpen)};
+ $('#adminBtn').onclick=()=>nav('/admin');
+
+/* ═══════════ LOADERS ═══════════ */
+async function ldV(){try{S.videos=await api('/api/v1/videos')}catch{S.videos=[]}return S.videos}
+async function ldC(){try{S.categories=await api('/api/v1/categories')}catch{S.categories=[]}return S.categories}
+async function ldP(){try{S.posts=await api('/api/v1/posts')}catch{S.posts=[]}return S.posts}
+async function ldA(){try{S.audio=await api('/api/v1/audio')}catch{S.audio=[]}return S.audio}
+async function ldS(){try{S.settings=await api('/api/v1/settings')}catch{S.settings={}}return S.settings}
+
+/* ═══════════ CARD TEMPLATES ═══════════ */
+function vCard(v){const c=S.categories.find(x=>x.id===v.category_id);return`<div class="card cursor-pointer group" onclick="nav('/videos/${v.id}')"><div class="thumb"><img src="${thumb(v)}" alt="${esc(v.title)}" loading="lazy"><div class="card-play absolute inset-0 bg-black/40 flex items-center justify-center"><div class="w-12 h-12 rounded-full flex items-center justify-center" style="background:var(--accent)"><span class="iconify text-xl text-white" data-icon="mdi:play"></span></div></div><div class="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-0.5 rounded">${fmtT(v.duration)}</div>${v.video_type==='youtube'?'<div class="absolute top-2 left-2"><span class="badge badge-r text-[10px]">YouTube</span></div>':''}</div><div class="p-3"><h3 class="text-sm font-semibold truncate group-hover:text-accent transition" style="color:var(--tx)">${esc(v.title)}</h3><div class="flex items-center gap-2 mt-1 text-xs" style="color:var(--tx3)"><span class="flex items-center gap-1"><span class="iconify text-sm" data-icon="mdi:eye-outline"></span>${fmtV(v.views)}</span>${c?`<span>·</span><span>${esc(c.name)}</span>`:''}</div></div></div>`}
+
+function aCard(a){return`<div class="cursor-pointer group" onclick="playAudio('${a.id}')"><div class="audio-cover"><img src="${cover(a)}" alt="${esc(a.title)}" loading="lazy"><div class="card-play absolute inset-0 bg-black/40 flex items-center justify-center"><div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center"><span class="iconify text-xl text-white" data-icon="mdi:play"></span></div></div></div><div class="mt-2.5 px-0.5"><h3 class="text-sm font-medium truncate" style="color:var(--tx)">${esc(a.title)}</h3><p class="text-xs truncate" style="color:var(--tx3)">${esc(a.artist)}</p></div></div>`}
+
+function pCard(p){return`<article class="card cursor-pointer group overflow-hidden" onclick="nav('/posts/${p.id}')">${p.image_url?`<div class="aspect-video overflow-hidden"><img src="${p.image_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy"></div>`:`<div class="aspect-video flex items-center justify-center" style="background:var(--accent-bg)"><span class="iconify text-4xl" style="color:var(--accent)" data-icon="mdi:newspaper-variant-outline"></span></div>`}<div class="p-6"><p class="text-xs mb-2" style="color:var(--tx3)">${fmtDate(p.created_at)}</p><h3 class="text-lg font-semibold leading-snug mb-2 group-hover:text-accent transition" style="color:var(--tx)">${esc(p.title)}</h3><p class="text-sm line-clamp-2 leading-relaxed" style="color:var(--tx2)">${esc((p.content||'').substring(0,120))}…</p></div></article>`}
+
+function footer(){return`<footer style="border-top:1px solid var(--bd)" class="py-12 px-4 sm:px-6 lg:px-8"><div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-md flex items-center justify-center" style="background:var(--accent-bg)"><span class="iconify text-sm" style="color:var(--accent)" data-icon="mdi:play-circle"></span></div><span class="text-sm font-semibold" style="color:var(--tx)">Maxaas<span class="text-accent">.u</span></span></div><p class="text-xs" style="color:var(--tx3)">© ${new Date().getFullYear()} Maxaas.u</p><div class="flex items-center gap-4"><a href="#/contact" class="text-xs transition" style="color:var(--tx3)" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--tx3)'">Nala Xiriir</a><a href="#/admin" class="text-xs transition" style="color:var(--tx3)" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--tx3)'">Maamul</a></div></div></footer>`}
+
+/* ═══════════ HOME PAGE ═══════════ */
+async function rHome(){
+  const[v,c,p,a]=await Promise.all([ldV(),ldC(),ldP(),ldA()]);
+  const feat=v.filter(x=>x.is_featured);
+  const mainFeat=feat[0]||v[0];
+  const gridV=v.slice(0,12);
+  const gridA=a.slice(0,6);
+  const gridP=p.slice(0,3);
+
+  $('#app').innerHTML=`
+  ${mainFeat?`
+  <!-- YouTube-Style Hero Player -->
+  <section class="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2">
+        <div class="yt-embed" id="heroPlayer">
+          <div class="absolute inset-0 flex items-center justify-center"><span class="iconify text-3xl animate-spin" style="color:var(--tx3)" data-icon="mdi:loading"></span></div>
+        </div>
+        <div class="mt-4">
+          <div class="flex items-center gap-2 flex-wrap mb-2">${mainFeat.video_type==='youtube'?'<span class="badge badge-r">YouTube</span>':''}${S.categories.find(x=>x.id===mainFeat.category_id)?`<span class="badge badge-i">${esc(S.categories.find(x=>x.id===mainFeat.category_id).name)}</span>`:''}</div>
+          <h2 class="text-xl sm:text-2xl font-bold" style="color:var(--tx)">${esc(mainFeat.title)}</h2>
+          <div class="flex items-center gap-3 mt-2 text-sm" style="color:var(--tx3)">
+            <span class="flex items-center gap-1"><span class="iconify" data-icon="mdi:eye-outline"></span>${fmtV(mainFeat.views)}</span>
+            <span>${fmtDate(mainFeat.created_at)}</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3 class="text-sm font-semibold mb-3" style="color:var(--tx2)">Kuwa La Xiriira</h3>
+        <div class="flex flex-col gap-3 max-h-[500px] overflow-y-auto pr-1">
+          ${v.filter(x=>x.id!==mainFeat.id).slice(0,8).map(r=>`
+          <div class="flex gap-3 cursor-pointer group p-2 rounded-lg transition" style="background:transparent" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'" onclick="nav('/videos/${r.id}')">
+            <div class="w-40 flex-shrink-0 aspect-video rounded-lg overflow-hidden" style="background:var(--bg3)"><img src="${thumb(r)}" class="w-full h-full object-cover" loading="lazy"></div>
+            <div class="min-w-0 py-0.5"><p class="text-sm font-medium truncate group-hover:text-accent transition" style="color:var(--tx)">${esc(r.title)}</p><p class="text-xs mt-1" style="color:var(--tx3)">${fmtV(r.views)} daawasho</p><p class="text-xs" style="color:var(--tx3)">${fmtT(r.duration)}</p></div>
+          </div>`).join('')}
+        </div>
       </div>
     </div>
-  `).join('');
-  openModal('rename-modal');
+  </section>`:''}
+
+  <!-- Video Grid (YouTube-style chips + grid) -->
+  <section class="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-bold" style="color:var(--tx)">${navLabel('videos')}</h2>
+      <a href="#/videos" class="text-sm font-medium text-accent flex items-center gap-1 hover:underline">Dhammaan <span class="iconify" data-icon="mdi:arrow-right"></span></a>
+    </div>
+    <div class="flex gap-2 overflow-x-auto pb-3 mb-4" id="homeChips">
+      <button onclick="homeChipFilter()" class="badge badge-i cursor-pointer whitespace-nowrap px-4 py-1.5 home-chip active">Dhammaan</button>
+      ${c.map(ct=>`<button onclick="homeChipFilter('${ct.id}')" class="badge cursor-pointer whitespace-nowrap px-4 py-1.5 home-chip" style="background:var(--bg3);color:var(--tx2)">${esc(ct.name)}</button>`).join('')}
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" id="homeVidGrid">
+      ${gridV.map(v=>vCard(v)).join('')}
+    </div>
+  </section>
+
+  ${gridA.length?`
+  <section class="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="line-sep mb-10"></div>
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-bold" style="color:var(--tx)">${navLabel('audio')}</h2>
+      <a href="#/audio" class="text-sm font-medium text-accent flex items-center gap-1 hover:underline">Dhammaan <span class="iconify" data-icon="mdi:arrow-right"></span></a>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">${gridA.map(a=>aCard(a)).join('')}</div>
+  </section>`:''}
+
+  ${gridP.length?`
+  <section class="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="line-sep mb-10"></div>
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-bold" style="color:var(--tx)">${navLabel('posts')}</h2>
+      <a href="#/posts" class="text-sm font-medium text-accent flex items-center gap-1 hover:underline">Dhammaan <span class="iconify" data-icon="mdi:arrow-right"></span></a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">${gridP.map(p=>pCard(p)).join('')}</div>
+  </section>`:''}
+
+  ${footer()}`;
+
+  // Load hero player
+  if(mainFeat) loadHeroPlayer(mainFeat);
 }
 
-function applyRename() {
-  document.querySelectorAll('.rename-item-input').forEach(inp => {
-    const key = inp.dataset.key;
-    const val = inp.value.trim() || key;
-    state.menuLabels[key] = val;
-  });
-  localStorage.setItem('menuLabels', JSON.stringify(state.menuLabels));
-  applyMenuLabels();
-  closeModal('rename-modal');
-  toast('Menu labels updated!', 'success');
-}
-
-function applyMenuLabels() {
-  Object.entries(state.menuLabels).forEach(([key, val]) => {
-    const el = document.getElementById('navlbl-' + key);
-    if (el) el.textContent = val;
-  });
-}
-
-/* ═══════════════════════════════════════════
-   MODALS
-═══════════════════════════════════════════ */
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-/* Close on backdrop click */
-document.querySelectorAll('.modal-backdrop').forEach(m => {
-  m.addEventListener('click', function(e) {
-    if (e.target === this) this.classList.remove('open');
-  });
-});
-
-/* ═══════════════════════════════════════════
-   TOAST
-═══════════════════════════════════════════ */
-function toast(msg, type = 'success') {
-  const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle' };
-  const colors = { success: 'var(--green)', error: 'var(--red)', info: 'var(--blue)' };
-  const t = document.createElement('div');
-  t.className = 'toast ' + type;
-  t.innerHTML = `<i class="fas ${icons[type]}" style="color:${colors[type]}"></i> ${msg}`;
-  document.getElementById('toasts').appendChild(t);
-  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000);
-}
-
-/* ═══════════════════════════════════════════
-   CONFIRM DELETE
-═══════════════════════════════════════════ */
-function confirmDelete(text, cb) {
-  document.getElementById('confirm-text').textContent = text;
-  const btn = document.getElementById('confirm-btn');
-  btn.onclick = () => { cb(); closeModal('confirm-modal'); };
-  openModal('confirm-modal');
-}
-
-/* ═══════════════════════════════════════════
-   API HELPERS
-═══════════════════════════════════════════ */
-async function api(method, path, body) {
-  const opts = { method, credentials: 'include', headers: {} };
-  if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
-  const r = await fetch(API + path, opts);
-  if (!r.ok) throw new Error(await r.text());
-  return r.json().catch(() => ({}));
-}
-
-/* ═══════════════════════════════════════════
-   LOAD ALL
-═══════════════════════════════════════════ */
-async function loadAll() {
-  await Promise.allSettled([
-    loadVideos(), loadAudio(), loadPosts(), loadCategories(),
-    loadMessages(), loadAnalytics(), loadSettings()
-  ]);
-}
-
-async function refreshDashboard() {
-  await loadAnalytics();
-  toast('Dashboard refreshed', 'success');
-}
-
-/* ═══════════════════════════════════════════
-   ANALYTICS
-═══════════════════════════════════════════ */
-async function loadAnalytics() {
-  try {
-    const d = await api('GET', '/api/v1/admin/analytics');
-    document.getElementById('stat-views').textContent = fmtNum(d.totalViews || 0);
-    document.getElementById('stat-videos').textContent = d.totalVideos || 0;
-    document.getElementById('stat-messages').textContent = d.unread || 0;
-    document.getElementById('stat-week').textContent = d.thisWeek || 0;
-    document.getElementById('a-views').textContent = fmtNum(d.totalViews || 0);
-    document.getElementById('a-videos').textContent = d.totalVideos || 0;
-    document.getElementById('a-unread').textContent = d.unread || 0;
-    document.getElementById('a-week').textContent = d.thisWeek || 0;
-
-    if (d.unread > 0) {
-      document.getElementById('notif-badge').style.display = 'block';
-      document.getElementById('msg-badge').style.display = 'flex';
-      document.getElementById('msg-badge').textContent = d.unread;
+async function loadHeroPlayer(v){
+  const el=$('#heroPlayer');
+  try{
+    const res=await api(`/api/v1/videos/request-stream/${v.id}`,{method:'POST'});
+    if(res.youtubeUrl){
+      el.innerHTML=`<iframe src="${res.youtubeUrl}" allow="autoplay;encrypted-media;picture-in-picture;fullscreen" allowfullscreen></iframe>
+      <div id="ytFallback" class="fallback" style="display:none">
+        <span class="iconify text-4xl" data-icon="mdi:youtube"></span>
+        <p class="text-sm">Fiidyowgan laguma shubi karo</p>
+        <a href="https://www.youtube.com/watch=${extractYtId(v.url)}" target="_blank" rel="noopener" class="btn btn-p btn-sm"><span class="iconify" data-icon="mdi:open-in-new"></span> YouTube Daawo</a>
+      </div>`;
+      // YouTube error detection
+      setTimeout(()=>{
+        const iframe=el.querySelector('iframe');
+        if(iframe){
+          iframe.onerror=()=>{$('#ytFallback')&&($('#ytFallback').style.display='flex')};
+        }
+      },2000);
+    }else if(res.streamToken){
+      el.innerHTML=`<video controls autoplay src="/api/v1/stream/${res.streamToken}"></video>`;
+    }else{
+      el.innerHTML=`<div class="absolute inset-0 flex items-center justify-center" style="background:var(--bg3)"><div class="text-center"><span class="iconify text-5xl" style="color:var(--tx3)" data-icon="mdi:video-off-outline"></span><p class="text-sm mt-2" style="color:var(--tx3)">Waa la xiray</p></div></div>`;
     }
+  }catch{
+    el.innerHTML=`<div class="absolute inset-0 flex items-center justify-center" style="background:var(--bg3)"><div class="text-center"><span class="iconify text-5xl" style="color:var(--tx3)" data-icon="mdi:alert-circle-outline"></span><p class="text-sm mt-2" style="color:var(--tx3)">Khalad ayaa dhacay</p></div></div>`;
+  }
+}
 
-    // Top videos list
-    const top = document.getElementById('top-videos-list');
-    if (!d.topVideos?.length) { top.innerHTML = '<div class="empty"><i class="fas fa-video"></i><p>Video ma jiro</p></div>'; }
-    else {
-      top.innerHTML = d.topVideos.map((v,i) => `
-        <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)">
-          <div style="width:24px;height:24px;background:var(--bg4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:${i===0?'var(--yellow)':'var(--text3)'}">${i+1}</div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(v.title)}</div>
+function extractYtId(u){if(!u)return null;const m=u.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);return m?m[1]:null}
+
+function homeChipFilter(catId){
+  $$('.home-chip').forEach(el=>{el.classList.remove('badge-i');el.style.background='var(--bg3)';el.style.color='var(--tx2)'});
+  event.target.classList.add('badge-i');event.target.style.background='';event.target.style.color='';
+  const vids=catId?S.videos.filter(v=>v.category_id===catId):S.videos;
+  const g=$('#homeVidGrid');
+  g.innerHTML=vids.slice(0,12).map(v=>vCard(v)).join('')||`<div class="col-span-full text-center py-10"><p style="color:var(--tx3)">Wali fiidyow ma jiro</p></div>`;
+}
+
+/* ═══════════ VIDEOS PAGE ═══════════ */
+async function rVideos(catId){
+  const[v,c]=await Promise.all([ldV(),ldC()]);
+  const f=catId?v.filter(x=>x.category_id===catId):v;
+  $('#app').innerHTML=`
+  <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="mb-8"><h1 class="text-3xl font-bold" style="color:var(--tx)">${navLabel('videos')}</h1></div>
+    <div class="flex flex-wrap gap-2 mb-8">
+      <button onclick="rVideos()" class="badge ${!catId?'badge-i':''} cursor-pointer px-4 py-1.5" style="${!catId?'':'background:var(--bg3);color:var(--tx2)'}">Dhammaan</button>
+      ${c.map(ct=>`<button onclick="rVideos('${ct.id}')" class="badge ${catId===ct.id?'badge-i':''} cursor-pointer px-4 py-1.5" style="${catId===ct.id?'':'background:var(--bg3);color:var(--tx2)'}">${esc(ct.name)}</button>`).join('')}
+    </div>
+    ${f.length?`<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">${f.map(v=>vCard(v)).join('')}</div>`:`<div class="text-center py-20"><span class="iconify text-5xl" style="color:var(--tx3)" data-icon="mdi:video-off-outline"></span><p class="mt-3" style="color:var(--tx3)">Wali fiidyow ma jiro</p></div>`}
+  </section>${footer()}`;
+}
+
+/* ═══════════ VIDEO DETAIL ═══════════ */
+async function rVideoDetail(id){
+  const vids=await ldV();await ldC();
+  const v=vids.find(x=>x.id===id);
+  if(!v){$('#app').innerHTML=`<div class="flex flex-col items-center justify-center min-h-[60vh] gap-4"><span class="iconify text-5xl" style="color:var(--tx3)" data-icon="mdi:video-off-outline"></span><p style="color:var(--tx3)">Lama helin</p><button class="btn btn-p btn-sm" onclick="nav('/videos')">Dib u noqo</button></div>`;return}
+  const cat=S.categories.find(x=>x.id===v.category_id);
+  const related=vids.filter(x=>x.id!==id&&x.category_id===v.category_id).slice(0,6);
+  const ytId=extractYtId(v.url);
+
+  $('#app').innerHTML=`
+  <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <button onclick="nav('/videos')" class="flex items-center gap-2 text-sm mb-6 transition" style="color:var(--tx3)" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--tx3)'"><span class="iconify" data-icon="mdi:arrow-left"></span> Dib u noqo</button>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-2">
+        <div class="yt-embed" id="vidPlayer"><div class="absolute inset-0 flex items-center justify-center"><span class="iconify text-3xl animate-spin" style="color:var(--tx3)" data-icon="mdi:loading"></span></div></div>
+        <div class="mt-5">
+          <div class="flex items-center gap-2 flex-wrap mb-2">${cat?`<span class="badge badge-i">${esc(cat.name)}</span>`:''}${v.video_type?`<span class="badge badge-a">${esc(v.video_type)}</span>`:''}</div>
+          <h1 class="text-2xl font-bold" style="color:var(--tx)">${esc(v.title)}</h1>
+          <div class="flex items-center gap-4 mt-3 text-sm" style="color:var(--tx3)">
+            <span class="flex items-center gap-1"><span class="iconify" data-icon="mdi:eye-outline"></span>${fmtV(v.views)}</span>
+            <span class="flex items-center gap-1"><span class="iconify" data-icon="mdi:clock-outline"></span>${fmtT(v.duration)}</span>
+            <span>${fmtDate(v.created_at)}</span>
           </div>
-          <div style="font-size:13px;color:var(--text2);font-family:var(--mono)">${fmtNum(v.views||0)}</div>
+          ${v.description?`<p class="mt-4 leading-relaxed" style="color:var(--tx2)">${esc(v.description)}</p>`:''}
+          ${ytId?`<a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 mt-4 text-sm font-medium transition" style="color:var(--accent)" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'"><span class="iconify" data-icon="mdi:youtube"></span> YouTube Daawo</a>`:''}
         </div>
-      `).join('');
+      </div>
+      <div>
+        <h3 class="text-sm font-semibold mb-4" style="color:var(--tx2)">Kuwa la mid ah</h3>
+        <div class="flex flex-col gap-3">
+          ${related.map(r=>`<div class="flex gap-3 cursor-pointer group p-2 rounded-lg transition" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'" onclick="nav('/videos/${r.id}')"><div class="w-32 flex-shrink-0 aspect-video rounded-lg overflow-hidden" style="background:var(--bg3)"><img src="${thumb(r)}" class="w-full h-full object-cover" loading="lazy"></div><div class="min-w-0"><p class="text-sm font-medium truncate group-hover:text-accent transition" style="color:var(--tx)">${esc(r.title)}</p><p class="text-xs mt-1" style="color:var(--tx3)">${fmtV(r.views)}</p></div></div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </section>${footer()}`;
+
+  // Load player
+  try{
+    const res=await api(`/api/v1/videos/request-stream/${id}`,{method:'POST'});
+    const el=$('#vidPlayer');
+    if(res.youtubeUrl){
+      el.innerHTML=`<iframe src="${res.youtubeUrl}" allow="autoplay;encrypted-media;picture-in-picture;fullscreen" allowfullscreen id="ytIframe"></iframe>
+      <div id="ytFallback" class="fallback" style="display:none">
+        <img src="${thumb(v)}" class="absolute inset-0 w-full h-full object-cover opacity-30">
+        <div class="relative z-10 text-center">
+          <span class="iconify text-5xl mb-2" data-icon="mdi:youtube" style="color:#f00"></span>
+          <p class="text-white font-medium mb-3">Fiidyowgan laguma shubi karo</p>
+          <a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener" class="btn btn-p"><span class="iconify" data-icon="mdi:open-in-new"></span> YouTube Ka Daawo</a>
+        </div>
+      </div>`;
+      // Detect YouTube embed failure
+      setTimeout(()=>{
+        const iframe=el.querySelector('iframe');
+        try{const doc=iframe?.contentDocument;if(doc&&(doc.body?.innerHTML===''||doc.title?.includes('Error'))){$('#ytFallback')&&($('#ytFallback').style.display='flex')}}catch{}
+      },4000);
+      // Also add a manual "can't play?" link
+      el.addEventListener('error',()=>{$('#ytFallback')&&($('#ytFallback').style.display='flex')},true);
+    }else if(res.streamToken){
+      el.innerHTML=`<video controls autoplay src="/api/v1/stream/${res.streamToken}" onerror="this.parentElement.innerHTML='<div class=\\'absolute inset-0 flex items-center justify-center\\' style=\\'background:var(--bg3)\\'><div class=\\'text-center\\'><span class=\\'iconify text-5xl\\' style=\\'color:var(--tx3)\\' data-icon=\\'mdi:alert-circle-outline\\'></span><p class=\\'text-sm mt-2\\' style=\\'color:var(--tx3)\\'>Khalad ayaa dhacay</p></div></div>'"></video>`;
+    }else{
+      el.innerHTML=`<div class="absolute inset-0 flex items-center justify-center" style="background:var(--bg3)"><div class="text-center"><span class="iconify text-5xl" style="color:var(--tx3)" data-icon="mdi:video-off-outline"></span><p class="text-sm mt-2" style="color:var(--tx3)">Waa la xiray</p></div></div>`;
     }
-
-    // Bar chart
-    renderBarChart(d.topVideos || []);
-
-    // Analytics table
-    const at = document.getElementById('analytics-table');
-    at.innerHTML = (d.topVideos||[]).map((v,i) => `
-      <tr>
-        <td>${i+1}</td>
-        <td class="text-main">${esc(v.title)}</td>
-        <td class="mono">${fmtNum(v.views||0)}</td>
-        <td>${viewBar(v.views, d.totalViews)}</td>
-      </tr>
-    `).join('');
-  } catch(e) { console.error('Analytics:', e); }
+  }catch{$('#vidPlayer').innerHTML=`<div class="absolute inset-0 flex items-center justify-center" style="background:var(--bg3)"><p style="color:var(--tx3)">Khalad</p></div>`}
 }
 
-function renderBarChart(videos) {
-  const bc = document.getElementById('bar-chart');
-  if (!videos.length) { bc.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px">No data</div>'; return; }
-  const maxV = Math.max(...videos.map(v => v.views||0)) || 1;
-  bc.innerHTML = videos.map(v => {
-    const h = Math.round(((v.views||0) / maxV) * 90);
-    return `<div class="bar" style="height:${Math.max(h,4)}px" data-label="${(v.title||'').substring(0,8)}"></div>`;
-  }).join('');
+/* ═══════════ AUDIO ═══════════ */
+async function rAudio(){
+  const a=await ldA();
+  $('#app').innerHTML=`
+  <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="mb-8"><h1 class="text-3xl font-bold" style="color:var(--tx)">${navLabel('audio')}</h1></div>
+    ${a.length?`<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">${a.map(x=>aCard(x)).join('')}</div>`:`<div class="text-center py-20"><span class="iconify text-5xl" style="color:var(--tx3)" data-icon="mdi:music-off"></span><p class="mt-3" style="color:var(--tx3)">Wali hees ma jiro</p></div>`}
+  </section>${footer()}`;
 }
 
-function viewBar(views, total) {
-  const pct = total ? Math.round((views/total)*100) : 0;
-  return `<div style="display:flex;align-items:center;gap:8px">
-    <div style="flex:1;height:4px;background:var(--bg4);border-radius:2px">
-      <div style="width:${pct}%;height:100%;background:var(--red);border-radius:2px"></div>
+/* ═══════════ AUDIO PLAYER ═══════════ */
+const aEl=$('#audioEl');
+async function playAudio(id){
+  const t=S.audio.find(x=>x.id===id);if(!t)return toast('Lama helin','error');
+  try{
+    const res=await api(`/api/v1/audio/request-stream/${id}`,{method:'POST'});
+    if(!res.streamToken)throw new Error('No token');
+    S.audioQ=S.audio.slice();S.audioI=S.audio.findIndex(x=>x.id===id);
+    aEl.src=`/api/v1/stream/${res.streamToken}`;aEl.play().catch(()=>{});S.audioOn=true;
+    updAP();$('#audioBar').classList.add('show');
+  }catch{toast('Khalad','error')}
+}
+function updAP(){const t=S.audioQ[S.audioI];if(!t)return;$('#apTitle').textContent=t.title;$('#apArtist').textContent=t.artist;$('#apIcon').setAttribute('data-icon',S.audioOn?'mdi:pause':'mdi:play')}
+function apToggle(){S.audioOn?aEl.pause():aEl.play();S.audioOn=!S.audioOn;updAP()}
+function apPrev(){if(S.audioI>0)playAudio(S.audioQ[S.audioI-1].id)}
+function apNext(){if(S.audioI<S.audioQ.length-1)playAudio(S.audioQ[S.audioI+1].id)}
+function apClose(){aEl.pause();aEl.src='';S.audioOn=false;S.audioI=-1;$('#audioBar').classList.remove('show')}
+aEl.addEventListener('timeupdate',()=>{if(!aEl.duration)return;$('#apSeek').value=(aEl.currentTime/aEl.duration)*100;$('#apCur').textContent=sec2t(aEl.currentTime);$('#apDur').textContent=sec2t(aEl.duration)});
+aEl.addEventListener('ended',()=>{if(S.audioI<S.audioQ.length-1)playAudio(S.audioQ[S.audioI+1].id);else{S.audioOn=false;updAP()}});
+ $('#apSeek').oninput=()=>{if(aEl.duration)aEl.currentTime=($('#apSeek').value/100)*aEl.duration};
+
+/* ═══════════ POSTS ═══════════ */
+async function rPosts(){
+  const p=await ldP();
+  $('#app').innerHTML=`
+  <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="mb-8"><h1 class="text-3xl font-bold" style="color:var(--tx)">${navLabel('posts')}</h1></div>
+    ${p.length?`<div class="grid grid-cols-1 md:grid-cols-3 gap-8">${p.map(x=>pCard(x)).join('')}</div>`:`<div class="text-center py-20"><span class="iconify text-5xl" style="color:var(--tx3)" data-icon="mdi:newspaper-variant-outline"></span><p class="mt-3" style="color:var(--tx3)">Wali qoraal ma jiro</p></div>`}
+  </section>${footer()}`;
+}
+async function rPostDetail(id){
+  const ps=await ldP();const p=ps.find(x=>x.id===id);
+  if(!p){$('#app').innerHTML=`<div class="text-center py-20"><p style="color:var(--tx3)">Lama helin</p></div>`;return}
+  try{await api(`/api/v1/posts/${id}/view`,{method:'POST'})}catch{}
+  $('#app').innerHTML=`
+  <article class="py-24 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto">
+    <button onclick="nav('/posts')" class="flex items-center gap-2 text-sm mb-8 transition" style="color:var(--tx3)" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--tx3)'"><span class="iconify" data-icon="mdi:arrow-left"></span> Dib u noqo</button>
+    ${p.image_url?`<img src="${p.image_url}" class="w-full aspect-video object-cover rounded-2xl mb-8" loading="lazy">`:''}
+    <div class="flex items-center gap-3 text-sm mb-4" style="color:var(--tx3)"><span>${fmtDate(p.created_at)}</span><span>·</span><span class="flex items-center gap-1"><span class="iconify" data-icon="mdi:eye-outline"></span>${fmtV(p.views)}</span>${p.author?`<span>·</span><span>${esc(p.author)}</span>`:''}</div>
+    <h1 class="text-3xl font-bold mb-8 leading-tight" style="color:var(--tx)">${esc(p.title)}</h1>
+    <div class="whitespace-pre-wrap leading-relaxed" style="color:var(--tx2)">${esc(p.content)}</div>
+  </article>${footer()}`;
+}
+
+/* ═══════════ CONTACT ═══════════ */
+function rContact(){
+  $('#app').innerHTML=`
+  <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-2xl mx-auto">
+    <div class="mb-10 text-center"><h1 class="text-3xl font-bold" style="color:var(--tx)">${navLabel('contact')}</h1><p class="mt-2" style="color:var(--tx3)">Fikrad, su'aal ama wada sheekayn — nala soo wadaag.</p></div>
+    <form id="cForm" class="card p-8" style="border-radius:16px">
+      <div class="space-y-5">
+        <div><label class="block text-sm font-medium mb-1.5" style="color:var(--tx2)">Magacaaga</label><input name="alias_name" class="inp" placeholder="Magacaaga ama naanays" required maxlength="50"></div>
+        <div><label class="block text-sm font-medium mb-1.5" style="color:var(--tx2)">La xiriir</label><input name="contact_method" class="inp" placeholder="Email, taleefon" maxlength="100"></div>
+        <div><label class="block text-sm font-medium mb-1.5" style="color:var(--tx2)">Nooca</label><select name="message_type" class="inp"><option value="general">Guud</option><option value="feedback">Fikrad</option><option value="complaint">Cabasho</option><option value="business">Ganacsi</option></select></div>
+        <div><label class="block text-sm font-medium mb-1.5" style="color:var(--tx2)">Fariinta</label><textarea name="message" class="inp" rows="5" placeholder="Fariintaada halkan ku qor…" required maxlength="2000"></textarea></div>
+        <button type="submit" class="btn btn-p w-full justify-center"><span class="iconify" data-icon="mdi:send"></span> Dir Fariinta</button>
+      </div>
+    </form>
+  </section>${footer()}`;
+  $('#cForm').onsubmit=async e=>{e.preventDefault();const f=e.target;const b=f.querySelector('button');b.disabled=true;b.innerHTML='<span class="iconify animate-spin" data-icon="mdi:loading"></span> Dirayaa…';try{await api('/api/v1/contacts',{method:'POST',body:JSON.stringify({alias_name:f.alias_name.value,contact_method:f.contact_method.value,message_type:f.message_type.value,message:f.message.value})});toast('Fariintii waa la diray!','success');f.reset()}catch{toast('Khalad. Mar kale isku day.','error')}finally{b.disabled=false;b.innerHTML='<span class="iconify" data-icon="mdi:send"></span> Dir Fariinta'}};
+}
+
+/* ═══════════ ADMIN ═══════════ */
+async function rAdmin(){if(!S.admin){rAdminLogin();return}await ldS();rAdminPanel()}
+function rAdminLogin(){
+  $('#app').innerHTML=`
+  <section class="min-h-screen flex items-center justify-center px-4">
+    <div class="card p-8 sm:p-10 w-full max-w-md" style="border-radius:16px;box-shadow:0 0 60px var(--glow)">
+      <div class="text-center mb-8"><div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style="background:var(--accent-bg)"><span class="iconify text-3xl" style="color:var(--accent)" data-icon="mdi:shield-crown-outline"></span></div><h1 class="text-2xl font-bold" style="color:var(--tx)">Maamulka Sooto</h1><p class="text-sm mt-1" style="color:var(--tx3)">Fadlan soo geli</p></div>
+      <form id="loginForm" class="space-y-4">
+        <div><label class="block text-sm font-medium mb-1.5" style="color:var(--tx2)">Magaca</label><input name="username" class="inp" required></div>
+        <div><label class="block text-sm font-medium mb-1.5" style="color:var(--tx2)">Furaha</label><input name="password" type="password" class="inp" required></div>
+        <div><label class="block text-sm font-medium mb-1.5" style="color:var(--tx2)">PIN (8 xaraf)</label><input name="pin" class="inp" maxlength="8" required></div>
+        <button type="submit" class="btn btn-p w-full justify-center"><span class="iconify" data-icon="mdi:login"></span> Soo Geli</button>
+      </form>
     </div>
-    <span style="font-size:11px;color:var(--text3);width:28px">${pct}%</span>
+  </section>`;
+  $('#loginForm').onsubmit=async e=>{e.preventDefault();const f=e.target;const b=f.querySelector('button');b.disabled=true;b.innerHTML='<span class="iconify animate-spin" data-icon="mdi:loading"></span> Saxayaa…';try{const d=await api('/api/v1/auth/login',{method:'POST',body:JSON.stringify({username:f.username.value,password:f.password.value,pin:f.pin.value})});S.admin={username:d.username};toast('Ku soo dhawow, '+d.username+'!','success');rAdminPanel()}catch(err){toast(err.message||'Khalad','error')}finally{b.disabled=false;b.innerHTML='<span class="iconify" data-icon="mdi:login"></span> Soo Geli'}};
+}
+
+function rAdminPanel(){
+  const tabs=[{id:'dashboard',label:'Dashboard',icon:'mdi:view-dashboard'},{id:'videos',label:'Fiidyowyada',icon:'mdi:video'},{id:'audio',label:'Heesaha',icon:'mdi:music'},{id:'posts',label:'Qoraallada',icon:'mdi:newspaper'},{id:'categories',label:'Qaybaha',icon:'mdi:folder'},{id:'contacts',label:'Fariimaha',icon:'mdi:message'},{id:'settings',label:'Settings',icon:'mdi:cog'},{id:'credentials',label:'Xirfadeeynta',icon:'mdi:key'}];
+  $('#app').innerHTML=`
+  <div class="flex min-h-screen pt-16">
+    <aside class="hidden md:flex flex-col w-60 p-4 sticky top-16 h-[calc(100vh-4rem)]" style="border-right:1px solid var(--bd)">
+      <p class="text-xs font-semibold uppercase tracking-widest mb-4 px-3" style="color:var(--tx3)">Maamulka</p>
+      <div class="flex flex-col gap-1">${tabs.map(t=>`<button onclick="setATab('${t.id}')" class="admin-link ${S.adminTab===t.id?'on':''}" data-t="${t.id}"><span class="iconify text-lg" data-icon="${t.icon}"></span>${t.label}</button>`).join('')}</div>
+      <div class="mt-auto pt-4" style="border-top:1px solid var(--bd)"><button onclick="aLogout()" class="admin-link" style="color:var(--badge-rt)"><span class="iconify text-lg" data-icon="mdi:logout"></span>Ka Bax</button></div>
+    </aside>
+    <div class="md:hidden fixed bottom-0 left-0 right-0 z-50 flex overflow-x-auto gap-0" style="background:var(--card);border-top:1px solid var(--bd)">${tabs.map(t=>`<button onclick="setATab('${t.id}')" class="flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2 text-[10px] transition" style="color:${S.adminTab===t.id?'var(--accent)':'var(--tx3)'}" data-t="${t.id}"><span class="iconify text-lg" data-icon="${t.icon}"></span>${t.label}</button>`).join('')}</div>
+    <div class="flex-1 p-4 sm:p-6 lg:p-8 pb-24 md:pb-8" id="aContent"></div>
   </div>`;
+  loadATab();
 }
 
-/* ═══════════════════════════════════════════
-   VIDEOS
-═══════════════════════════════════════════ */
-async function loadVideos() {
-  try {
-    state.videos = await api('GET', '/api/v1/admin/videos');
-    renderVideos(state.videos);
-    // Populate category select
-    const sel = document.getElementById('v-cat');
-    sel.innerHTML = '<option value="">-- Xulo --</option>' +
-      state.categories.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
-  } catch(e) { console.error(e); }
+async function setATab(t){S.adminTab=t;$$('.admin-link').forEach(el=>el.classList.toggle('on',el.dataset.t===t));$$('[data-t]').forEach(el=>{if(el.classList.contains('admin-link'))return;el.style.color=el.dataset.t===t?'var(--accent)':'var(--tx3)'});loadATab()}
+async function loadATab(){const c=$('#aContent');c.innerHTML='<div class="flex justify-center py-20"><span class="iconify text-3xl animate-spin" style="color:var(--tx3)" data-icon="mdi:loading"></span></div>';try{switch(S.adminTab){case'dashboard':await aDash(c);break;case'videos':await aVids(c);break;case'audio':await aAud(c);break;case'posts':await aPos(c);break;case'categories':await aCats(c);break;case'contacts':await aCon(c);break;case'settings':await aSet(c);break;case'credentials':aCred(c);break}}catch{c.innerHTML='<p style="color:var(--badge-rt)">Khalad</p>'}}
+
+async function aDash(c){const d=await api('/api/v1/admin/analytics');c.innerHTML=`<h2 class="text-2xl font-bold mb-6" style="color:var(--tx)">Dashboard</h2><div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">${[['Daawasho',fmtV(d.totalViews)],['Fiidyowyada',d.totalVideos||0],['Fariimaha Aan La Akhrin',d.unread||0],['Usbuucan',d.thisWeek||0]].map(([l,v])=>`<div class="card p-5" style="border-radius:12px"><p class="text-2xl font-bold text-accent">${v}</p><p class="text-xs mt-1" style="color:var(--tx3)">${l}</p></div>`).join('')}</div>${d.topVideos?.length?`<h3 class="text-lg font-semibold mb-4" style="color:var(--tx)">Ugu Badan</h3><div class="card overflow-hidden" style="border-radius:12px"><table class="w-full text-sm"><thead><tr style="border-bottom:1px solid var(--bd)" class="text-left text-xs uppercase" style="color:var(--tx3)"><th class="p-3">Title</th><th class="p-3 text-right">Views</th></tr></thead><tbody>${d.topVideos.map(v=>`<tr style="border-bottom:1px solid var(--bd)"><td class="p-3" style="color:var(--tx)">${esc(v.title)}</td><td class="p-3 text-right text-accent font-medium">${fmtV(v.views)}</td></tr>`).join('')}</tbody></table></div>`:''}`}
+
+/* ═══ ADMIN VIDEOS ═══ */
+async function aVids(c){const[vs,cs]=await Promise.all([api('/api/v1/admin/videos'),ldC()]);window._aV=vs;c.innerHTML=`<div class="flex items-center justify-between mb-6"><h2 class="text-2xl font-bold" style="color:var(--tx)">Fiidyowyada</h2><button onclick="vModal()" class="btn btn-p btn-sm"><span class="iconify" data-icon="mdi:plus"></span> Cusub</button></div><div class="card overflow-x-auto" style="border-radius:12px"><table class="w-full text-sm min-w-[700px]"><thead><tr style="border-bottom:1px solid var(--bd)" class="text-left text-xs uppercase" style="color:var(--tx3)"><th class="p-3">Title</th><th class="p-3">Nooca</th><th class="p-3">Category</th><th class="p-3 text-center">Pub</th><th class="p-3 text-right">Views</th><th class="p-3 text-right">Ficil</th></tr></thead><tbody>${vs.map(v=>`<tr style="border-bottom:1px solid var(--bd)" class="hover:opacity-80"><td class="p-3"><div class="flex items-center gap-3"><img src="${thumb(v)}" class="w-16 h-10 rounded object-cover flex-shrink-0"><span class="font-medium truncate max-w-[200px] block" style="color:var(--tx)">${esc(v.title)}</span></div></td><td class="p-3"><span class="badge badge-a">${esc(v.video_type||'mp4')}</span></td><td class="p-3" style="color:var(--tx3)">${esc(cs.find(c=>c.id===v.category_id)?.name||'—')}</td><td class="p-3 text-center">${v.is_published?'<span class="badge badge-g">Haa</span>':'<span class="badge badge-r">Maya</span>'}</td><td class="p-3 text-right" style="color:var(--tx3)">${fmtV(v.views)}</td><td class="p-3 text-right"><div class="flex justify-end gap-1"><button onclick="vModal('${v.id}')" class="btn btn-s btn-sm"><span class="iconify" data-icon="mdi:pencil"></span></button><button onclick="del('videos','${v.id}')" class="btn btn-d btn-sm"><span class="iconify" data-icon="mdi:delete"></span></button></div></td></tr>`).join('')}</tbody></table></div>`}
+function vModal(id){const v=id?window._aV.find(x=>x.id===id):null;const cs=S.categories;oModal(`<h3 class="text-lg font-bold mb-6" style="color:var(--tx)">${v?'Wax ka bedel':'Cusub'}</h3><form id="vForm" class="space-y-4"><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Title *</label><input name="title" class="inp" value="${v?esc(v.title):''}" required></div><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">URL *</label><input name="url" class="inp" value="${v?esc(v.url):''}" required></div><div class="grid grid-cols-2 gap-4"><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Nooca</label><select name="video_type" class="inp">${['mp4','youtube','archive','ipfs'].map(t=>`<option value="${t}" ${v?.video_type===t?'selected':''}>${t.toUpperCase()}</option>`).join('')}</select></div><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Qaybta</label><select name="category_id" class="inp"><option value="">—</option>${cs.map(c=>`<option value="${c.id}" ${v?.category_id===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div></div><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Thumbnail</label><input name="thumbnail" class="inp" value="${v?esc(v.thumbnail||''):''}"></div><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Sharaxaad</label><textarea name="description" class="inp" rows="3">${v?esc(v.description||''):''}</textarea></div><div class="grid grid-cols-3 gap-4"><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Waqtiga</label><input name="duration" class="inp" value="${v?esc(v.duration||'0:00'):'0:00'}"></div><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Order</label><input name="order_index" type="number" class="inp" value="${v?v.order_index||0:0}"></div><div class="flex flex-col gap-2 pt-5"><label class="flex items-center gap-2 text-sm" style="color:var(--tx2)"><input type="checkbox" name="is_published" ${!v||v.is_published?'checked':''} class="accent-brand-500"> Published</label><label class="flex items-center gap-2 text-sm" style="color:var(--tx2)"><input type="checkbox" name="is_featured" ${v?.is_featured?'checked':''} class="accent-brand-500"> Featured</label></div></div><div class="flex justify-end gap-3 pt-2"><button type="button" onclick="cModal()" class="btn btn-s">Kansal</button><button type="submit" class="btn btn-p">${v?'Keydi':'Ku Dar'}</button></div></form>`);$('#vForm').onsubmit=async e=>{e.preventDefault();const f=e.target;const d={title:f.title.value,url:f.url.value,video_type:f.video_type.value,category_id:f.category_id.value||null,thumbnail:f.thumbnail.value,description:f.description.value,duration:f.duration.value,order_index:parseInt(f.order_index.value)||0,is_published:f.is_published.checked,is_featured:f.is_featured.checked};try{if(v)await api(`/api/v1/admin/videos/${id}`,{method:'PUT',body:JSON.stringify(d)});else await api('/api/v1/admin/videos',{method:'POST',body:JSON.stringify(d)});toast(v?'Waa la keydiyay!':'Waa lagu daray!','success');cModal();loadATab()}catch(err){toast(err.message,'error')}}}
+
+/* ═══ ADMIN AUDIO ═══ */
+async function aAud(c){const as=await api('/api/v1/admin/audio');window._aA=as;c.innerHTML=`<div class="flex items-center justify-between mb-6"><h2 class="text-2xl font-bold" style="color:var(--tx)">Heesaha</h2><button onclick="aModal()" class="btn btn-p btn-sm"><span class="iconify" data-icon="mdi:plus"></span> Cusub</button></div><div class="card overflow-x-auto" style="border-radius:12px"><table class="w-full text-sm min-w-[600px]"><thead><tr style="border-bottom:1px solid var(--bd)" class="text-left text-xs uppercase" style="color:var(--tx3)"><th class="p-3">Title</th><th class="p-3">Artist</th><th class="p-3">Nooca</th><th class="p-3 text-center">Pub</th><th class="p-3 text-right">Views</th><th class="p-3 text-right">Ficil</th></tr></thead><tbody>${as.map(a=>`<tr style="border-bottom:1px solid var(--bd)"><td class="p-3"><div class="flex items-center gap-3"><img src="${cover(a)}" class="w-10 h-10 rounded object-cover flex-shrink-0"><span class="font-medium" style="color:var(--tx)">${esc(a.title)}</span></div></td><td class="p-3" style="color:var(--tx3)">${esc(a.artist)}</td><td class="p-3"><span class="badge badge-a">${esc(a.audio_type||'mp3')}</span></td><td class="p-3 text-center">${a.is_published?'<span class="badge badge-g">Haa</span>':'<span class="badge badge-r">Maya</span>'}</td><td class="p-3 text-right" style="color:var(--tx3)">${fmtV(a.views)}</td><td class="p-3 text-right"><div class="flex justify-end gap-1"><button onclick="aModal('${a.id}')" class="btn btn-s btn-sm"><span class="iconify" data-icon="mdi:pencil"></span></button><button onclick="del('audio','${a.id}')" class="btn btn-d btn-sm"><span class="iconify" data-icon="mdi:delete"></span></button></div></td></tr>`).join('')}</tbody></table></div>`}
+function aModal(id){const a=id?window._aA.find(x=>x.id===id):null;oModal(`<h3 class="text-lg font-bold mb-6" style="color:var(--tx)">${a?'Wax ka bedel':'Hees Cusub'}</h3><form id="aForm" class="space-y-4"><div class="grid grid-cols-2 gap-4"><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Title *</label><input name="title" class="inp" value="${a?esc(a.title):''}" required></div><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Artist</label><input name="artist" class="inp" value="${a?esc(a.artist||''):''}"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">URL *</label><input name="url" class="inp" value="${a?esc(a.url):''}" required></div><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Nooca</label><select name="audio_type" class="inp">${['mp3','ogg','wav','m4a'].map(t=>`<option value="${t}" ${a?.audio_type===t?'selected':''}>${t.toUpperCase()}</option>`).join('')}</select></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Cover URL</label><input name="cover_url" class="inp" value="${a?esc(a.cover_url||''):''}"></div><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Category</label><input name="category" class="inp" value="${a?esc(a.category||''):''}"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Duration</label><input name="duration" class="inp" value="${a?esc(a.duration||'0:00'):'0:00'}"></div><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Website URL</label><input name="website_url" class="inp" value="${a?esc(a.website_url||''):''}"></div></div><label class="flex items-center gap-2 text-sm" style="color:var(--tx2)"><input type="checkbox" name="is_published" ${!a||a.is_published?'checked':''} class="accent-brand-500"> Published</label><div class="flex justify-end gap-3 pt-2"><button type="button" onclick="cModal()" class="btn btn-s">Kansal</button><button type="submit" class="btn btn-p">${a?'Keydi':'Ku Dar'}</button></div></form>`);$('#aForm').onsubmit=async e=>{e.preventDefault();const f=e.target;const d={title:f.title.value,artist:f.artist.value,url:f.url.value,audio_type:f.audio_type.value,cover_url:f.cover_url.value,category:f.category.value,duration:f.duration.value,website_url:f.website_url.value,is_published:f.is_published.checked};try{if(a)await api(`/api/v1/admin/audio/${id}`,{method:'PUT',body:JSON.stringify(d)});else await api('/api/v1/admin/audio',{method:'POST',body:JSON.stringify(d)});toast(a?'Waa la keydiyay!':'Waa lagu daray!','success');cModal();loadATab()}catch(err){toast(err.message,'error')}}}
+
+/* ═══ ADMIN POSTS ═══ */
+async function aPos(c){const ps=await api('/api/v1/admin/posts');window._aP=ps;c.innerHTML=`<div class="flex items-center justify-between mb-6"><h2 class="text-2xl font-bold" style="color:var(--tx)">Qoraallada</h2><button onclick="pModal()" class="btn btn-p btn-sm"><span class="iconify" data-icon="mdi:plus"></span> Cusub</button></div><div class="card overflow-x-auto" style="border-radius:12px"><table class="w-full text-sm min-w-[500px]"><thead><tr style="border-bottom:1px solid var(--bd)" class="text-left text-xs uppercase" style="color:var(--tx3)"><th class="p-3">Title</th><th class="p-3">Author</th><th class="p-3 text-center">Pub</th><th class="p-3 text-right">Views</th><th class="p-3 text-right">Ficil</th></tr></thead><tbody>${ps.map(p=>`<tr style="border-bottom:1px solid var(--bd)"><td class="p-3 font-medium" style="color:var(--tx)">${esc(p.title)}</td><td class="p-3" style="color:var(--tx3)">${esc(p.author||'—')}</td><td class="p-3 text-center">${p.is_published?'<span class="badge badge-g">Haa</span>':'<span class="badge badge-r">Maya</span>'}</td><td class="p-3 text-right" style="color:var(--tx3)">${fmtV(p.views)}</td><td class="p-3 text-right"><div class="flex justify-end gap-1"><button onclick="pModal('${p.id}')" class="btn btn-s btn-sm"><span class="iconify" data-icon="mdi:pencil"></span></button><button onclick="del('posts','${p.id}')" class="btn btn-d btn-sm"><span class="iconify" data-icon="mdi:delete"></span></button></div></td></tr>`).join('')}</tbody></table></div>`}
+function pModal(id){const p=id?window._aP.find(x=>x.id===id):null;oModal(`<h3 class="text-lg font-bold mb-6" style="color:var(--tx)">${p?'Wax ka bedel':'Qoraal Cusub'}</h3><form id="pForm" class="space-y-4"><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Title *</label><input name="title" class="inp" value="${p?esc(p.title):''}" required></div><div class="grid grid-cols-2 gap-4"><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Author</label><input name="author" class="inp" value="${p?esc(p.author||''):''}"></div><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Image URL</label><input name="image_url" class="inp" value="${p?esc(p.image_url||''):''}"></div></div><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Content *</label><textarea name="content" class="inp" rows="8" required>${p?esc(p.content||''):''}</textarea></div><label class="flex items-center gap-2 text-sm" style="color:var(--tx2)"><input type="checkbox" name="is_published" ${!p||p.is_published?'checked':''} class="accent-brand-500"> Published</label><div class="flex justify-end gap-3 pt-2"><button type="button" onclick="cModal()" class="btn btn-s">Kansal</button><button type="submit" class="btn btn-p">${p?'Keydi':'Ku Dar'}</button></div></form>`);$('#pForm').onsubmit=async e=>{e.preventDefault();const f=e.target;const d={title:f.title.value,content:f.content.value,author:f.author.value,image_url:f.image_url.value,is_published:f.is_published.checked};try{if(p)await api(`/api/v1/admin/posts/${id}`,{method:'PUT',body:JSON.stringify(d)});else await api('/api/v1/admin/posts',{method:'POST',body:JSON.stringify(d)});toast(p?'Waa la keydiyay!':'Waa lagu daray!','success');cModal();loadATab()}catch(err){toast(err.message,'error')}}}
+
+/* ═══ ADMIN CATEGORIES ═══ */
+async function aCats(c){const cs=await api('/api/v1/admin/categories');window._aC=cs;S.categories=cs;c.innerHTML=`<div class="flex items-center justify-between mb-6"><h2 class="text-2xl font-bold" style="color:var(--tx)">Qaybaha</h2><button onclick="cMdl()" class="btn btn-p btn-sm"><span class="iconify" data-icon="mdi:plus"></span> Cusub</button></div><div class="card overflow-x-auto" style="border-radius:12px"><table class="w-full text-sm"><thead><tr style="border-bottom:1px solid var(--bd)" class="text-left text-xs uppercase" style="color:var(--tx3)"><th class="p-3">Magaca</th><th class="p-3">Icon</th><th class="p-3 text-center">Order</th><th class="p-3 text-center">Active</th><th class="p-3 text-right">Ficil</th></tr></thead><tbody>${cs.map(ct=>`<tr style="border-bottom:1px solid var(--bd)"><td class="p-3 font-medium" style="color:var(--tx)">${esc(ct.name)}</td><td class="p-3" style="color:var(--tx3)"><span class="iconify" data-icon="${ct.icon||'mdi:folder'}"></span></td><td class="p-3 text-center" style="color:var(--tx3)">${ct.order_index||0}</td><td class="p-3 text-center">${ct.is_active?'<span class="badge badge-g">Haa</span>':'<span class="badge badge-r">Maya</span>'}</td><td class="p-3 text-right"><div class="flex justify-end gap-1"><button onclick="cMdl('${ct.id}')" class="btn btn-s btn-sm"><span class="iconify" data-icon="mdi:pencil"></span></button><button onclick="del('categories','${ct.id}')" class="btn btn-d btn-sm"><span class="iconify" data-icon="mdi:delete"></span></button></div></td></tr>`).join('')}</tbody></table></div>`}
+function cMdl(id){const ct=id?window._aC.find(x=>x.id===id):null;oModal(`<h3 class="text-lg font-bold mb-6" style="color:var(--tx)">${ct?'Wax ka bedel':'Qayb Cusub'}</h3><form id="cForm" class="space-y-4"><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Magaca *</label><input name="name" class="inp" value="${ct?esc(ct.name):''}" required></div><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Sharaxaad</label><textarea name="description" class="inp" rows="2">${ct?esc(ct.description||''):''}</textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Icon</label><input name="icon" class="inp" value="${ct?esc(ct.icon||'mdi:folder'):'mdi:folder'}"></div><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Order</label><input name="order_index" type="number" class="inp" value="${ct?ct.order_index||0:0}"></div></div><label class="flex items-center gap-2 text-sm" style="color:var(--tx2)"><input type="checkbox" name="is_active" ${!ct||ct.is_active?'checked':''} class="accent-brand-500"> Active</label><div class="flex justify-end gap-3 pt-2"><button type="button" onclick="cModal()" class="btn btn-s">Kansal</button><button type="submit" class="btn btn-p">${ct?'Keydi':'Ku Dar'}</button></div></form>`);$('#cForm').onsubmit=async e=>{e.preventDefault();const f=e.target;const d={name:f.name.value,description:f.description.value,icon:f.icon.value,order_index:parseInt(f.order_index.value)||0,is_active:f.is_active.checked};try{if(ct)await api(`/api/v1/admin/categories/${id}`,{method:'PUT',body:JSON.stringify(d)});else await api('/api/v1/admin/categories',{method:'POST',body:JSON.stringify(d)});toast(ct?'Waa la keydiyay!':'Waa lagu daray!','success');cModal();loadATab()}catch(err){toast(err.message,'error')}}}
+
+/* ═══ ADMIN CONTACTS ═══ */
+async function aCon(c){const cs=await api('/api/v1/admin/contacts');c.innerHTML=`<h2 class="text-2xl font-bold mb-6" style="color:var(--tx)">Fariimaha</h2>${cs.length?`<div class="space-y-3">${cs.map(ct=>`<div class="card p-5" style="border-radius:12px;${!ct.is_read?'border-left:4px solid var(--accent)':''}"><div class="flex items-start justify-between gap-4"><div class="min-w-0 flex-1"><div class="flex items-center gap-2 flex-wrap mb-1"><span class="font-semibold" style="color:var(--tx)">${esc(ct.alias_name)}</span>${ct.message_type?`<span class="badge badge-i">${esc(ct.message_type)}</span>`:''} ${!ct.is_read?'<span class="badge badge-a">Cusub</span>':''}<span class="text-xs" style="color:var(--tx3)">${fmtDate(ct.created_at)}</span></div>${ct.contact_method?`<p class="text-xs mb-2" style="color:var(--tx3)">Xiriir: ${esc(ct.contact_method)}</p>`:''}<p class="text-sm whitespace-pre-wrap" style="color:var(--tx2)">${esc(ct.message)}</p>${ct.admin_response?`<div class="mt-3 p-3 rounded-lg" style="background:var(--accent-bg);border:1px solid var(--glass-bd)"><p class="text-xs mb-1" style="color:var(--tx3)">Jawaabta:</p><p class="text-sm" style="color:var(--tx2)">${esc(ct.admin_response)}</p></div>`:''}</div><div class="flex flex-col gap-1 flex-shrink-0">${!ct.is_read?`<button onclick="markRead('${ct.id}')" class="btn btn-s btn-sm"><span class="iconify" data-icon="mdi:check"></span></button>`:''}<button onclick="respCon('${ct.id}')" class="btn btn-s btn-sm"><span class="iconify" data-icon="mdi:reply"></span></button><button onclick="del('contacts','${ct.id}')" class="btn btn-d btn-sm"><span class="iconify" data-icon="mdi:delete"></span></button></div></div></div>`).join('')}</div>`:'<p class="text-center py-8" style="color:var(--tx3)">Wali fariin ma jiro</p>'}`}
+async function markRead(id){try{await api(`/api/v1/admin/contacts/${id}`,{method:'PUT',body:JSON.stringify({is_read:true})});loadATab()}catch(e){toast(e.message,'error')}}
+function respCon(id){oModal(`<h3 class="text-lg font-bold mb-4" style="color:var(--tx)">Jawaab</h3><textarea id="admResp" class="inp mb-4" rows="4" placeholder="Qor jawaabtaada…"></textarea><div class="flex justify-end gap-3"><button onclick="cModal()" class="btn btn-s">Kansal</button><button onclick="sendResp('${id}')" class="btn btn-p">Dir</button></div>`)}
+async function sendResp(id){const r=$('#admResp').value;if(!r)return;try{await api(`/api/v1/admin/contacts/${id}`,{method:'PUT',body:JSON.stringify({admin_response:r,is_read:true})});toast('Jawaabta waa la diray!','success');cModal();loadATab()}catch(e){toast(e.message,'error')}}
+
+/* ═══ ADMIN SETTINGS (with menu labels) ═══ */
+async function aSet(c){await ldS();const s=S.settings;
+c.innerHTML=`
+<h2 class="text-2xl font-bold mb-6" style="color:var(--tx)">Settings</h2>
+<div class="space-y-8">
+  <!-- General -->
+  <div class="card p-6" style="border-radius:12px">
+    <h3 class="text-sm font-semibold uppercase tracking-wider mb-4" style="color:var(--tx3)">General</h3>
+    <form id="setForm" class="space-y-4 max-w-xl">
+      <div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Site Name</label><input name="site_name" class="inp" value="${esc(s.site_name||'Maxaas.u')}"></div>
+      <div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Description</label><textarea name="site_description" class="inp" rows="2">${esc(s.site_description||'')}</textarea></div>
+      <div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Hero Title</label><input name="hero_title" class="inp" value="${esc(s.hero_title||'')}"></div>
+      <div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Hero Subtitle</label><input name="hero_subtitle" class="inp" value="${esc(s.hero_subtitle||'')}"></div>
+      <button type="submit" class="btn btn-p"><span class="iconify" data-icon="mdi:content-save"></span> Keydi</button>
+    </form>
+  </div>
+  <!-- Menu Labels -->
+  <div class="card p-6" style="border-radius:12px">
+    <h3 class="text-sm font-semibold uppercase tracking-wider mb-4" style="color:var(--tx3)">Menu Magacyada</h3>
+    <p class="text-sm mb-4" style="color:var(--tx3)">Bedel magaca qaybaha menu-ga.</p>
+    <form id="navForm" class="space-y-3 max-w-xl">
+      ${NAV_DEF.map(n=>`<div class="flex items-center gap-3"><label class="w-28 text-sm font-medium flex-shrink-0" style="color:var(--tx2)"><span class="iconify mr-1" data-icon="${n.icon}"></span>${n.defaultLabel}</label><input name="nav_${n.key}" class="inp" value="${esc(s['nav_'+n.key]||'')}" placeholder="${n.defaultLabel}"></div>`).join('')}
+      <button type="submit" class="btn btn-p"><span class="iconify" data-icon="mdi:content-save"></span> Keydi</button>
+    </form>
+  </div>
+</div>`;
+
+ $('#setForm').onsubmit=async e=>{e.preventDefault();const f=e.target;const d={};['site_name','site_description','hero_title','hero_subtitle'].forEach(k=>d[k]=f[k].value);try{await api('/api/v1/admin/settings',{method:'PUT',body:JSON.stringify(d)});toast('Settings waa la keydiyay!','success');await ldS()}catch(e){toast(e.message,'error')}};
+
+ $('#navForm').onsubmit=async e=>{e.preventDefault();const f=e.target;const d={};NAV_DEF.forEach(n=>d['nav_'+n.key]=f['nav_'+n.key].value);try{await api('/api/v1/admin/settings',{method:'PUT',body:JSON.stringify(d)});toast('Menu magacyada waa la keydiyay!','success');await ldS();updateNav()}catch(e){toast(e.message,'error')}};
 }
 
-function filterVideos() {
-  const q = document.getElementById('video-search').value.toLowerCase();
-  renderVideos(state.videos.filter(v => v.title?.toLowerCase().includes(q)));
-}
+/* ═══ ADMIN CREDENTIALS ═══ */
+function aCred(c){c.innerHTML=`<h2 class="text-2xl font-bold mb-6" style="color:var(--tx)">Xirfadeeynta</h2><div class="card p-6 max-w-md" style="border-radius:12px"><p class="text-sm mb-4" style="color:var(--tx3)">Wax ka bedel xirfadeeynta.</p><form id="credForm" class="space-y-4"><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">PIN-ka Hadda *</label><input name="pin" class="inp" maxlength="8" required></div><div class="line-sep my-2"></div><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Magac Cusub</label><input name="new_username" class="inp"></div><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">Furaha Cusub (8+ xaraf)</label><input name="new_password" type="password" class="inp"></div><div><label class="block text-sm font-medium mb-1" style="color:var(--tx2)">PIN Cusub (8 xaraf)</label><input name="new_pin" class="inp" maxlength="8"></div><button type="submit" class="btn btn-p"><span class="iconify" data-icon="mdi:content-save"></span> Keydi</button></form></div>`;$('#credForm').onsubmit=async e=>{e.preventDefault();const f=e.target;const d={pin:f.pin.value};if(f.new_username.value)d.new_username=f.new_username.value;if(f.new_password.value)d.new_password=f.new_password.value;if(f.new_pin.value)d.new_pin=f.new_pin.value;try{await api('/api/v1/admin/credentials',{method:'PUT',body:JSON.stringify(d)});toast('Waa la cusbooneysiiyay!','success');f.reset()}catch(e){toast(e.message,'error')}}}
 
-function renderVideos(videos) {
-  const tb = document.getElementById('videos-table');
-  if (!videos.length) { tb.innerHTML = `<tr><td colspan="6"><div class="empty"><i class="fas fa-video"></i><p>Video ma jiro</p></div></td></tr>`; return; }
-  tb.innerHTML = videos.map(v => `
-    <tr>
-      <td>${v.thumbnail ? `<img src="${esc(v.thumbnail)}" class="thumb" onerror="this.style.display='none'">` : `<div class="thumb-placeholder"><i class="fas fa-video"></i></div>`}</td>
-      <td class="text-main">${esc(v.title)}</td>
-      <td><span class="tag tag-blue"><i class="fas fa-play"></i> ${v.video_type||'mp4'}</span></td>
-      <td class="mono">${fmtNum(v.views||0)}</td>
-      <td>${v.is_published ? `<span class="tag tag-green"><i class="fas fa-circle" style="font-size:7px"></i> Live</span>` : `<span class="tag tag-gray">Draft</span>`}</td>
-      <td>
-        <div class="actions-cell">
-          <button class="btn btn-ghost btn-sm btn-icon" onclick="editVideo('${v.id}')" data-tooltip="Edit"><i class="fas fa-edit"></i></button>
-          <label class="switch" title="${v.is_published?'Unpublish':'Publish'}">
-            <input type="checkbox" ${v.is_published?'checked':''} onchange="toggleVideo('${v.id}',this.checked)">
-            <div class="switch-slider"></div>
-          </label>
-          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteVideo('${v.id}')" data-tooltip="Delete"><i class="fas fa-trash"></i></button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
+/* ═══ DELETE ═══ */
+async function del(type,id){if(!confirm('Ma hubtaa inaad tirtirto?'))return;const ep={videos:'videos',audio:'audio',posts:'posts',categories:'categories',contacts:'contacts'};try{await api(`/api/v1/admin/${ep[type]}/${id}`,{method:'DELETE'});toast('Waa la tirtiray!','success');loadATab()}catch(e){toast(e.message,'error')}}
 
-function openVideoModal(v) {
-  document.getElementById('video-modal-title').textContent = v ? 'Video Wax ka Bedel' : 'Video Cusub';
-  document.getElementById('v-id').value = v?.id || '';
-  document.getElementById('v-title').value = v?.title || '';
-  document.getElementById('v-url').value = v?.url || '';
-  document.getElementById('v-thumb').value = v?.thumbnail || '';
-  document.getElementById('v-desc').value = v?.description || '';
-  document.getElementById('v-type').value = v?.video_type || 'mp4';
-  document.getElementById('v-dur').value = v?.duration || '';
-  document.getElementById('v-order').value = v?.order_index || 0;
-  document.getElementById('v-cat').value = v?.category_id || '';
-  document.getElementById('v-featured').checked = !!v?.is_featured;
-  document.getElementById('v-published').checked = v ? !!v.is_published : true;
-  openModal('video-modal');
-}
+async function aLogout(){try{await api('/api/v1/auth/logout',{method:'POST'})}catch{}S.admin=null;toast('Waad ka baxday','success');rAdminLogin()}
 
-function editVideo(id) {
-  const v = state.videos.find(x => x.id == id);
-  if (v) openVideoModal(v);
-}
+/* ═══ MODAL ═══ */
+function oModal(h){$('#modalBox').innerHTML=h;$('#modalBg').classList.add('show')}
+function cModal(){$('#modalBg').classList.remove('show')}
+ $('#modalBg').onclick=e=>{if(e.target===$('#modalBg'))cModal()};
 
-async function saveVideo() {
-  const id = document.getElementById('v-id').value;
-  const data = {
-    title: document.getElementById('v-title').value.trim(),
-    url: document.getElementById('v-url').value.trim(),
-    thumbnail: document.getElementById('v-thumb').value.trim(),
-    description: document.getElementById('v-desc').value.trim(),
-    video_type: document.getElementById('v-type').value,
-    duration: document.getElementById('v-dur').value.trim(),
-    order_index: parseInt(document.getElementById('v-order').value) || 0,
-    category_id: document.getElementById('v-cat').value || null,
-    is_featured: document.getElementById('v-featured').checked,
-    is_published: document.getElementById('v-published').checked
-  };
-  if (!data.title || !data.url) { toast('Cinwaan iyo URL buuxi', 'error'); return; }
-  try {
-    if (id) await api('PUT', '/api/v1/admin/videos/' + id, data);
-    else await api('POST', '/api/v1/admin/videos', data);
-    closeModal('video-modal');
-    await loadVideos();
-    toast(id ? 'Video la update gareeyay' : 'Video la sameeyay', 'success');
-  } catch(e) { toast('Khalad: ' + e.message, 'error'); }
-}
-
-async function toggleVideo(id, pub) {
-  try {
-    await api('PUT', '/api/v1/admin/videos/' + id, { is_published: pub });
-    const v = state.videos.find(x => x.id == id);
-    if (v) v.is_published = pub;
-    toast(pub ? 'Video la baahiyay' : 'Video la qariiyay', 'info');
-  } catch(e) { toast('Khalad', 'error'); }
-}
-
-async function deleteVideo(id) {
-  confirmDelete('Miyaad hubtaa inaad tirtirto videogan?', async () => {
-    try { await api('DELETE', '/api/v1/admin/videos/' + id); await loadVideos(); toast('Video la tirtirday', 'success'); }
-    catch(e) { toast('Khalad', 'error'); }
-  });
-}
-
-/* ═══════════════════════════════════════════
-   AUDIO
-═══════════════════════════════════════════ */
-async function loadAudio() {
-  try {
-    state.audio = await api('GET', '/api/v1/admin/audio');
-    renderAudio(state.audio);
-  } catch(e) { console.error(e); }
-}
-
-function filterAudio() {
-  const q = document.getElementById('audio-search').value.toLowerCase();
-  renderAudio(state.audio.filter(a => a.title?.toLowerCase().includes(q) || a.artist?.toLowerCase().includes(q)));
-}
-
-function renderAudio(tracks) {
-  const tb = document.getElementById('audio-table');
-  if (!tracks.length) { tb.innerHTML = `<tr><td colspan="6"><div class="empty"><i class="fas fa-music"></i><p>Audio ma jiro</p></div></td></tr>`; return; }
-  tb.innerHTML = tracks.map(a => `
-    <tr>
-      <td class="text-main">${a.cover_url ? `<span style="display:flex;align-items:center;gap:8px"><img src="${esc(a.cover_url)}" style="width:36px;height:36px;border-radius:4px;object-fit:cover">${esc(a.title)}</span>` : esc(a.title)}</td>
-      <td>${esc(a.artist||'Unknown')}</td>
-      <td><span class="tag tag-yellow">${a.audio_type||'mp3'}</span></td>
-      <td class="mono">${fmtNum(a.views||0)}</td>
-      <td>${a.is_published ? `<span class="tag tag-green"><i class="fas fa-circle" style="font-size:7px"></i> Live</span>` : `<span class="tag tag-gray">Draft</span>`}</td>
-      <td>
-        <div class="actions-cell">
-          <button class="btn btn-ghost btn-sm btn-icon" onclick="editAudio('${a.id}')"><i class="fas fa-edit"></i></button>
-          <label class="switch">
-            <input type="checkbox" ${a.is_published?'checked':''} onchange="toggleAudio('${a.id}',this.checked)">
-            <div class="switch-slider"></div>
-          </label>
-          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteAudio('${a.id}')"><i class="fas fa-trash"></i></button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
-
-function openAudioModal(a) {
-  document.getElementById('audio-modal-title').textContent = a ? 'Audio Wax ka Bedel' : 'Audio Cusub';
-  document.getElementById('a-id').value = a?.id || '';
-  document.getElementById('a-title').value = a?.title || '';
-  document.getElementById('a-artist').value = a?.artist || '';
-  document.getElementById('a-url').value = a?.url || '';
-  document.getElementById('a-cover').value = a?.cover_url || '';
-  document.getElementById('a-type').value = a?.audio_type || 'mp3';
-  document.getElementById('a-dur').value = a?.duration || '';
-  document.getElementById('a-cat').value = a?.category || '';
-  document.getElementById('a-web').value = a?.website_url || '';
-  document.getElementById('a-published').checked = a ? !!a.is_published : true;
-  openModal('audio-modal');
-}
-function editAudio(id) { openAudioModal(state.audio.find(x => x.id == id)); }
-async function saveAudio() {
-  const id = document.getElementById('a-id').value;
-  const data = {
-    title: document.getElementById('a-title').value.trim(),
-    artist: document.getElementById('a-artist').value.trim(),
-    url: document.getElementById('a-url').value.trim(),
-    cover_url: document.getElementById('a-cover').value.trim(),
-    audio_type: document.getElementById('a-type').value,
-    duration: document.getElementById('a-dur').value.trim(),
-    category: document.getElementById('a-cat').value.trim(),
-    website_url: document.getElementById('a-web').value.trim(),
-    is_published: document.getElementById('a-published').checked
-  };
-  if (!data.title || !data.url) { toast('Cinwaan iyo URL buuxi', 'error'); return; }
-  try {
-    if (id) await api('PUT', '/api/v1/admin/audio/' + id, data);
-    else await api('POST', '/api/v1/admin/audio', data);
-    closeModal('audio-modal'); await loadAudio();
-    toast(id ? 'Audio la update gareeyay' : 'Audio la sameeyay', 'success');
-  } catch(e) { toast('Khalad: ' + e.message, 'error'); }
-}
-async function toggleAudio(id, pub) {
-  try { await api('PUT', '/api/v1/admin/audio/' + id, { is_published: pub }); toast(pub ? 'Audio la baahiyay' : 'Audio la qariiyay', 'info'); }
-  catch { toast('Khalad', 'error'); }
-}
-async function deleteAudio(id) {
-  confirmDelete('Miyaad hubtaa inaad tirtirto audiodan?', async () => {
-    try { await api('DELETE', '/api/v1/admin/audio/' + id); await loadAudio(); toast('Audio la tirtirday', 'success'); }
-    catch { toast('Khalad', 'error'); }
-  });
-}
-
-/* ═══════════════════════════════════════════
-   POSTS
-═══════════════════════════════════════════ */
-async function loadPosts() {
-  try {
-    state.posts = await api('GET', '/api/v1/admin/posts');
-    renderPosts();
-  } catch(e) { console.error(e); }
-}
-function renderPosts() {
-  const tb = document.getElementById('posts-table');
-  if (!state.posts.length) { tb.innerHTML = `<tr><td colspan="5"><div class="empty"><i class="fas fa-newspaper"></i><p>Post ma jiro</p></div></td></tr>`; return; }
-  tb.innerHTML = state.posts.map(p => `
-    <tr>
-      <td class="text-main">${esc(p.title)}</td>
-      <td>${esc(p.author||'—')}</td>
-      <td>${p.is_published ? `<span class="tag tag-green">Live</span>` : `<span class="tag tag-gray">Draft</span>`}</td>
-      <td style="font-size:12px;color:var(--text3)">${new Date(p.created_at).toLocaleDateString()}</td>
-      <td>
-        <div class="actions-cell">
-          <button class="btn btn-ghost btn-sm btn-icon" onclick="editPost('${p.id}')"><i class="fas fa-edit"></i></button>
-          <button class="btn btn-danger btn-sm btn-icon" onclick="deletePost('${p.id}')"><i class="fas fa-trash"></i></button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
-function openPostModal(p) {
-  document.getElementById('post-modal-title').textContent = p ? 'Post Wax ka Bedel' : 'Post Cusub';
-  document.getElementById('p-id').value = p?.id || '';
-  document.getElementById('p-title').value = p?.title || '';
-  document.getElementById('p-content').value = p?.content || '';
-  document.getElementById('p-author').value = p?.author || '';
-  document.getElementById('p-img').value = p?.image_url || '';
-  document.getElementById('p-published').checked = p ? !!p.is_published : true;
-  openModal('post-modal');
-}
-function editPost(id) { openPostModal(state.posts.find(x => x.id == id)); }
-async function savePost() {
-  const id = document.getElementById('p-id').value;
-  const data = {
-    title: document.getElementById('p-title').value.trim(),
-    content: document.getElementById('p-content').value.trim(),
-    author: document.getElementById('p-author').value.trim(),
-    image_url: document.getElementById('p-img').value.trim(),
-    is_published: document.getElementById('p-published').checked
-  };
-  if (!data.title || !data.content) { toast('Cinwaan iyo content buuxi', 'error'); return; }
-  try {
-    if (id) await api('PUT', '/api/v1/admin/posts/' + id, data);
-    else await api('POST', '/api/v1/admin/posts', data);
-    closeModal('post-modal'); await loadPosts();
-    toast(id ? 'Post la update gareeyay' : 'Post la sameeyay', 'success');
-  } catch(e) { toast('Khalad', 'error'); }
-}
-async function deletePost(id) {
-  confirmDelete('Miyaad hubtaa inaad tirtirto postgan?', async () => {
-    try { await api('DELETE', '/api/v1/admin/posts/' + id); await loadPosts(); toast('Post la tirtirday', 'success'); }
-    catch { toast('Khalad', 'error'); }
-  });
-}
-
-/* ═══════════════════════════════════════════
-   CATEGORIES
-═══════════════════════════════════════════ */
-async function loadCategories() {
-  try {
-    state.categories = await api('GET', '/api/v1/admin/categories');
-    renderCategories();
-  } catch(e) { console.error(e); }
-}
-function renderCategories() {
-  const tb = document.getElementById('categories-table');
-  if (!state.categories.length) { tb.innerHTML = `<tr><td colspan="5"><div class="empty"><i class="fas fa-folder"></i><p>Category ma jiro</p></div></td></tr>`; return; }
-  tb.innerHTML = state.categories.map(c => `
-    <tr>
-      <td><i class="fas ${c.icon||'fa-folder'}" style="color:var(--text2);font-size:18px"></i></td>
-      <td class="text-main">${esc(c.name)}</td>
-      <td>${esc(c.description||'—')}</td>
-      <td class="mono">${c.order_index||0}</td>
-      <td>
-        <div class="actions-cell">
-          <button class="btn btn-ghost btn-sm btn-icon" onclick="editCat('${c.id}')"><i class="fas fa-edit"></i></button>
-          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteCat('${c.id}')"><i class="fas fa-trash"></i></button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
-function openCatModal(c) {
-  document.getElementById('cat-modal-title').textContent = c ? 'Category Wax ka Bedel' : 'Category Cusub';
-  document.getElementById('c-id').value = c?.id || '';
-  document.getElementById('c-name').value = c?.name || '';
-  document.getElementById('c-desc').value = c?.description || '';
-  document.getElementById('c-icon').value = c?.icon || 'fa-folder';
-  document.getElementById('c-order').value = c?.order_index || 0;
-  openModal('cat-modal');
-}
-function editCat(id) { openCatModal(state.categories.find(x => x.id == id)); }
-async function saveCat() {
-  const id = document.getElementById('c-id').value;
-  const data = {
-    name: document.getElementById('c-name').value.trim(),
-    description: document.getElementById('c-desc').value.trim(),
-    icon: document.getElementById('c-icon').value.trim() || 'fa-folder',
-    order_index: parseInt(document.getElementById('c-order').value) || 0
-  };
-  if (!data.name) { toast('Magaca buuxi', 'error'); return; }
-  try {
-    if (id) await api('PUT', '/api/v1/admin/categories/' + id, data);
-    else await api('POST', '/api/v1/admin/categories', data);
-    closeModal('cat-modal'); await loadCategories();
-    toast(id ? 'Category la update gareeyay' : 'Category la sameeyay', 'success');
-  } catch(e) { toast('Khalad', 'error'); }
-}
-async function deleteCat(id) {
-  confirmDelete('Miyaad hubtaa inaad tirtirto categorydan?', async () => {
-    try { await api('DELETE', '/api/v1/admin/categories/' + id); await loadCategories(); toast('Category la tirtirday', 'success'); }
-    catch { toast('Khalad', 'error'); }
-  });
-}
-
-/* ═══════════════════════════════════════════
-   MESSAGES
-═══════════════════════════════════════════ */
-async function loadMessages() {
-  try {
-    state.messages = await api('GET', '/api/v1/admin/contacts');
-    renderMessages();
-  } catch(e) { console.error(e); }
-}
-function renderMessages() {
-  const tb = document.getElementById('messages-table');
-  if (!state.messages.length) { tb.innerHTML = `<tr><td colspan="6"><div class="empty"><i class="fas fa-envelope"></i><p>Farriin ma jiro</p></div></td></tr>`; return; }
-  tb.innerHTML = state.messages.map(m => `
-    <tr style="${!m.is_read ? 'background:rgba(255,255,255,.02)' : ''}">
-      <td class="text-main" style="${!m.is_read ? 'font-weight:700' : ''}">${esc(m.alias_name||'—')}</td>
-      <td style="font-size:12px;color:var(--text3)">${esc(m.contact_method||'—')}</td>
-      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc((m.message||'').substring(0,60))}${(m.message||'').length>60?'...':''}</td>
-      <td style="font-size:12px;color:var(--text3)">${new Date(m.created_at).toLocaleDateString()}</td>
-      <td>${m.is_read ? `<span class="tag tag-gray">Akhristay</span>` : `<span class="tag tag-yellow">Cusub</span>`}</td>
-      <td>
-        <div class="actions-cell">
-          <button class="btn btn-ghost btn-sm btn-icon" onclick="viewMessage('${m.id}')" title="Eeg"><i class="fas fa-eye"></i></button>
-          ${!m.is_read ? `<button class="btn btn-ghost btn-sm btn-icon" onclick="markRead('${m.id}')" title="Mark read"><i class="fas fa-check"></i></button>` : ''}
-          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteMessage('${m.id}')"><i class="fas fa-trash"></i></button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
-function viewMessage(id) {
-  const m = state.messages.find(x => x.id == id);
-  if (!m) return;
-  document.getElementById('msg-modal-body').innerHTML = `
-    <div style="margin-bottom:16px">
-      <div class="form-label">Magac</div>
-      <div style="font-size:15px;font-weight:600">${esc(m.alias_name)}</div>
-    </div>
-    <div style="margin-bottom:16px">
-      <div class="form-label">Xiriir</div>
-      <div>${esc(m.contact_method||'—')}</div>
-    </div>
-    <div style="margin-bottom:16px">
-      <div class="form-label">Nooca Farriin</div>
-      <div>${esc(m.message_type||'—')}</div>
-    </div>
-    <div style="margin-bottom:16px">
-      <div class="form-label">Farriin</div>
-      <div style="background:var(--bg3);border-radius:8px;padding:12px;font-size:14px;line-height:1.6">${esc(m.message||'')}</div>
-    </div>
-    <div style="font-size:12px;color:var(--text3)">${new Date(m.created_at).toLocaleString()}</div>
-  `;
-  openModal('msg-modal');
-  if (!m.is_read) markRead(id);
-}
-async function markRead(id) {
-  try {
-    await api('PUT', '/api/v1/admin/contacts/' + id, { is_read: true });
-    const m = state.messages.find(x => x.id == id);
-    if (m) m.is_read = true;
-    renderMessages();
-    toast('Farriinta la akhristay', 'info');
-  } catch { toast('Khalad', 'error'); }
-}
-async function deleteMessage(id) {
-  confirmDelete('Miyaad hubtaa inaad tirtirto farriintan?', async () => {
-    try { await api('DELETE', '/api/v1/admin/contacts/' + id); await loadMessages(); toast('Farriin la tirtirday', 'success'); }
-    catch { toast('Khalad', 'error'); }
-  });
-}
-
-/* ═══════════════════════════════════════════
-   SETTINGS
-═══════════════════════════════════════════ */
-async function loadSettings() {
-  try {
-    const d = await api('GET', '/api/v1/settings');
-    if (d.site_name) document.getElementById('s-name').value = d.site_name;
-    if (d.site_description) document.getElementById('s-desc').value = d.site_description;
-    if (d.logo_url) document.getElementById('s-logo').value = d.logo_url;
-    if (d.contact_email) document.getElementById('s-email').value = d.contact_email;
-  } catch {}
-}
-async function saveSettings() {
-  const data = {
-    site_name: document.getElementById('s-name').value.trim(),
-    site_description: document.getElementById('s-desc').value.trim(),
-    logo_url: document.getElementById('s-logo').value.trim(),
-    contact_email: document.getElementById('s-email').value.trim()
-  };
-  try {
-    await api('PUT', '/api/v1/admin/settings', data);
-    toast('Settings la keydsday', 'success');
-  } catch(e) { toast('Khalad', 'error'); }
-}
-
-/* ═══════════════════════════════════════════
-   SECURITY
-═══════════════════════════════════════════ */
-async function saveCredentials() {
-  const pin = document.getElementById('sec-pin').value.trim();
-  const nu = document.getElementById('sec-user').value.trim();
-  const np = document.getElementById('sec-pass').value;
-  const npin = document.getElementById('sec-newpin').value.trim();
-  if (!pin || pin.length !== 8) { toast('PIN 8 digits ah geli', 'error'); return; }
-  if (!nu && !np && !npin) { toast('Mid ka mid ah buuxi', 'error'); return; }
-  const data = { pin };
-  if (nu) data.new_username = nu;
-  if (np) data.new_password = np;
-  if (npin) { if (npin.length !== 8) { toast('PIN cusub 8 digits', 'error'); return; } data.new_pin = npin; }
-  try {
-    await api('PUT', '/api/v1/admin/credentials', data);
-    toast('Macluumaadka la beddelay', 'success');
-    ['sec-pin','sec-user','sec-pass','sec-newpin'].forEach(id => document.getElementById(id).value = '');
-  } catch(e) { toast('Khalad: PIN saxi', 'error'); }
-}
-
-/* ═══════════════════════════════════════════
-   CONTEXT MENU (right-click on nav items)
-═══════════════════════════════════════════ */
-let ctxTarget = null;
-const ctxMenu = document.getElementById('ctx-menu');
-
-document.querySelectorAll('.nav-item[id^="nav-"]').forEach(item => {
-  item.addEventListener('contextmenu', e => {
-    e.preventDefault();
-    ctxTarget = item;
-    ctxMenu.style.left = e.clientX + 'px';
-    ctxMenu.style.top = Math.min(e.clientY, window.innerHeight - 120) + 'px';
-    ctxMenu.classList.add('show');
-  });
-});
-
-document.getElementById('ctx-rename').onclick = () => {
-  hideCtxMenu();
-  openRenameModal();
-};
-document.getElementById('ctx-edit').onclick = () => hideCtxMenu();
-document.getElementById('ctx-delete').onclick = () => hideCtxMenu();
-
-function hideCtxMenu() { ctxMenu.classList.remove('show'); }
-
-/* ═══════════════════════════════════════════
-   UTILS
-═══════════════════════════════════════════ */
-function esc(s) {
-  if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function fmtNum(n) {
-  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
-  if (n >= 1000) return (n/1000).toFixed(1) + 'K';
-  return String(n);
-}
+/* ═══ INIT ═══ */
+window.addEventListener('hashchange',router);
+window.addEventListener('DOMContentLoaded',()=>{ldS();ldC();router()});
 </script>
 </body>
 </html>
