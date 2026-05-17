@@ -1,419 +1,239 @@
 <!DOCTYPE html>
-<html lang="so">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Maxaas.u — Streaming & Admin</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<style>
-:root{--bg:#0a0a0a;--bg2:#111;--bg3:#1a1a1a;--bg4:#222;--bg5:#2a2a2a;--surface:#181818;--surface2:#1e1e1e;--border:#2a2a2a;--border2:#383838;--red:#ff0000;--red2:#cc0000;--red-glow:rgba(255,0,0,.12);--text:#f1f1f1;--text2:#b3b3b3;--text3:#777;--text4:#555;--green:#00c853;--blue:#2979ff;--yellow:#ffd600;--sidebar-w:240px;--radius:10px;--radius-sm:6px;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--tr:0.2s cubic-bezier(.4,0,.2,1)}
-*{margin:0;padding:0;box-sizing:border-box}body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}a{text-decoration:none;color:inherit}button{font-family:var(--font);cursor:pointer}input,textarea,select{font-family:var(--font)}
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes modalIn{from{opacity:0;transform:scale(.94) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-@keyframes toastIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
-@keyframes livePulse{0%,100%{opacity:1}50%{opacity:.4}}
-.spinner{width:24px;height:24px;border:2px solid var(--border2);border-top-color:var(--red);border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
-.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
-.tag-red{background:rgba(255,0,0,.12);color:#ff6666}.tag-blue{background:rgba(41,121,255,.12);color:#6699ff}.tag-green{background:rgba(0,200,83,.12);color:#66ffaa}.tag-gray{background:var(--bg4);color:var(--text3)}.tag-yellow{background:rgba(255,214,0,.12);color:#ffd600}
-.live-dot{width:8px;height:8px;background:var(--red);border-radius:50%;animation:livePulse 1.2s ease infinite;display:inline-block}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;border:none;transition:all var(--tr);white-space:nowrap}
-.btn-primary{background:var(--red);color:#fff}.btn-primary:hover{background:var(--red2);transform:translateY(-1px)}
-.btn-secondary{background:var(--bg4);color:var(--text2);border:1px solid var(--border)}.btn-secondary:hover{background:var(--bg3);color:var(--text)}
-.btn-ghost{background:transparent;color:var(--text3);padding:8px 12px}.btn-ghost:hover{color:var(--text);background:var(--bg4)}
-.btn-danger{background:rgba(255,0,0,.1);color:#ff4444;border:1px solid rgba(255,0,0,.2)}.btn-danger:hover{background:rgba(255,0,0,.2)}
-.btn-sm{padding:6px 12px;font-size:12px}.btn-icon{width:36px;height:36px;padding:0;justify-content:center;border-radius:50%}
-.form-group{margin-bottom:16px}.form-label{display:block;font-size:12px;font-weight:600;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
-.form-control{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;color:var(--text);font-size:14px;outline:none;transition:border-color var(--tr)}
-.form-control:focus{border-color:var(--red)}.form-control::placeholder{color:var(--text4)}textarea.form-control{resize:vertical;min-height:80px}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.form-check{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;color:var(--text2)}
-.form-check input[type=checkbox]{accent-color:var(--red);width:15px;height:15px;cursor:pointer}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Maxaas.u | Premium Streaming</title>
+  
+  <!-- Premium Player -->
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+  
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-/* MODALS */
-.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
-.modal-backdrop.open{display:flex}.modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.6);animation:modalIn .2s ease}
-.modal-header{padding:20px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.modal-title{font-size:16px;font-weight:700}.modal-close{width:32px;height:32px;border:none;background:var(--bg4);color:var(--text2);border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all var(--tr)}.modal-close:hover{background:var(--border2);color:var(--text)}
-.modal-body{padding:20px}.modal-footer{padding:16px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
-.divider{height:1px;background:var(--border);margin:16px 0}
+  <style>
+    :root {
+      --bg-dark: #0a0a0a;
+      --bg-card: #141414;
+      --accent: #e50914;
+      --text-main: #ffffff;
+      --text-muted: #8c8c8c;
+    }
 
-/* TOASTS */
-.toasts{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-.toast{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;font-size:13px;color:var(--text);display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,.6);animation:toastIn .25s ease;pointer-events:all;max-width:320px}
-.toast.success{border-left:3px solid var(--green)}.toast.error{border-left:3px solid var(--red)}.toast.info{border-left:3px solid var(--blue)}
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      overflow-x: hidden;
+      -webkit-user-select: none; /* Prevent text selection */
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
 
-/* SWITCH */
-.switch{position:relative;width:36px;height:20px;flex-shrink:0}.switch input{opacity:0;width:0;height:0}
-.switch-slider{position:absolute;inset:0;background:var(--bg4);border-radius:20px;cursor:pointer;transition:background var(--tr)}
-.switch-slider::before{content:'';position:absolute;height:14px;width:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform var(--tr)}
-.switch input:checked+.switch-slider{background:var(--green)}.switch input:checked+.switch-slider::before{transform:translateX(16px)}
+    /* NAVBAR */
+    .navbar {
+      position: fixed; top: 0; width: 100%; padding: 20px 50px;
+      display: flex; justify-content: space-between; align-items: center;
+      z-index: 1000; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+    }
+    .logo { font-size: 2rem; font-weight: 800; color: var(--accent); letter-spacing: -1px; }
+    .nav-links a { color: var(--text-main); text-decoration: none; margin-left: 20px; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text-muted); }
 
-/* TABLE */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px}
-.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.card-title{font-size:15px;font-weight:600}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:13px}
-thead tr{border-bottom:1px solid var(--border)}thead th{padding:10px 16px;text-align:left;color:var(--text4);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
-tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background var(--tr)}tbody tr:last-child{border-bottom:none}tbody tr:hover{background:var(--bg4)}
-td{padding:12px 16px;color:var(--text2);vertical-align:middle}td.text-main{color:var(--text);font-weight:500}td .mono{font-family:var(--mono);font-size:12px}
-.thumb{width:80px;height:45px;object-fit:cover;border-radius:4px;background:var(--bg4)}.actions-cell{display:flex;align-items:center;gap:4px}
-.table-search{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 12px;min-width:200px}
-.table-search input{background:transparent;border:none;color:var(--text);font-size:13px;outline:none;width:100%}
-.empty{text-align:center;padding:48px 24px;color:var(--text4)}.empty i{font-size:40px;margin-bottom:12px;opacity:.4}
+    /* HERO SECTION */
+    .hero {
+      height: 90vh; position: relative;
+      background-size: cover; background-position: center;
+      display: flex; align-items: center; padding: 0 50px;
+    }
+    .hero::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 40%; background: linear-gradient(to top, var(--bg-dark), transparent); }
+    .hero-content { position: relative; z-index: 2; max-width: 600px; }
+    .hero-title { font-size: 4rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px; text-shadow: 2px 2px 8px rgba(0,0,0,0.6); }
+    .hero-desc { color: var(--text-muted); font-size: 1.2rem; margin-bottom: 30px; }
+    .btn-play { background: var(--accent); color: white; border: none; padding: 15px 40px; font-size: 1.2rem; font-weight: 600; border-radius: 5px; cursor: pointer; transition: transform 0.2s, background 0.2s; }
+    .btn-play:hover { transform: scale(1.05); background: #f40612; }
 
-/* VIEW SWITCHING */
-#public-view{display:block}#admin-view{display:none}#login-page{display:none;position:fixed;inset:0;background:var(--bg);z-index:1000;align-items:center;justify-content:center}
-#login-page.show{display:flex}
+    /* CATEGORIES / SLIDER */
+    .section { padding: 30px 50px; position: relative; z-index: 2; margin-top: -100px; }
+    .section-title { font-size: 1.5rem; font-weight: 600; margin-bottom: 20px; }
+    .slider { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 20px; scroll-behavior: smooth; scrollbar-width: none; }
+    .slider::-webkit-scrollbar { display: none; }
 
-/* ══════════ PUBLIC ══════════ */
-.pub-header{position:fixed;top:0;left:0;right:0;height:60px;background:rgba(10,10,10,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;z-index:100;gap:16px}
-.pub-logo{display:flex;align-items:center;gap:10px;flex-shrink:0}.pub-logo-icon{width:36px;height:36px;background:var(--red);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff}
-.pub-logo-text{font-size:20px;font-weight:800;letter-spacing:-.5px}.pub-logo-text span{color:var(--red)}
-.pub-nav{display:flex;align-items:center;gap:4px;margin-left:24px}
-.pub-nav-item{padding:8px 16px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;color:var(--text2);cursor:pointer;transition:all var(--tr);border:none;background:none}
-.pub-nav-item:hover{color:var(--text);background:var(--bg4)}.pub-nav-item.active{color:var(--text);background:var(--red-glow)}
-.pub-search{flex:1;max-width:440px;margin:0 auto;display:flex;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:40px;overflow:hidden;transition:border-color var(--tr)}
-.pub-search:focus-within{border-color:var(--red)}.pub-search input{flex:1;background:transparent;border:none;padding:9px 16px;color:var(--text);font-size:13px;outline:none}
-.pub-search input::placeholder{color:var(--text4)}.pub-search-btn{width:44px;height:38px;background:var(--bg4);border:none;border-left:1px solid var(--border);color:var(--text3);cursor:pointer;transition:all var(--tr)}.pub-search-btn:hover{color:var(--text)}
-.pub-admin-btn{padding:7px 14px;border-radius:var(--radius-sm);background:transparent;border:1px solid var(--border2);color:var(--text3);font-size:12px;font-weight:600;cursor:pointer;transition:all var(--tr);display:flex;align-items:center;gap:6px}.pub-admin-btn:hover{border-color:var(--red);color:var(--red);background:var(--red-glow)}
-.pub-main{padding-top:60px;min-height:100vh;padding-bottom:90px}.pub-page{display:none;padding:24px 28px;animation:fadeIn .3s ease}.pub-page.active{display:block}
+    .card {
+      min-width: 250px; height: 350px; border-radius: 8px; overflow: hidden;
+      position: relative; cursor: pointer; transition: transform 0.3s ease, z-index 0.3s;
+    }
+    .card:hover { transform: scale(1.1); z-index: 10; }
+    .card img { width: 100%; height: 100%; object-fit: cover; }
+    .card-info {
+      position: absolute; bottom: 0; left: 0; right: 0; padding: 20px;
+      background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); opacity: 0; transition: opacity 0.3s;
+    }
+    .card:hover .card-info { opacity: 1; }
 
-/* Hero */
-.hero{position:relative;height:480px;border-radius:16px;overflow:hidden;margin-bottom:32px;background:var(--bg2);cursor:pointer}
-.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:brightness(.4);transition:transform 8s ease}.hero:hover .hero-bg{transform:scale(1.05)}
-.hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,10,.95) 0%,rgba(10,10,10,.3) 50%,transparent 100%)}
-.hero-content{position:absolute;bottom:0;left:0;right:0;padding:40px;display:flex;align-items:flex-end;gap:24px}
-.hero-info{flex:1;min-width:0}.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(255,0,0,.2);color:#ff6666;margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
-.hero-title{font-size:36px;font-weight:900;line-height:1.1;letter-spacing:-1px;margin-bottom:8px}.hero-meta{font-size:14px;color:var(--text2);display:flex;align-items:center;gap:16px;flex-wrap:wrap}.hero-meta i{color:var(--text3);margin-right:4px}
-.hero-play-btn{width:64px;height:64px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--tr);box-shadow:0 4px 24px rgba(255,0,0,.4);flex-shrink:0}.hero-play-btn:hover{transform:scale(1.1)}
+    /* VIDEO PLAYER MODAL */
+    .player-modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.95); z-index: 9999; justify-content: center; align-items: center;
+    }
+    .player-container { width: 90%; max-width: 1100px; position: relative; }
+    .close-btn { position: absolute; top: -40px; right: 0; color: white; font-size: 2rem; cursor: pointer; z-index: 10000; }
 
-/* Section */
-.section{margin-bottom:40px}.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px}
-.section-title{font-size:20px;font-weight:700;letter-spacing:-.3px;display:flex;align-items:center;gap:10px}.section-title i{color:var(--red);font-size:18px}
-.section-link{font-size:13px;color:var(--text3);cursor:pointer;transition:color var(--tr);display:flex;align-items:center;gap:4px}.section-link:hover{color:var(--red)}
-
-/* Cat Tabs */
-.cat-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:20px;scrollbar-width:none}.cat-tabs::-webkit-scrollbar{display:none}
-.cat-tab{padding:7px 18px;border-radius:20px;font-size:13px;font-weight:500;color:var(--text2);background:var(--bg3);border:1px solid var(--border);cursor:pointer;transition:all var(--tr);white-space:nowrap;flex-shrink:0}
-.cat-tab:hover{border-color:var(--border2);color:var(--text)}.cat-tab.active{background:var(--red);border-color:var(--red);color:#fff}
-
-/* Video Grid */
-.vid-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
-.vid-card{background:var(--surface);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all var(--tr);border:1px solid transparent}.vid-card:hover{transform:translateY(-4px);border-color:var(--border2);box-shadow:0 8px 32px rgba(0,0,0,.6)}
-.vid-thumb{position:relative;aspect-ratio:16/9;background:var(--bg3);overflow:hidden}.vid-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease}.vid-card:hover .vid-thumb img{transform:scale(1.06)}
-.vid-thumb-overlay{position:absolute;inset:0;background:rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity var(--tr)}.vid-card:hover .vid-thumb-overlay{opacity:1}
-.vid-play-icon{width:48px;height:48px;background:rgba(255,0,0,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff}
-.vid-duration{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.8);padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;font-family:var(--mono);color:#fff}
-.vid-body{padding:14px}.vid-title{font-size:14px;font-weight:600;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:6px}
-.vid-meta{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:12px}
-
-/* Audio Grid */
-.audio-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
-.audio-card{background:var(--surface);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all var(--tr);display:flex;flex-direction:column;align-items:center;text-align:center;border:1px solid transparent}.audio-card:hover{transform:translateY(-3px);border-color:var(--border2)}
-.audio-cover{width:100%;aspect-ratio:1;border-radius:var(--radius);background:var(--bg3);overflow:hidden;margin-bottom:14px;position:relative;box-shadow:0 4px 16px rgba(0,0,0,.4)}.audio-cover img{width:100%;height:100%;object-fit:cover}
-.audio-cover-play{position:absolute;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity var(--tr);font-size:28px;color:#fff}.audio-card:hover .audio-cover-play{opacity:1}
-.audio-title{font-size:14px;font-weight:600;margin-bottom:4px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.audio-artist{font-size:12px;color:var(--text3)}
-
-/* Post Grid */
-.post-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
-.post-card{background:var(--surface);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all var(--tr);border:1px solid transparent}.post-card:hover{transform:translateY(-3px);border-color:var(--border2)}
-.post-img{aspect-ratio:16/9;background:var(--bg3);overflow:hidden}.post-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease}.post-card:hover .post-img img{transform:scale(1.04)}
-.post-body{padding:18px}.post-title{font-size:16px;font-weight:700;margin-bottom:8px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.post-excerpt{font-size:13px;color:var(--text2);line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:12px}
-.post-footer{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:12px}
-
-/* Player */
-.player-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;align-items:center;justify-content:center;flex-direction:column;padding:16px;backdrop-filter:blur(8px)}.player-overlay.open{display:flex}
-.player-container{width:100%;max-width:1000px;animation:modalIn .3s ease}.player-video-wrap{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:16px 16px 0 0;overflow:hidden}
-.player-video-wrap video,.player-video-wrap iframe{width:100%;height:100%;border:none}
-.player-info{background:var(--bg2);border-radius:0 0 16px 16px;padding:20px 24px}.player-title{font-size:20px;font-weight:700;margin-bottom:8px}.player-meta{font-size:13px;color:var(--text2);display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.player-close{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.6);border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;backdrop-filter:blur(4px);transition:all var(--tr)}.player-close:hover{background:var(--red)}
-
-/* Audio Bar */
-.audio-bar{display:none;position:fixed;bottom:0;left:0;right:0;height:72px;background:var(--bg2);border-top:1px solid var(--border);z-index:200;align-items:center;padding:0 20px;gap:16px;animation:slideUp .3s ease}.audio-bar.open{display:flex}
-.audio-bar-cover{width:48px;height:48px;border-radius:6px;background:var(--bg4);overflow:hidden;flex-shrink:0}.audio-bar-cover img{width:100%;height:100%;object-fit:cover}
-.audio-bar-info{flex:1;min-width:0}.audio-bar-title{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.audio-bar-artist{font-size:11px;color:var(--text3)}
-.audio-bar-controls{display:flex;align-items:center;gap:12px}.audio-bar-btn{width:36px;height:36px;border-radius:50%;border:none;background:transparent;color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--tr)}.audio-bar-btn:hover{background:var(--bg4)}
-.audio-bar-btn.play-btn{width:42px;height:42px;background:var(--red);color:#fff;font-size:16px}.audio-bar-btn.play-btn:hover{background:var(--red2);transform:scale(1.05)}
-.audio-bar-progress{flex:2;max-width:400px;display:flex;align-items:center;gap:8px}.audio-bar-time{font-size:11px;color:var(--text3);font-family:var(--mono);min-width:36px}
-.progress-track{flex:1;height:4px;background:var(--bg4);border-radius:2px;cursor:pointer;position:relative;overflow:hidden}.progress-fill{height:100%;background:var(--red);border-radius:2px;width:0%;transition:width .1s linear}
-
-/* Contact */
-.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-
-/* Footer */
-.pub-footer{background:var(--bg2);border-top:1px solid var(--border);padding:40px 28px 20px;margin-top:40px}
-.pub-footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;margin-bottom:32px}
-.pub-footer-brand{font-size:20px;font-weight:800;margin-bottom:8px}.pub-footer-brand span{color:var(--red)}.pub-footer-desc{font-size:13px;color:var(--text3);line-height:1.6;max-width:300px}
-.pub-footer-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;color:var(--text2)}
-.pub-footer-links{list-style:none;display:flex;flex-direction:column;gap:8px}.pub-footer-links li a{font-size:13px;color:var(--text3);transition:color var(--tr)}.pub-footer-links li a:hover{color:var(--red)}
-.pub-footer-bottom{border-top:1px solid var(--border);padding-top:16px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text4)}
-
-/* ══════════ ADMIN ══════════ */
-.admin-header{position:fixed;top:0;left:0;right:0;height:56px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 16px;z-index:200;backdrop-filter:blur(12px)}
-.admin-menu-btn{width:40px;height:40px;border:none;background:transparent;color:var(--text);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:background var(--tr);flex-shrink:0}.admin-menu-btn:hover{background:var(--bg4)}
-.admin-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0}.admin-logo-icon{width:32px;height:32px;background:var(--red);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff}
-.admin-logo-text{font-size:18px;font-weight:800;letter-spacing:-.5px}.admin-logo-text span{color:var(--red)}
-.admin-back-btn{padding:6px 14px;border-radius:var(--radius-sm);background:var(--bg4);border:1px solid var(--border);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all var(--tr);margin-left:auto}.admin-back-btn:hover{border-color:var(--red);color:var(--red)}
-.admin-icon-btn{width:40px;height:40px;border:none;background:transparent;color:var(--text2);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all var(--tr);position:relative;flex-shrink:0}.admin-icon-btn:hover{background:var(--bg4);color:var(--text)}
-.admin-badge{position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid var(--bg2)}
-.admin-avatar{width:32px;height:32px;background:linear-gradient(135deg,var(--red),#ff6b6b);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0}
-
-.admin-sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:150}.admin-sidebar-overlay.show{display:block}
-.admin-sidebar{position:fixed;top:56px;left:0;bottom:0;width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;z-index:160;transition:transform var(--tr);scrollbar-width:thin;scrollbar-color:var(--border) transparent}
-.admin-sidebar::-webkit-scrollbar{width:4px}.admin-sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.sidebar-section{padding:8px 0;border-bottom:1px solid var(--border)}.section-label{font-size:11px;font-weight:600;color:var(--text4);text-transform:uppercase;letter-spacing:1px;padding:8px 20px 4px;white-space:nowrap}
-.nav-item{display:flex;align-items:center;gap:16px;padding:10px 16px;cursor:pointer;border-radius:6px;margin:2px 8px;transition:all var(--tr);text-decoration:none;color:var(--text2);font-size:14px;font-weight:500;white-space:nowrap;position:relative;overflow:hidden}
-.nav-item:hover{background:var(--bg4);color:var(--text)}.nav-item.active{background:var(--red-glow);color:var(--text)}.nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--red);border-radius:0 2px 2px 0}
-.nav-icon{width:20px;text-align:center;font-size:15px;flex-shrink:0}.nav-label{flex:1;overflow:hidden;text-overflow:ellipsis}
-.nav-badge{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center}
-
-.admin-main{margin-left:var(--sidebar-w);padding-top:56px;min-height:100vh}.admin-page{display:none;padding:24px;animation:fadeIn .25s ease}.admin-page.active{display:block}
-.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
-.page-title{font-size:22px;font-weight:700;letter-spacing:-.5px}.breadcrumb{font-size:12px;color:var(--text4);margin-bottom:6px;display:flex;align-items:center;gap:6px}.breadcrumb span{color:var(--text2)}
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:28px}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden;transition:border-color var(--tr),transform var(--tr);cursor:default}.stat-card:hover{border-color:var(--border2);transform:translateY(-2px)}
-.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}.stat-card.red::before{background:var(--red)}.stat-card.blue::before{background:var(--blue)}.stat-card.green::before{background:var(--green)}.stat-card.yellow::before{background:var(--yellow)}
-.stat-icon{width:40px;height:40px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:14px}
-.stat-icon.red{background:rgba(255,0,0,.12);color:var(--red)}.stat-icon.blue{background:rgba(41,121,255,.12);color:var(--blue)}.stat-icon.green{background:rgba(0,200,83,.12);color:var(--green)}.stat-icon.yellow{background:rgba(255,214,0,.12);color:var(--yellow)}
-.stat-value{font-size:28px;font-weight:800;line-height:1;font-family:var(--mono)}.stat-label{font-size:12px;color:var(--text4);margin-top:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
-
-.bar-chart{display:flex;align-items:flex-end;gap:6px;height:100px;padding:0 4px}.bar{flex:1;background:var(--red-glow);border-radius:4px 4px 0 0;border:1px solid rgba(255,0,0,.2);cursor:pointer;transition:background var(--tr);min-height:4px}.bar:hover{background:rgba(255,0,0,.3)}
-
-/* Login */
-.login-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
-.login-logo{text-align:center;margin-bottom:28px}.login-logo-icon{width:56px;height:56px;background:var(--red);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;margin:0 auto 12px}
-.login-title{font-size:22px;font-weight:800;text-align:center;margin-bottom:4px}.login-sub{text-align:center;color:var(--text4);font-size:13px;margin-bottom:28px}
-.login-error{background:rgba(255,0,0,.1);border:1px solid rgba(255,0,0,.3);border-radius:6px;padding:10px 14px;font-size:13px;color:#ff6666;margin-bottom:16px;display:none}.login-error.show{display:block}
-
-.rename-list{display:flex;flex-direction:column;gap:10px}.rename-item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px}
-.rename-item-icon{width:36px;height:36px;background:var(--bg4);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:14px;flex-shrink:0}
-.rename-item-info{flex:1;min-width:0}.rename-item-label{font-size:11px;color:var(--text4);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
-.rename-item-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--font);font-size:13px;font-weight:500;padding:5px 8px;outline:none;transition:border-color var(--tr)}.rename-item-input:focus{border-color:var(--blue)}
-
-@media(max-width:768px){
-.pub-nav{display:none}.hero{height:320px}.hero-title{font-size:24px}.hero-content{padding:24px}
-.vid-grid{grid-template-columns:1fr 1fr;gap:12px}.audio-grid{grid-template-columns:1fr 2fr;gap:10px}.post-grid{grid-template-columns:1fr}.contact-grid{grid-template-columns:1fr}
-.pub-footer-grid{grid-template-columns:1fr 1fr;gap:20px}.stats-grid{grid-template-columns:1fr 1fr}.form-row{grid-template-columns:1fr}
-.admin-sidebar{transform:translateX(-100%)}.admin-sidebar.mobile-open{transform:translateX(0)}.admin-main{margin-left:0!important}
-.audio-bar-progress{display:none}
-}
-@media(max-width:480px){.vid-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr}.pub-footer-grid{grid-template-columns:1fr}}
-</style>
+    /* MOBILE OPTIMIZATION */
+    @media (max-width: 768px) {
+      .navbar { padding: 15px 20px; }
+      .hero { height: 70vh; padding: 0 20px; }
+      .hero-title { font-size: 2.5rem; }
+      .section { padding: 20px; margin-top: -50px; }
+      .card { min-width: 150px; height: 220px; }
+      .btn-play { padding: 12px 25px; font-size: 1rem; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- ═══ PUBLIC VIEW ═══ -->
-<div id="public-view">
-  <header class="pub-header">
-    <a href="#" class="pub-logo" onclick="pubShow('home')"><div class="pub-logo-icon"><i class="fab fa-youtube"></i></div><div class="pub-logo-text">Maxaas<span>.u</span></div></a>
-    <nav class="pub-nav" id="pub-nav">
-      <button class="pub-nav-item active" onclick="pubShow('home')" data-page="home">Bogga Hore</button>
-      <button class="pub-nav-item" onclick="pubShow('videos')" data-page="videos">Videos</button>
-      <button class="pub-nav-item" onclick="pubShow('audio')" data-page="audio">Audio</button>
-      <button class="pub-nav-item" onclick="pubShow('posts')" data-page="posts">Posts</button>
-      <button class="pub-nav-item" onclick="pubShow('contact')" data-page="contact">Nala Xiriir</button>
-    </nav>
-    <div class="pub-search"><input type="text" placeholder="Raadi..." id="pub-search-input" onkeydown="if(event.key==='Enter')pubSearch()"><button class="pub-search-btn" onclick="pubSearch()"><i class="fas fa-search"></i></button></div>
-    <button class="pub-admin-btn" onclick="enterAdmin()"><i class="fas fa-lock"></i> Admin</button>
-  </header>
-  <main class="pub-main">
-    <div class="pub-page active" id="pub-page-home"><div id="hero-area"></div><div class="section" id="sec-vids"><div class="section-header"><div class="section-title"><i class="fas fa-fire"></i> Videos Ugu Weyn</div><a class="section-link" onclick="pubShow('videos')">Dhammaan <i class="fas fa-arrow-right"></i></a></div><div class="vid-grid" id="home-videos"></div></div><div class="section" id="sec-auds"><div class="section-header"><div class="section-title"><i class="fas fa-music"></i> Audio Cusub</div><a class="section-link" onclick="pubShow('audio')">Dhammaan <i class="fas fa-arrow-right"></i></a></div><div class="audio-grid" id="home-audio"></div></div><div class="section" id="sec-posts"><div class="section-header"><div class="section-title"><i class="fas fa-newspaper"></i> Posts</div><a class="section-link" onclick="pubShow('posts')">Dhammaan <i class="fas fa-arrow-right"></i></a></div><div class="post-grid" id="home-posts"></div></div></div>
-    <div class="pub-page" id="pub-page-videos"><div class="section-header" style="margin-top:8px"><div class="section-title"><i class="fas fa-play-circle"></i> Dhammaan Videos</div></div><div class="cat-tabs" id="pub-vid-cats"></div><div class="vid-grid" id="pub-videos"></div></div>
-    <div class="pub-page" id="pub-page-audio"><div class="section-header" style="margin-top:8px"><div class="section-title"><i class="fas fa-headphones"></i> Dhammaan Audio</div></div><div class="audio-grid" id="pub-audio"></div></div>
-    <div class="pub-page" id="pub-page-posts"><div class="section-header" style="margin-top:8px"><div class="section-title"><i class="fas fa-newspaper"></i> Dhammaan Posts</div></div><div class="post-grid" id="pub-posts"></div></div>
-    <div class="pub-page" id="pub-page-contact"><div class="section-header" style="margin-top:8px"><div class="section-title"><i class="fas fa-envelope"></i> Nala Xiriir</div></div><div class="contact-grid"><div class="card"><div class="modal-body"><div class="form-group"><label class="form-label">Magacaaga</label><input class="form-control" id="ct-name" placeholder="Magacaaga..."></div><div class="form-group"><label class="form-label">Email / Telefoon</label><input class="form-control" id="ct-contact" placeholder="email@example.com"></div><div class="form-group"><label class="form-label">Farriinta</label><textarea class="form-control" id="ct-message" rows="5" placeholder="Qor farriintaada..."></textarea></div><button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px" onclick="submitContact()"><i class="fas fa-paper-plane"></i> Dir</button></div></div><div><div class="card" style="padding:24px"><h3 style="font-size:16px;font-weight:700;margin-bottom:12px"><i class="fas fa-info-circle" style="color:var(--blue)"></i> Macluumaad</h3><p style="font-size:14px;color:var(--text2);line-height:1.7">Maxaas.u waa platform streaming ah oo aad kaga daawan karto barnaamijyada Soomaalida.</p></div></div></div></div>
-    <footer class="pub-footer"><div class="pub-footer-grid"><div><div class="pub-footer-brand">Maxaas<span>.u</span></div><p class="pub-footer-desc">Platform streaming ah oo loogu talagalay barnaamijyada Soomaalida.</p></div><div><div class="pub-footer-title">Bogagga</div><ul class="pub-footer-links"><li><a href="#" onclick="pubShow('home')">Bogga Hore</a></li><li><a href="#" onclick="pubShow('videos')">Videos</a></li><li><a href="#" onclick="pubShow('audio')">Audio</a></li></ul></div><div><div class="pub-footer-title">Xiriir</div><ul class="pub-footer-links"><li><a href="#" onclick="pubShow('contact')">Nala Xiriir</a></li><li><a href="#">Telegram</a></li></ul></div><div><div class="pub-footer-title">Sharci</div><ul class="pub-footer-links"><li><a href="#">Qawaaninka</a></li><li><a href="#">Privacy</a></li></ul></div></div><div class="pub-footer-bottom"><span>&copy; 2025 Maxaas.u</span></div></footer>
-  </main>
-</div>
-
-<!-- Player Overlay -->
-<div class="player-overlay" id="player-overlay"><div class="player-container"><div class="player-video-wrap" id="player-video-wrap"><button class="player-close" onclick="closePlayer()"><i class="fas fa-times"></i></button><div id="player-content"></div></div><div class="player-info"><div class="player-title" id="player-title">—</div><div class="player-meta" id="player-meta"></div></div></div></div>
-
-<!-- Audio Bar -->
-<div class="audio-bar" id="audio-bar"><div class="audio-bar-cover" id="ab-cover"></div><div class="audio-bar-info"><div class="audio-bar-title" id="ab-title">—</div><div class="audio-bar-artist" id="ab-artist">—</div></div><div class="audio-bar-controls"><button class="audio-bar-btn" onclick="audioPrev()"><i class="fas fa-step-backward"></i></button><button class="audio-bar-btn play-btn" id="ab-play-btn" onclick="audioToggle()"><i class="fas fa-play"></i></button><button class="audio-bar-btn" onclick="audioNext()"><i class="fas fa-step-forward"></i></button></div><div class="audio-bar-progress"><span class="audio-bar-time" id="ab-cur">0:00</span><div class="progress-track" id="ab-progress-track" onclick="audioSeek(event)"><div class="progress-fill" id="ab-progress-fill"></div></div><span class="audio-bar-time" id="ab-dur">0:00</span></div><button class="audio-bar-btn" onclick="closeAudioBar()" style="font-size:13px"><i class="fas fa-times"></i></button></div>
-<audio id="audio-el" preload="auto"></audio>
-
-<!-- ═══ ADMIN VIEW ═══ -->
-<div id="admin-view">
-  <header class="admin-header">
-    <button class="admin-menu-btn" onclick="toggleAdminSidebar()"><i class="fas fa-bars"></i></button>
-    <a href="#" class="admin-logo"><div class="admin-logo-icon"><i class="fab fa-youtube"></i></div><div class="admin-logo-text">Maxaas<span>.u</span> <small style="font-size:10px;color:var(--text4);font-weight:400">ADMIN</small></div></a>
-    <button class="admin-back-btn" onclick="exitAdmin()"><i class="fas fa-globe"></i> Website</button>
-    <button class="admin-icon-btn" onclick="adminShow('messages')"><i class="fas fa-bell"></i><div class="admin-badge" id="notif-badge"></div></button>
-    <div class="admin-avatar" id="header-avatar" onclick="adminShow('security')">A</div>
-  </header>
-  <div class="admin-sidebar-overlay" id="admin-overlay" onclick="closeAdminSidebar()"></div>
-  <nav class="admin-sidebar" id="admin-sidebar">
-    <div class="sidebar-section"><div class="section-label">Ugu Weyn</div><a class="nav-item active" onclick="adminShow('dashboard')" id="nav-dashboard"><div class="nav-icon"><i class="fas fa-th-large"></i></div><div class="nav-label" id="navlbl-dashboard">Dashboard</div></a><a class="nav-item" onclick="adminShow('analytics')" id="nav-analytics"><div class="nav-icon"><i class="fas fa-chart-bar"></i></div><div class="nav-label" id="navlbl-analytics">Analytics</div></a></div>
-    <div class="sidebar-section"><div class="section-label">Content</div><a class="nav-item" onclick="adminShow('videos')" id="nav-videos"><div class="nav-icon"><i class="fas fa-play-circle"></i></div><div class="nav-label" id="navlbl-videos">Videos</div></a><a class="nav-item" onclick="adminShow('audio')" id="nav-audio"><div class="nav-icon"><i class="fas fa-music"></i></div><div class="nav-label" id="navlbl-audio">Audio</div></a><a class="nav-item" onclick="adminShow('posts')" id="nav-posts"><div class="nav-icon"><i class="fas fa-newspaper"></i></div><div class="nav-label" id="navlbl-posts">Posts</div></a><a class="nav-item" onclick="adminShow('categories')" id="nav-categories"><div class="nav-icon"><i class="fas fa-folder"></i></div><div class="nav-label" id="navlbl-categories">Categories</div></a></div>
-    <div class="sidebar-section"><div class="section-label">Manage</div><a class="nav-item" onclick="adminShow('messages')" id="nav-messages"><div class="nav-icon"><i class="fas fa-envelope"></i></div><div class="nav-label" id="navlbl-messages">Messages</div><div class="nav-badge" id="msg-badge" style="display:none"></div></a><a class="nav-item" onclick="adminShow('settings')" id="nav-settings"><div class="nav-icon"><i class="fas fa-sliders-h"></i></div><div class="nav-label" id="navlbl-settings">Settings</div></a><a class="nav-item" onclick="adminShow('security')" id="nav-security"><div class="nav-icon"><i class="fas fa-shield-alt"></i></div><div class="nav-label" id="navlbl-security">Security</div></a></div>
-    <div class="sidebar-section"><a class="nav-item" onclick="openRenameModal()" style="color:var(--blue)"><div class="nav-icon"><i class="fas fa-edit"></i></div><div class="nav-label">Rename Menu</div></a><a class="nav-item" onclick="doLogout()" style="color:#ff4444"><div class="nav-icon"><i class="fas fa-sign-out-alt"></i></div><div class="nav-label">Logout</div></a></div>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="logo">MAXAAS.U</div>
+    <div class="nav-links">
+      <a href="#">Home</a>
+      <a href="#">Movies</a>
+      <a href="#">Series</a>
+    </div>
   </nav>
-  <main class="admin-main" id="admin-main">
-    <div class="admin-page active" id="admin-page-dashboard"><div class="page-header"><div><div class="breadcrumb"><i class="fas fa-th-large"></i> <span>Dashboard</span></div><div class="page-title">Ku Soo Dhowow, <span id="admin-name">Admin</span> 👋</div></div><button class="btn btn-primary" onclick="loadAll()"><i class="fas fa-sync-alt"></i> Cusboonaysii</button></div><div class="stats-grid"><div class="stat-card red"><div class="stat-icon red"><i class="fas fa-eye"></i></div><div class="stat-value" id="stat-views">—</div><div class="stat-label">Wadarta Views</div></div><div class="stat-card blue"><div class="stat-icon blue"><i class="fas fa-play-circle"></i></div><div class="stat-value" id="stat-videos">—</div><div class="stat-label">Videos</div></div><div class="stat-card green"><div class="stat-icon green"><i class="fas fa-envelope"></i></div><div class="stat-value" id="stat-messages">—</div><div class="stat-label">Farriin Cusub</div></div></div><div class="card"><div class="card-header"><div class="card-title"><i class="fas fa-chart-line" style="color:var(--blue)"></i> Views Chart</div></div><div style="padding:24px 16px 36px"><div class="bar-chart" id="bar-chart"></div></div></div></div>
+
+  <!-- HERO -->
+  <div class="hero" style="background-image: url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=2070&auto=format&fit=crop');">
+    <div class="hero-content">
+      <h1 class="hero-title">The Future of Streaming</h1>
+      <p class="hero-desc">Watch securely anywhere. No URLs exposed. Premium quality.</p>
+      <button class="btn-play" onclick="openPlayer('123e4567-e89b-12d3-a456-426614174000')">
+        <i class="fas fa-play"></i> Watch Now
+      </button>
+    </div>
+  </div>
+
+  <!-- VIDEOS SLIDER -->
+  <div class="section">
+    <h2 class="section-title">Trending Now</h2>
+    <div class="slider" id="videoSlider">
+      <!-- Cards injected via JS -->
+    </div>
+  </div>
+
+  <!-- SECURE PLAYER MODAL -->
+  <div class="player-modal" id="playerModal">
+    <div class="player-container">
+      <div class="close-btn" onclick="closePlayer()"><i class="fas fa-times"></i></div>
+      <div id="streamWrapper">
+        <!-- Video tag or Iframe injected securely here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+  <script>
+    /* ═══════════════════════════════════════
+       SECURITY: Anti-Download & Anti-Inspect
+       ═══════════════════════════════════════ */
     
-    <div class="admin-page" id="admin-page-analytics"><div class="page-header"><div><div class="breadcrumb"><i class="fas fa-chart-bar"></i> <span>Analytics</span></div><div class="page-title">Analytics</div></div></div><div class="card"><div class="card-header"><div class="card-title">Top Videos</div></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Title</th><th>Views</th></tr></thead><tbody id="analytics-table"></tbody></table></div></div></div>
+    // Disable Right Click
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // Disable Keyboard Shortcuts (F12, Ctrl+Shift+I, Ctrl+U, Ctrl+S)
+    document.addEventListener('keydown', e => {
+      if (e.keyCode === 123 || // F12
+         (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || // Ctrl+Shift+I/J/C
+         (e.ctrlKey && e.keyCode === 85) || // Ctrl+U
+         (e.ctrlKey && e.keyCode === 83)) { // Ctrl+S
+        e.preventDefault();
+        return false;
+      }
+    });
+
+    // Anti-Drag for images/videos
+    document.addEventListener('dragstart', e => {
+      if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO') e.preventDefault();
+    });
+
+    /* ═══════════════════════════════════════
+       UI: DYNAMIC LOAD & SECURE STREAMING
+       ═══════════════════════════════════════ */
     
-    <div class="admin-page" id="admin-page-videos"><div class="page-header"><div><div class="breadcrumb"><i class="fas fa-play-circle"></i> <span>Videos</span></div><div class="page-title">Maamul Videos</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><div class="table-search"><i class="fas fa-search" style="color:var(--text4)"></i><input type="text" placeholder="Raadi..." id="video-search" oninput="filterVideos()"></div><button class="btn btn-primary" onclick="openVideoModal()"><i class="fas fa-plus"></i> Ku dar</button></div></div><div class="card"><div class="table-wrap"><table><thead><tr><th>Thumb</th><th>Cinwaan</th><th>Nooc</th><th>Views</th><th>Status</th><th>Waxqabad</th></tr></thead><tbody id="videos-table"></tbody></table></div></div></div>
-    
-    <div class="admin-page" id="admin-page-audio"><div class="page-header"><div><div class="breadcrumb"><i class="fas fa-music"></i> <span>Audio</span></div><div class="page-title">Maamul Audio</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><div class="table-search"><i class="fas fa-search" style="color:var(--text4)"></i><input type="text" placeholder="Raadi..." id="audio-search" oninput="filterAudio()"></div><button class="btn btn-primary" onclick="openAudioModal()"><i class="fas fa-plus"></i> Ku dar</button></div></div><div class="card"><div class="table-wrap"><table><thead><tr><th>Cinwaan</th><th>Fannaanka</th><th>Views</th><th>Status</th><th>Waxqabad</th></tr></thead><tbody id="audio-table"></tbody></table></div></div></div>
-    
-    <div class="admin-page" id="admin-page-posts"><div class="page-header"><div><div class="breadcrumb"><i class="fas fa-newspaper"></i> <span>Posts</span></div><div class="page-title">Maamul Posts</div></div><button class="btn btn-primary" onclick="openPostModal()"><i class="fas fa-plus"></i> Post Cusub</button></div><div class="card"><div class="table-wrap"><table><thead><tr><th>Cinwaan</th><th>Qore</th><th>Status</th><th>Waxqabad</th></tr></thead><tbody id="posts-table"></tbody></table></div></div></div>
-    
-    <div class="admin-page" id="admin-page-categories"><div class="page-header"><div><div class="breadcrumb"><i class="fas fa-folder"></i> <span>Categories</span></div><div class="page-title">Maamul Categories</div></div><button class="btn btn-primary" onclick="openCatModal()"><i class="fas fa-plus"></i> Category Cusub</button></div><div class="card"><div class="table-wrap"><table><thead><tr><th>Magac</th><th>Sharaxaad</th><th>Waxqabad</th></tr></thead><tbody id="categories-table"></tbody></table></div></div></div>
-    
-    <div class="admin-page" id="admin-page-messages"><div class="page-header"><div><div class="breadcrumb"><i class="fas fa-envelope"></i> <span>Messages</span></div><div class="page-title">Farriimaha</div></div></div><div class="card"><div class="table-wrap"><table><thead><tr><th>Magac</th><th>Xiriir</th><th>Farriin</th><th>Waxqabad</th></tr></thead><tbody id="messages-table"></tbody></table></div></div></div>
-    
-    <div class="admin-page" id="admin-page-settings"><div class="page-header"><div><div class="breadcrumb"><i class="fas fa-sliders-h"></i> <span>Settings</span></div><div class="page-title">Site Settings</div></div></div><div class="card"><div class="card-header"><div class="card-title">Guud</div></div><div class="modal-body"><div class="form-group"><label class="form-label">Site Name</label><input class="form-control" id="s-name"></div><div class="form-group"><label class="form-label">Sharaxaad</label><textarea class="form-control" id="s-desc" rows="3"></textarea></div><div class="form-group"><label class="form-label">Contact Email</label><input class="form-control" id="s-email"></div><button class="btn btn-primary" onclick="saveSettings()"><i class="fas fa-save"></i> Kaydi</button></div></div></div>
-    
-    <div class="admin-page" id="admin-page-security"><div class="page-header"><div><div class="breadcrumb"><i class="fas fa-shield-alt"></i> <span>Security</span></div><div class="page-title">Security</div></div></div><div class="card"><div class="card-header"><div class="card-title">Bedel Macluumaadka</div></div><div class="modal-body"><div class="form-group"><label class="form-label">PIN Hadda</label><input class="form-control" id="sec-pin" type="text" maxlength="8"></div><div class="divider"></div><div class="form-group"><label class="form-label">Username Cusub</label><input class="form-control" id="sec-user"></div><div class="form-group"><label class="form-label">Password Cusub</label><input class="form-control" id="sec-pass" type="password"></div><div class="form-group"><label class="form-label">PIN Cusub</label><input class="form-control" id="sec-newpin" type="text" maxlength="8"></div><button class="btn btn-primary" onclick="saveCredentials()"><i class="fas fa-save"></i> Kaydi</button></div></div></div>
-  </main>
-</div>
+    let player = null;
 
-<!-- Login -->
-<div id="login-page"><div class="login-card"><div class="login-logo"><div class="login-logo-icon"><i class="fab fa-youtube"></i></div><div class="login-title">Maxaas.u</div><div class="login-sub">Admin Dashboard</div></div><div id="login-error" class="login-error"></div><div class="form-group"><label class="form-label">Username</label><input class="form-control" id="l-user" type="text" placeholder="admin"></div><div class="form-group"><label class="form-label">Password</label><input class="form-control" id="l-pass" type="password" placeholder="••••••••"></div><div class="form-group"><label class="form-label">PIN (8 digits)</label><input class="form-control" id="l-pin" type="text" placeholder="00000000" maxlength="8"></div><button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Gal</button></div></div>
+    // Fake Data Fetch (Replace with your /api/v1/videos call)
+    async function loadVideos() {
+      // const res = await fetch('/api/v1/videos');
+      // const videos = await res.json();
+      const videos = [
+        { id: '1', title: 'Action Movie', thumbnail: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1925&auto=format&fit=crop' },
+        { id: '2', title: 'Drama Series', thumbnail: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=2059&auto=format&fit=crop' }
+      ];
 
-<!-- Modals -->
-<div class="modal-backdrop" id="video-modal"><div class="modal"><div class="modal-header"><div class="modal-title" id="video-modal-title">Video Cusub</div><button class="modal-close" onclick="closeModal('video-modal')"><i class="fas fa-times"></i></button></div><div class="modal-body"><input type="hidden" id="v-id"><div class="form-group"><label class="form-label">Cinwaan *</label><input class="form-control" id="v-title" placeholder="Video title..."></div><div class="form-group"><label class="form-label">URL *</label><input class="form-control" id="v-url" placeholder="https://..."></div><div class="form-group"><label class="form-label">Thumbnail URL</label><input class="form-control" id="v-thumb"></div><div class="form-row"><div class="form-group"><label class="form-label">Nooc</label><select class="form-control" id="v-type"><option value="mp4">MP4</option><option value="youtube">YouTube</option><option value="hls">HLS</option></select></div><div class="form-group"><label class="form-label">Muddo</label><input class="form-control" id="v-dur" placeholder="10:30"></div></div><div class="form-row"><div class="form-group"><label class="form-label">Category</label><select class="form-control" id="v-cat"><option value="">-- Xulo --</option></select></div><div class="form-group"><label class="form-label">Order</label><input class="form-control" id="v-order" type="number" value="0"></div></div><div style="display:flex;gap:20px"><label class="form-check"><input type="checkbox" id="v-featured"> Featured</label><label class="form-check"><input type="checkbox" id="v-published" checked> Published</label></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('video-modal')">Jooji</button><button class="btn btn-primary" onclick="saveVideo()"><i class="fas fa-save"></i> Kaydi</button></div></div></div>
+      const slider = document.getElementById('videoSlider');
+      videos.forEach(v => {
+        slider.innerHTML += `
+          <div class="card" onclick="openPlayer('${v.id}')">
+            <img src="${v.thumbnail}" alt="${v.title}" draggable="false">
+            <div class="card-info">
+              <h3>${v.title}</h3>
+            </div>
+          </div>
+        `;
+      });
+    }
 
-<div class="modal-backdrop" id="audio-modal"><div class="modal"><div class="modal-header"><div class="modal-title" id="audio-modal-title">Audio Cusub</div><button class="modal-close" onclick="closeModal('audio-modal')"><i class="fas fa-times"></i></button></div><div class="modal-body"><input type="hidden" id="a-id"><div class="form-group"><label class="form-label">Cinwaan *</label><input class="form-control" id="a-title"></div><div class="form-group"><label class="form-label">Fannaanka</label><input class="form-control" id="a-artist"></div><div class="form-group"><label class="form-label">URL *</label><input class="form-control" id="a-url"></div><div class="form-group"><label class="form-label">Cover URL</label><input class="form-control" id="a-cover"></div><div class="form-row"><div class="form-group"><label class="form-label">Nooc</label><select class="form-control" id="a-type"><option value="mp3">MP3</option><option value="ogg">OGG</option><option value="hls">HLS</option></select></div><div class="form-group"><label class="form-label">Muddo</label><input class="form-control" id="a-dur"></div></div><label class="form-check"><input type="checkbox" id="a-published" checked> Published</label></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('audio-modal')">Jooji</button><button class="btn btn-primary" onclick="saveAudio()"><i class="fas fa-save"></i> Kaydi</button></div></div></div>
+    // SECURE PLAYER INITIALIZATION
+    async function openPlayer(videoId) {
+      const modal = document.getElementById('playerModal');
+      const wrapper = document.getElementById('streamWrapper');
+      
+      // 1. Request Secure Token from Backend
+      const res = await fetch(`/api/v1/videos/request-stream/${videoId}`, { method: 'POST' });
+      const data = await res.json();
 
-<div class="modal-backdrop" id="post-modal"><div class="modal"><div class="modal-header"><div class="modal-title" id="post-modal-title">Post Cusub</div><button class="modal-close" onclick="closeModal('post-modal')"><i class="fas fa-times"></i></button></div><div class="modal-body"><input type="hidden" id="p-id"><div class="form-group"><label class="form-label">Cinwaan *</label><input class="form-control" id="p-title"></div><div class="form-group"><label class="form-label">Content *</label><textarea class="form-control" id="p-content" rows="5"></textarea></div><div class="form-row"><div class="form-group"><label class="form-label">Qore</label><input class="form-control" id="p-author"></div><div class="form-group"><label class="form-label">Image URL</label><input class="form-control" id="p-img"></div></div><label class="form-check"><input type="checkbox" id="p-published" checked> Published</label></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('post-modal')">Jooji</button><button class="btn btn-primary" onclick="savePost()"><i class="fas fa-save"></i> Kaydi</button></div></div></div>
+      if (data.type === 'youtube') {
+        // YouTube Embed (No URL in source, uses nocookie domain)
+        wrapper.innerHTML = `<div class="plyr__video-embed" id="player">
+          <iframe src="${data.youtubeUrl}" allowfullscreen allowtransparency allow="autoplay"></iframe>
+        </div>`;
+      } else if (data.streamToken) {
+        // Proxied Stream (Absolute security, URL is hidden behind token)
+        wrapper.innerHTML = `<video id="player" playsinline controls></video>`;
+        const video = document.querySelector('#player');
+        video.src = `/api/v1/stream/${data.streamToken}`;
+        
+        // Initialize Plyr
+        player = new Plyr(video, {
+          controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
+          settings: ['quality'],
+          autoplay: true,
+          keyboard: { focused: true, global: true }
+        });
 
-<div class="modal-backdrop" id="cat-modal"><div class="modal" style="max-width:400px"><div class="modal-header"><div class="modal-title" id="cat-modal-title">Category Cusub</div><button class="modal-close" onclick="closeModal('cat-modal')"><i class="fas fa-times"></i></button></div><div class="modal-body"><input type="hidden" id="c-id"><div class="form-group"><label class="form-label">Magac *</label><input class="form-control" id="c-name"></div><div class="form-group"><label class="form-label">Sharaxaad</label><input class="form-control" id="c-desc"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('cat-modal')">Jooji</button><button class="btn btn-primary" onclick="saveCat()"><i class="fas fa-save"></i> Kaydi</button></div></div></div>
+        // Security: Disable download button natively
+        video.controlsList = 'nodownload';
+      }
 
-<div class="modal-backdrop" id="rename-modal"><div class="modal" style="max-width:460px"><div class="modal-header"><div class="modal-title"><i class="fas fa-edit" style="color:var(--blue)"></i> Rename Menu Items</div><button class="modal-close" onclick="closeModal('rename-modal')"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="rename-list" id="rename-list"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('rename-modal')">Jooji</button><button class="btn btn-primary" onclick="applyRename()"><i class="fas fa-check"></i> Apply</button></div></div></div>
+      modal.style.display = 'flex';
+    }
 
-<div class="modal-backdrop" id="msg-modal"><div class="modal"><div class="modal-header"><div class="modal-title">Farriin</div><button class="modal-close" onclick="closeModal('msg-modal')"><i class="fas fa-times"></i></button></div><div class="modal-body" id="msg-modal-body"></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('msg-modal')">Xir</button></div></div></div>
+    function closePlayer() {
+      const modal = document.getElementById('playerModal');
+      const wrapper = document.getElementById('streamWrapper');
+      if (player) player.destroy(); // Destroy instance to stop stream
+      wrapper.innerHTML = ''; // Clear DOM to remove stream traces
+      modal.style.display = 'none';
+    }
 
-<div class="modal-backdrop" id="confirm-modal"><div class="modal" style="max-width:380px"><div class="modal-header"><div class="modal-title" style="color:#ff4444"><i class="fas fa-trash"></i> Tirtir</div><button class="modal-close" onclick="closeModal('confirm-modal')"><i class="fas fa-times"></i></button></div><div class="modal-body"><p style="color:var(--text2);font-size:14px" id="confirm-text">Miyaad hubtaa?</p></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('confirm-modal')">Jooji</button><button class="btn btn-danger" id="confirm-btn">Tirtir</button></div></div></div>
-
-<div class="toasts" id="toasts"></div>
-
-<script>
-const API='';
-let S={loggedIn:false,adminName:'Admin',videos:[],audio:[],posts:[],categories:[],messages:[],playlist:[],plIdx:-1,playing:false,
-  menuLabels:JSON.parse(localStorage.getItem('menuLabels')||'null')||{dashboard:'Dashboard',analytics:'Analytics',videos:'Videos',audio:'Audio',posts:'Posts',categories:'Categories',messages:'Messages',settings:'Settings',security:'Security'}};
-const $=id=>document.getElementById(id);
-const esc=s=>s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):'';
-const fmtNum=n=>{if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return String(n)};
-const fmtTime=s=>{if(!s||isNaN(s))return'0:00';const m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec};
-
-function toast(msg,type='success'){const icons={success:'fa-check-circle',error:'fa-times-circle',info:'fa-info-circle'};const colors={success:'var(--green)',error:'var(--red)',info:'var(--blue)'};const t=document.createElement('div');t.className='toast '+type;t.innerHTML=`<i class="fas ${icons[type]}" style="color:${colors[type]}"></i> ${msg}`;$('toasts').appendChild(t);setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300)},3000)}
-function openModal(id){$(id).classList.add('open')}function closeModal(id){$(id).classList.remove('open')}
-function confirmDelete(text,cb){$('confirm-text').textContent=text;$('confirm-btn').onclick=()=>{cb();closeModal('confirm-modal')};openModal('confirm-modal')}
-async function api(method,path,body){const opts={method,credentials:'include',headers:{}};if(body){opts.headers['Content-Type']='application/json';opts.body=JSON.stringify(body)}const r=await fetch(API+path,opts);if(!r.ok)throw new Error(await r.text());return r.json().catch(()=>{})}
-
-/* ═══ INIT ═══ */
-window.addEventListener('DOMContentLoaded',()=>{applyMenuLabels();loadPublicData();document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.modal-backdrop.open').forEach(m=>m.classList.remove('open'));closePlayer()}});document.querySelectorAll('.modal-backdrop').forEach(m=>m.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open')}));const ae=$('audio-el');ae.addEventListener('timeupdate',()=>{if(!ae.duration)return;$('ab-progress-fill').style.width=(ae.currentTime/ae.duration*100)+'%';$('ab-cur').textContent=fmtTime(ae.currentTime)});ae.addEventListener('ended',audioNext);ae.addEventListener('loadedmetadata',()=>{$('ab-dur').textContent=fmtTime(ae.duration)})});
-
-/* ═══ VIEW SWITCH ═══ */
-function enterAdmin(){checkSession(true)}
-function exitAdmin(){$('admin-view').style.display='none';$('public-view').style.display='block';closePlayer()}
-async function checkSession(fromBtn){try{const r=await fetch(API+'/api/v1/admin/analytics',{credentials:'include'});if(r.ok){S.loggedIn=true;showAdminView()}else if(fromBtn)showLogin()}catch{if(fromBtn)showLogin()}}
-function showLogin(){$('login-page').classList.add('show')}function hideLogin(){$('login-page').classList.remove('show')}
-function showAdminView(){hideLogin();$('public-view').style.display='none';$('admin-view').style.display='block';closePlayer();closeAudioBar();$('admin-name').textContent=S.adminName;$('header-avatar').textContent=S.adminName[0].toUpperCase();loadAll()}
-async function doLogin(){const u=$('l-user').value.trim(),p=$('l-pass').value,pin=$('l-pin').value.trim(),err=$('login-error');err.classList.remove('show');if(!u||!p||!pin){err.textContent='Dhammaan xogta buuxi';err.classList.add('show');return}try{const r=await fetch(API+'/api/v1/auth/login',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p,pin})});const d=await r.json();if(!r.ok){err.textContent=d.error||'Khalad';err.classList.add('show');return}S.adminName=d.username||u;S.loggedIn=true;showAdminView()}catch{err.textContent='Server khalad';err.classList.add('show')}}
-async function doLogout(){await fetch(API+'/api/v1/auth/logout',{method:'POST',credentials:'include'});S.loggedIn=false;exitAdmin();toast('Logout successful','info')}
-['l-user','l-pass','l-pin'].forEach(id=>{const el=$(id);if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()})});
-
-/* ═══ PUBLIC PAGES ═══ */
-function pubShow(name){document.querySelectorAll('.pub-page').forEach(p=>p.classList.remove('active'));$('pub-page-'+name)?.classList.add('active');document.querySelectorAll('.pub-nav-item').forEach(n=>n.classList.toggle('active',n.dataset.page===name));window.scrollTo({top:0,behavior:'smooth'})}
-function pubSearch(){const q=$('pub-search-input').value.toLowerCase().trim();if(!q)return;const mv=S.videos.filter(v=>v.is_published&&v.title?.toLowerCase().includes(q));const ma=S.audio.filter(a=>a.is_published&&(a.title?.toLowerCase().includes(q)||a.artist?.toLowerCase().includes(q)));if(mv.length){pubShow('videos');renderVidCards(mv,'pub-videos')}else if(ma.length){pubShow('audio');renderAudCards(ma,'pub-audio')}else toast('Wax la ma helin','info')}
-
-async function loadPublicData(){try{const[v,a,p,c]=await Promise.allSettled([fetch(API+'/api/v1/videos').then(r=>r.json()),fetch(API+'/api/v1/audio').then(r=>r.json()),fetch(API+'/api/v1/posts').then(r=>r.json()),fetch(API+'/api/v1/categories').then(r=>r.json())]);S.videos=v.value||[];S.audio=a.value||[];S.posts=p.value||[];S.categories=c.value||[];renderPubHome();renderPubVids();renderPubAud();renderPubPosts()}catch(e){console.error(e)}}
-
-function renderPubHome(){const vids=S.videos.filter(v=>v.is_published),auds=S.audio.filter(a=>a.is_published),posts=S.posts.filter(p=>p.is_published);
-const h=$('hero-area');if(vids.length){const f=vids.find(v=>v.is_featured)||vids[0];h.innerHTML=`<div class="hero" onclick="playVideo('${f.id}')"><div class="hero-bg" style="background-image:url('${esc(f.thumbnail||'')}')"></div><div class="hero-overlay"></div><div class="hero-content"><div class="hero-info"><div class="hero-badge"><span class="live-dot"></span> ${f.video_type==='youtube'?'YouTube':f.video_type==='hls'?'LIVE':'Video'}</div><div class="hero-title">${esc(f.title)}</div><div class="hero-meta"><span><i class="fas fa-eye"></i> ${fmtNum(f.views||0)}</span>${f.duration?`<span><i class="fas fa-clock"></i> ${esc(f.duration)}</span>`:''}</div></div><button class="hero-play-btn"><i class="fas fa-play" style="margin-left:3px"></i></button></div></div>`}else{h.innerHTML=`<div class="hero" style="display:flex;align-items:center;justify-content:center"><div style="text-align:center;color:var(--text4)"><i class="fas fa-film" style="font-size:48px;opacity:.3;margin-bottom:12px;display:block"></i><p>Wali video ma jiro</p></div></div>`}
-renderVidCards(vids.slice(0,8),'home-videos');renderAudCards(auds.slice(0,6),'home-audio');renderPostCards(posts.slice(0,4),'home-posts')}
-
-function renderVidCards(videos,cid){const el=$(cid);if(!videos.length){el.innerHTML='<div class="empty" style="grid-column:1/-1"><i class="fas fa-video"></i><p>Video ma jiro</p></div>';return}el.innerHTML=videos.map(v=>`<div class="vid-card" onclick="playVideo('${v.id}')"><div class="vid-thumb">${v.thumbnail?`<img src="${esc(v.thumbnail)}" alt="" onerror="this.style.display='none'">`:''}<div class="vid-thumb-overlay"><div class="vid-play-icon"><i class="fas fa-play" style="margin-left:2px"></i></div></div>${v.duration?`<div class="vid-duration">${esc(v.duration)}</div>`:''}</div><div class="vid-body"><div class="vid-title">${esc(v.title)}</div><div class="vid-meta"><span><i class="fas fa-eye"></i> ${fmtNum(v.views||0)}</span><span class="tag tag-blue" style="font-size:10px;padding:1px 6px">${v.video_type||'mp4'}</span></div></div></div>`).join('')}
-
-function renderAudCards(tracks,cid){const el=$(cid);if(!tracks.length){el.innerHTML='<div class="empty" style="grid-column:1/-1"><i class="fas fa-music"></i><p>Audio ma jiro</p></div>';return}el.innerHTML=tracks.map(a=>`<div class="audio-card" onclick="playAudio('${a.id}')"><div class="audio-cover">${a.cover_url?`<img src="${esc(a.cover_url)}" alt="" onerror="this.style.display='none'">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px;color:var(--text4)"><i class="fas fa-music"></i></div>`}<div class="audio-cover-play"><i class="fas fa-play"></i></div></div><div class="audio-title">${esc(a.title)}</div><div class="audio-artist">${esc(a.artist||'Unknown')}</div></div>`).join('')}
-
-function renderPostCards(posts,cid){const el=$(cid);if(!posts.length){el.innerHTML='<div class="empty" style="grid-column:1/-1"><i class="fas fa-newspaper"></i><p>Post ma jiro</p></div>';return}el.innerHTML=posts.map(p=>`<div class="post-card" onclick="viewPost('${p.id}')">${p.image_url?`<div class="post-img"><img src="${esc(p.image_url)}" alt="" onerror="this.parentElement.style.display='none'"></div>`:''}<div class="post-body"><div class="post-title">${esc(p.title)}</div><div class="post-excerpt">${esc((p.content||'').substring(0,150))}...</div><div class="post-footer"><span><i class="fas fa-user"></i> ${esc(p.author||'Maxaas.u')}</span></div></div></div>`).join('')}
-
-function renderPubVids(){const cats=[...new Set(S.videos.filter(v=>v.is_published).map(v=>v.category_id).filter(Boolean))];$('pub-vid-cats').innerHTML=`<button class="cat-tab active">Dhammaan</button>`+S.categories.filter(c=>cats.includes(c.id)).map(c=>`<button class="cat-tab">${esc(c.name)}</button>`).join('');renderVidCards(S.videos.filter(v=>v.is_published),'pub-videos')}
-function renderPubAud(){renderAudCards(S.audio.filter(a=>a.is_published),'pub-audio')}
-function renderPubPosts(){renderPostCards(S.posts.filter(p=>p.is_published),'pub-posts')}
-
-/* ═══ PLAYERS ═══ */
-function playVideo(id){const v=S.videos.find(x=>x.id==id);if(!v)return;$('player-title').textContent=v.title;$('player-meta').innerHTML=`<span><i class="fas fa-eye"></i> ${fmtNum(v.views||0)}</span><span class="tag tag-blue">${v.video_type||'mp4'}</span>`;const url=v.url||'';let html='';if(v.video_type==='youtube'){const yt=extractYTId(url);if(yt)html=`<iframe src="https://www.youtube.com/embed/${yt}?autoplay=1&rel=0" allowfullscreen allow="autoplay; encrypted-media" style="width:100%;height:100%"></iframe>`}else if(v.video_type==='hls'){html=`<video id="hls-video" style="width:100%;height:100%" controls autoplay></video>`;setTimeout(()=>{const vid=$('hls-video');if(vid&&Hls.isSupported()){const hls=new Hls();hls.loadSource(url);hls.attachMedia(vid);hls.on(Hls.Events.MANIFEST_PARSED,()=>vid.play())}else if(vid&&vid.canPlayType('application/vnd.apple.mpegurl')){vid.src=url;vid.play()}},100)}else{html=`<video src="${esc(url)}" style="width:100%;height:100%" controls autoplay></video>`}$('player-content').innerHTML=html;$('player-overlay').classList.add('open');fetch(API+'/api/v1/videos/'+id+'/view',{method:'POST'}).catch(()=>{})}
-function extractYTId(url){if(!url)return null;const m=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s?]+)/);return m?m[1]:null}
-function closePlayer(){$('player-overlay').classList.remove('open');$('player-content').innerHTML=''}
-
-function playAudio(id){const a=S.audio.find(x=>x.id==id);if(!a)return;S.playlist=S.audio.filter(x=>x.is_published);S.plIdx=S.playlist.findIndex(x=>x.id==id);if(S.plIdx<0)S.plIdx=0;startAudio();$('audio-bar').classList.add('open');fetch(API+'/api/v1/audio/'+id+'/view',{method:'POST'}).catch(()=>{})}
-function startAudio(){const t=S.playlist[S.plIdx];if(!t)return;const ae=$('audio-el');ae.src=t.url;ae.play().catch(()=>{});S.playing=true;$('ab-title').textContent=t.title;$('ab-artist').textContent=t.artist||'Unknown';$('ab-play-btn').innerHTML='<i class="fas fa-pause"></i>';if(t.cover_url)$('ab-cover').innerHTML=`<img src="${esc(t.cover_url)}" alt="">`;else $('ab-cover').innerHTML=`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--text4)"><i class="fas fa-music"></i></div>`}
-function audioToggle(){const ae=$('audio-el');if(S.playing){ae.pause();S.playing=false;$('ab-play-btn').innerHTML='<i class="fas fa-play"></i>'}else{ae.play().catch(()=>{});S.playing=true;$('ab-play-btn').innerHTML='<i class="fas fa-pause"></i>'}}
-function audioNext(){if(!S.playlist.length)return;S.plIdx=(S.plIdx+1)%S.playlist.length;startAudio()}
-function audioPrev(){if(!S.playlist.length)return;S.plIdx=(S.plIdx-1+S.playlist.length)%S.playlist.length;startAudio()}
-function audioSeek(e){const ae=$('audio-el'),rect=e.currentTarget.getBoundingClientRect();ae.currentTime=((e.clientX-rect.left)/rect.width)*ae.duration}
-function closeAudioBar(){$('audio-bar').classList.remove('open');$('audio-el').pause();S.playing=false}
-
-function viewPost(id){const p=S.posts.find(x=>x.id==id);if(!p)return;$('msg-modal-body').innerHTML=`${p.image_url?`<img src="${esc(p.image_url)}" style="width:100%;border-radius:8px;margin-bottom:16px">`:''}<h2 style="font-size:20px;font-weight:800;margin-bottom:8px">${esc(p.title)}</h2><div style="font-size:15px;line-height:1.8;color:var(--text2)">${esc(p.content||'').replace(/\n/g,'<br>')}</div>`;openModal('msg-modal')}
-
-async function submitContact(){const n=$('ct-name').value.trim(),c=$('ct-contact').value.trim(),m=$('ct-message').value.trim();if(!n||!m){toast('Magaca iyo farriinta buuxi','error');return}try{await fetch(API+'/api/v1/contacts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({alias_name:n,contact_method:c,message:m})});toast('Farriinta waan dirnay!','success');$('ct-name').value='';$('ct-contact').value='';$('ct-message').value=''}catch{toast('Khalad','error')}}
-
-/* ═══ ADMIN ═══ */
-function toggleAdminSidebar(){if(window.innerWidth<=768){const s=$('admin-sidebar'),ov=$('admin-overlay');if(s.classList.contains('mobile-open')){s.classList.remove('mobile-open');ov.classList.remove('show')}else{s.classList.add('mobile-open');ov.classList.add('show')}}}
-function closeAdminSidebar(){$('admin-sidebar').classList.remove('mobile-open');$('admin-overlay').classList.remove('show')}
-function adminShow(name){document.querySelectorAll('.admin-page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));$('admin-page-'+name)?.classList.add('active');$('nav-'+name)?.classList.add('active');if(window.innerWidth<=768)closeAdminSidebar()}
-
-async function loadAll(){await Promise.allSettled([loadVideos(),loadAudio(),loadPosts(),loadCategories(),loadMessages(),loadAnalytics()])}
-
-async function loadAnalytics(){try{const d=await api('GET','/api/v1/admin/analytics');$('stat-views').textContent=fmtNum(d.totalViews||0);$('stat-videos').textContent=d.totalVideos||0;$('stat-messages').textContent=d.unread||0;if(d.unread>0){$('notif-badge').style.display='block';$('msg-badge').style.display='flex';$('msg-badge').textContent=d.unread}const bc=$('bar-chart');if(d.topVideos?.length){const mx=Math.max(...d.topVideos.map(v=>v.views||0))||1;bc.innerHTML=d.topVideos.map(v=>`<div class="bar" style="height:${Math.max(((v.views||0)/mx)*90,4)}px" data-label="${(v.title||'').substring(0,8)}"></div>`).join('')}else bc.innerHTML='';$('analytics-table').innerHTML=(d.topVideos||[]).map((v,i)=>`<tr><td>${i+1}</td><td class="text-main">${esc(v.title)}</td><td class="mono">${fmtNum(v.views||0)}</td></tr>`).join('')}catch(e){console.error(e)}}
-
-async function loadVideos(){try{S.videos=await api('GET','/api/v1/admin/videos');renderAdminVids(S.videos);$('v-cat').innerHTML='<option value="">-- Xulo --</option>'+S.categories.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}catch(e){console.error(e)}}
-function filterVideos(){const q=$('video-search').value.toLowerCase();renderAdminVids(S.videos.filter(v=>v.title?.toLowerCase().includes(q)))}
-function renderAdminVids(videos){const tb=$('videos-table');if(!videos.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><i class="fas fa-video"></i><p>Video ma jiro</p></div></td></tr>';return}tb.innerHTML=videos.map(v=>`<tr><td>${v.thumbnail?`<img src="${esc(v.thumbnail)}" class="thumb">`:'<div class="thumb-placeholder" style="width:80px;height:45px;background:var(--bg4);border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--text4)"><i class="fas fa-video"></i></div>'}</td><td class="text-main">${esc(v.title)}</td><td><span class="tag tag-blue">${v.video_type||'mp4'}</span></td><td class="mono">${fmtNum(v.views||0)}</td><td>${v.is_published?'<span class="tag tag-green">Live</span>':'<span class="tag tag-gray">Draft</span>'}</td><td><div class="actions-cell"><button class="btn btn-ghost btn-sm" onclick="editVideo('${v.id}')"><i class="fas fa-edit"></i></button><label class="switch"><input type="checkbox" ${v.is_published?'checked':''} onchange="toggleVideo('${v.id}',this.checked)"><div class="switch-slider"></div></label><button class="btn btn-danger btn-sm" onclick="deleteVideo('${v.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join('')}
-function openVideoModal(v){$('video-modal-title').textContent=v?'Video Wax ka Bedel':'Video Cusub';$('v-id').value=v?.id||'';$('v-title').value=v?.title||'';$('v-url').value=v?.url||'';$('v-thumb').value=v?.thumbnail||'';$('v-type').value=v?.video_type||'mp4';$('v-dur').value=v?.duration||'';$('v-order').value=v?.order_index||0;$('v-cat').value=v?.category_id||'';$('v-featured').checked=!!v?.is_featured;$('v-published').checked=v?!!v.is_published:true;openModal('video-modal')}
-function editVideo(id){openVideoModal(S.videos.find(x=>x.id==id))}
-async function saveVideo(){const id=$('v-id').value;const d={title:$('v-title').value.trim(),url:$('v-url').value.trim(),thumbnail:$('v-thumb').value.trim(),video_type:$('v-type').value,duration:$('v-dur').value.trim(),order_index:parseInt($('v-order').value)||0,category_id:$('v-cat').value||null,is_featured:$('v-featured').checked,is_published:$('v-published').checked};if(!d.title||!d.url){toast('Cinwaan iyo URL buuxi','error');return}try{if(id)await api('PUT','/api/v1/admin/videos/'+id,d);else await api('POST','/api/v1/admin/videos',d);closeModal('video-modal');await loadVideos();await loadPublicData();toast(id?'La update gareeyay':'La sameeyay','success')}catch(e){toast('Khalad','error')}}
-async function toggleVideo(id,pub){try{await api('PUT','/api/v1/admin/videos/'+id,{is_published:pub});await loadPublicData();toast(pub?'La baahiyay':'La qariiyay','info')}catch{toast('Khalad','error')}}
-async function deleteVideo(id){confirmDelete('Miyaad hubtaa?',async()=>{try{await api('DELETE','/api/v1/admin/videos/'+id);await loadVideos();await loadPublicData();toast('La tirtirday','success')}catch{toast('Khalad','error')}})}
-
-async function loadAudio(){try{S.audio=await api('GET','/api/v1/admin/audio');renderAdminAud(S.audio)}catch(e){console.error(e)}}
-function filterAudio(){const q=$('audio-search').value.toLowerCase();renderAdminAud(S.audio.filter(a=>a.title?.toLowerCase().includes(q)||a.artist?.toLowerCase().includes(q)))}
-function renderAdminAud(tracks){const tb=$('audio-table');if(!tracks.length){tb.innerHTML='<tr><td colspan="5"><div class="empty"><i class="fas fa-music"></i><p>Audio ma jiro</p></div></td></tr>';return}tb.innerHTML=tracks.map(a=>`<tr><td class="text-main">${esc(a.title)}</td><td>${esc(a.artist||'Unknown')}</td><td class="mono">${fmtNum(a.views||0)}</td><td>${a.is_published?'<span class="tag tag-green">Live</span>':'<span class="tag tag-gray">Draft</span>'}</td><td><div class="actions-cell"><button class="btn btn-ghost btn-sm" onclick="editAudio('${a.id}')"><i class="fas fa-edit"></i></button><label class="switch"><input type="checkbox" ${a.is_published?'checked':''} onchange="toggleAudio('${a.id}',this.checked)"><div class="switch-slider"></div></label><button class="btn btn-danger btn-sm" onclick="deleteAudio('${a.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join('')}
-function openAudioModal(a){$('audio-modal-title').textContent=a?'Audio Wax ka Bedel':'Audio Cusub';$('a-id').value=a?.id||'';$('a-title').value=a?.title||'';$('a-artist').value=a?.artist||'';$('a-url').value=a?.url||'';$('a-cover').value=a?.cover_url||'';$('a-type').value=a?.audio_type||'mp3';$('a-dur').value=a?.duration||'';$('a-published').checked=a?!!a.is_published:true;openModal('audio-modal')}
-function editAudio(id){openAudioModal(S.audio.find(x=>x.id==id))}
-async function saveAudio(){const id=$('a-id').value;const d={title:$('a-title').value.trim(),artist:$('a-artist').value.trim(),url:$('a-url').value.trim(),cover_url:$('a-cover').value.trim(),audio_type:$('a-type').value,duration:$('a-dur').value.trim(),is_published:$('a-published').checked};if(!d.title||!d.url){toast('Cinwaan iyo URL buuxi','error');return}try{if(id)await api('PUT','/api/v1/admin/audio/'+id,d);else await api('POST','/api/v1/admin/audio',d);closeModal('audio-modal');await loadAudio();await loadPublicData();toast(id?'La update gareeyay':'La sameeyay','success')}catch(e){toast('Khalad','error')}}
-async function toggleAudio(id,pub){try{await api('PUT','/api/v1/admin/audio/'+id,{is_published:pub});await loadPublicData();toast(pub?'La baahiyay':'La qariiyay','info')}catch{toast('Khalad','error')}}
-async function deleteAudio(id){confirmDelete('Miyaad hubtaa?',async()=>{try{await api('DELETE','/api/v1/admin/audio/'+id);await loadAudio();await loadPublicData();toast('La tirtirday','success')}catch{toast('Khalad','error')}})}
-
-async function loadPosts(){try{S.posts=await api('GET','/api/v1/admin/posts');renderAdminPosts()}catch(e){console.error(e)}}
-function renderAdminPosts(){const tb=$('posts-table');if(!S.posts.length){tb.innerHTML='<tr><td colspan="4"><div class="empty"><i class="fas fa-newspaper"></i><p>Post ma jiro</p></div></td></tr>';return}tb.innerHTML=S.posts.map(p=>`<tr><td class="text-main">${esc(p.title)}</td><td>${esc(p.author||'—')}</td><td>${p.is_published?'<span class="tag tag-green">Live</span>':'<span class="tag tag-gray">Draft</span>'}</td><td><div class="actions-cell"><button class="btn btn-ghost btn-sm" onclick="editPost('${p.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-sm" onclick="deletePost('${p.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join('')}
-function openPostModal(p){$('post-modal-title').textContent=p?'Post Wax ka Bedel':'Post Cusub';$('p-id').value=p?.id||'';$('p-title').value=p?.title||'';$('p-content').value=p?.content||'';$('p-author').value=p?.author||'';$('p-img').value=p?.image_url||'';$('p-published').checked=p?!!p.is_published:true;openModal('post-modal')}
-function editPost(id){openPostModal(S.posts.find(x=>x.id==id))}
-async function savePost(){const id=$('p-id').value;const d={title:$('p-title').value.trim(),content:$('p-content').value.trim(),author:$('p-author').value.trim(),image_url:$('p-img').value.trim(),is_published:$('p-published').checked};if(!d.title||!d.content){toast('Cinwaan iyo content buuxi','error');return}try{if(id)await api('PUT','/api/v1/admin/posts/'+id,d);else await api('POST','/api/v1/admin/posts',d);closeModal('post-modal');await loadPosts();await loadPublicData();toast(id?'La update gareeyay':'La sameeyay','success')}catch(e){toast('Khalad','error')}}
-async function deletePost(id){confirmDelete('Miyaad hubtaa?',async()=>{try{await api('DELETE','/api/v1/admin/posts/'+id);await loadPosts();await loadPublicData();toast('La tirtirday','success')}catch{toast('Khalad','error')}})}
-
-async function loadCategories(){try{S.categories=await api('GET','/api/v1/admin/categories');renderAdminCats()}catch(e){console.error(e)}}
-function renderAdminCats(){const tb=$('categories-table');if(!S.categories.length){tb.innerHTML='<tr><td colspan="3"><div class="empty"><i class="fas fa-folder"></i><p>Category ma jiro</p></div></td></tr>';return}tb.innerHTML=S.categories.map(c=>`<tr><td class="text-main">${esc(c.name)}</td><td>${esc(c.description||'—')}</td><td><div class="actions-cell"><button class="btn btn-ghost btn-sm" onclick="editCat('${c.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-sm" onclick="deleteCat('${c.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join('')}
-function openCatModal(c){$('cat-modal-title').textContent=c?'Category Wax ka Bedel':'Category Cusub';$('c-id').value=c?.id||'';$('c-name').value=c?.name||'';$('c-desc').value=c?.description||'';openModal('cat-modal')}
-function editCat(id){openCatModal(S.categories.find(x=>x.id==id))}
-async function saveCat(){const id=$('c-id').value;const d={name:$('c-name').value.trim(),description:$('c-desc').value.trim()};if(!d.name){toast('Magaca buuxi','error');return}try{if(id)await api('PUT','/api/v1/admin/categories/'+id,d);else await api('POST','/api/v1/admin/categories',d);closeModal('cat-modal');await loadCategories();await loadPublicData();toast(id?'La update gareeyay':'La sameeyay','success')}catch(e){toast('Khalad','error')}}
-async function deleteCat(id){confirmDelete('Miyaad hubtaa?',async()=>{try{await api('DELETE','/api/v1/admin/categories/'+id);await loadCategories();await loadPublicData();toast('La tirtirday','success')}catch{toast('Khalad','error')}})}
-
-async function loadMessages(){try{S.messages=await api('GET','/api/v1/admin/contacts');renderAdminMsgs()}catch(e){console.error(e)}}
-function renderAdminMsgs(){const tb=$('messages-table');if(!S.messages.length){tb.innerHTML='<tr><td colspan="4"><div class="empty"><i class="fas fa-envelope"></i><p>Farriin ma jiro</p></div></td></tr>';return}tb.innerHTML=S.messages.map(m=>`<tr><td class="text-main">${esc(m.alias_name||'—')}</td><td style="font-size:12px">${esc(m.contact_method||'—')}</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc((m.message||'').substring(0,60))}</td><td><div class="actions-cell"><button class="btn btn-ghost btn-sm" onclick="viewMsg('${m.id}')"><i class="fas fa-eye"></i></button><button class="btn btn-danger btn-sm" onclick="deleteMsg('${m.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join('')}
-function viewMsg(id){const m=S.messages.find(x=>x.id==id);if(!m)return;$('msg-modal-body').innerHTML=`<div style="margin-bottom:16px"><div class="form-label">Magac</div><div style="font-size:15px;font-weight:600">${esc(m.alias_name)}</div></div><div style="margin-bottom:16px"><div class="form-label">Xiriir</div><div>${esc(m.contact_method||'—')}</div></div><div style="margin-bottom:16px"><div class="form-label">Farriin</div><div style="background:var(--bg3);border-radius:8px;padding:12px;font-size:14px;line-height:1.6">${esc(m.message||'')}</div></div>`;openModal('msg-modal')}
-async function deleteMsg(id){confirmDelete('Miyaad hubtaa?',async()=>{try{await api('DELETE','/api/v1/admin/contacts/'+id);await loadMessages();toast('La tirtirday','success')}catch{toast('Khalad','error')}})}
-
-async function loadSettings(){try{const d=await api('GET','/api/v1/settings');if(d.site_name)$('s-name').value=d.site_name;if(d.site_description)$('s-desc').value=d.site_description;if(d.contact_email)$('s-email').value=d.contact_email}catch{}}
-async function saveSettings(){try{await api('PUT','/api/v1/admin/settings',{site_name:$('s-name').value.trim(),site_description:$('s-desc').value.trim(),contact_email:$('s-email').value.trim()});toast('Settings la keydsday','success')}catch{toast('Khalad','error')}}
-async function saveCredentials(){const pin=$('sec-pin').value.trim(),nu=$('sec-user').value.trim(),np=$('sec-pass').value,npin=$('sec-newpin').value.trim();if(!pin||pin.length!==8){toast('PIN 8 digits ah geli','error');return}const d={pin};if(nu)d.new_username=nu;if(np)d.new_password=np;if(npin){if(npin.length!==8){toast('PIN cusub 8 digits','error');return}d.new_pin=npin}try{await api('PUT','/api/v1/admin/credentials',d);toast('Macluumaadka la beddelay','success');['sec-pin','sec-user','sec-pass','sec-newpin'].forEach(id=>$(id).value='')}catch{toast('Khalad: PIN saxi','error')}}
-
-/* RENAME MENU */
-const RKEYS=[{key:'dashboard',icon:'fa-th-large',label:'Dashboard'},{key:'analytics',icon:'fa-chart-bar',label:'Analytics'},{key:'videos',icon:'fa-play-circle',label:'Videos'},{key:'audio',icon:'fa-music',label:'Audio'},{key:'posts',icon:'fa-newspaper',label:'Posts'},{key:'categories',icon:'fa-folder',label:'Categories'},{key:'messages',icon:'fa-envelope',label:'Messages'},{key:'settings',icon:'fa-sliders-h',label:'Settings'},{key:'security',icon:'fa-shield-alt',label:'Security'}];
-function openRenameModal(){$('rename-list').innerHTML=RKEYS.map(i=>`<div class="rename-item"><div class="rename-item-icon"><i class="fas ${i.icon}"></i></div><div class="rename-item-info"><div class="rename-item-label">${i.label}</div><input class="rename-item-input" data-key="${i.key}" value="${S.menuLabels[i.key]||i.label}"></div></div>`).join('');openModal('rename-modal')}
-function applyRename(){document.querySelectorAll('.rename-item-input').forEach(inp=>{S.menuLabels[inp.dataset.key]=inp.value.trim()||inp.dataset.key});localStorage.setItem('menuLabels',JSON.stringify(S.menuLabels));applyMenuLabels();closeModal('rename-modal');toast('Menu labels updated!','success')}
-function applyMenuLabels(){Object.entries(S.menuLabels).forEach(([k,v])=>{const el=$('navlbl-'+k);if(el)el.textContent=v})}
-</script>
+    // Init
+    loadVideos();
+  </script>
 </body>
 </html>
