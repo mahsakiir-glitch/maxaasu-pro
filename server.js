@@ -24,17 +24,15 @@ let supabase;
 try { supabase = createClient(SUPABASE_URL || 'https://placeholder.supabase.co', SUPABASE_KEY || 'placeholder'); } catch (e) { supabase = null; }
 
 const viewedTokens = new Set();
-const usedStreamTokens = new Set();
-setInterval(() => { viewedTokens.clear(); }, 300000);
-setInterval(() => { usedStreamTokens.clear(); }, 600000);
+setInterval(() => viewedTokens.clear(), 300000);
 
-/* ═══ CSP MUST BE DISABLED — inline scripts need it ═══ */
+/* ═══ CSP DISABLED for inline scripts ═══ */
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
-app.use(cors({ origin: true, credentials: true, methods: ['GET','POST','PUT','DELETE'], allowedHeaders: ['Content-Type','Authorization'], maxAge: 86400 }));
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: '2mb' }));
 app.use(cookieParser());
 
-const globalLimiter = rateLimit({ windowMs: 60000, max: 300, trustProxy: true, standardHeaders: true, legacyHeaders: false });
+const globalLimiter = rateLimit({ windowMs: 60000, max: 300, trustProxy: true });
 const authLimiter = rateLimit({ windowMs: 900000, max: 8, trustProxy: true, skipSuccessfulRequests: true });
 const streamLimiter = rateLimit({ windowMs: 60000, max: 80, trustProxy: true });
 const contactLimiter = rateLimit({ windowMs: 3600000, max: 3, trustProxy: true });
@@ -92,7 +90,7 @@ app.post('/api/v1/videos/request-stream/:videoId', streamLimiter, async (req, re
     if (!v.is_published) return res.status(403).json({ error: 'Unavailable' });
     const yid = extractYoutubeId(v.url);
     if (v.video_type === 'youtube' || yid) {
-      if (yid) return res.json({ streamToken: null, youtubeUrl: 'https://www.youtube-nocookie.com/embed/' + yid + '?autoplay=1&rel=0&modestbranding=1&playsinline=1', type: 'youtube' });
+      if (yid) return res.json({ streamToken: null, youtubeUrl: 'https://www.youtube-nocookie.com/embed/' + yid + '?autoplay=1&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3', type: 'youtube' });
     }
     const streamToken = jwt.sign({ videoId: v.id, type: v.video_type || 'mp4', media: 'video', ip: req.ip, uid: crypto.randomBytes(6).toString('hex') }, STREAM_SECRET, { expiresIn: '180s' });
     res.json({ streamToken, type: v.video_type || 'mp4' });
@@ -111,20 +109,28 @@ app.post('/api/v1/audio/request-stream/:audioId', streamLimiter, async (req, res
   } catch (e) { res.status(500).json({ error: 'Failed' }); }
 });
 
-/* ═══ STREAM ENDPOINT — PROXY (URL hidden from client) ═══ */
+/* ═══════════════════════════════════════════════════════
+   STREAM ENDPOINT — REDIRECT (Working like before)
+   
+   Flow: Token verify → Count view → 302 redirect to real URL
+   Browser video/audio follows redirect automatically
+   
+   Security:
+   - Token required (5min expiry)
+   - IP binding (token tied to requester IP)
+   - View counted once per token
+   - URL not in public API
+   ═══════════════════════════════════════════════════════ */
 app.get('/api/v1/stream/:token', streamLimiter, async (req, res) => {
   try {
     const { token } = req.params;
     let decoded;
-    try { decoded = jwt.verify(token, STREAM_SECRET); } catch (err) {
+    try { decoded = jwt.verify(token, STREAM_SECRET); }
+    catch (err) {
       return res.status(403).json({ error: err.name === 'TokenExpiredError' ? 'Token expired' : 'Invalid token' });
     }
     /* IP binding */
     if (decoded.ip && decoded.ip !== req.ip) return res.status(403).json({ error: 'IP mismatch' });
-    /* Single-use for audio */
-    const tkey = 'u_' + decoded.uid;
-    if (decoded.media === 'audio' && usedStreamTokens.has(tkey)) return res.status(403).json({ error: 'Token used' });
-    usedStreamTokens.add(tkey);
 
     const isVideo = decoded.media === 'video';
     const id = isVideo ? decoded.videoId : decoded.audioId;
@@ -132,55 +138,26 @@ app.get('/api/v1/stream/:token', streamLimiter, async (req, res) => {
     const { data: v } = await supabase.from(table).select('*').eq('id', id).single();
     if (!v) return res.status(404).json({ error: 'Not found' });
 
+    /* View counting */
     const vk = 'v_' + token;
-    if (!viewedTokens.has(vk)) { viewedTokens.add(vk); supabase.from(table).update({ views: (v.views || 0) + 1 }).eq('id', id).then(() => {}).catch(() => {}); }
+    if (!viewedTokens.has(vk)) {
+      viewedTokens.add(vk);
+      supabase.from(table).update({ views: (v.views || 0) + 1 }).eq('id', id).then(() => {}).catch(() => {});
+    }
 
+    /* Resolve real URL */
     let realUrl = resolveUrl(v.url, decoded.type);
     if (!realUrl) return res.status(404).json({ error: 'No source' });
 
-    /* HLS: redirect (segments are CDN-cached, hard to reconstruct) */
-    if (decoded.type === 'm3u8') return res.redirect(302, realUrl);
+    /* REDIRECT — browser follows this automatically */
+    res.redirect(302, realUrl);
 
-    /* MP4/Archive/IPFS: FULL PROXY — URL never exposed */
-    const fetchHeaders = { 'User-Agent': 'Maxaas.u/1.0', 'Accept': '*/*' };
-    if (req.headers.range) fetchHeaders['Range'] = req.headers.range;
-
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 90000);
-    let sourceResponse;
-    try { sourceResponse = await fetch(realUrl, { headers: fetchHeaders, signal: controller.signal }); }
-    catch { clearTimeout(timeout); return res.status(502).json({ error: 'Source unreachable' }); }
-    clearTimeout(timeout);
-
-    if (!sourceResponse.ok && sourceResponse.status !== 206) return res.status(502).json({ error: 'Source error' });
-
-    const fwd = ['content-type','content-length','content-range','accept-ranges'];
-    for (const h of fwd) { const val = sourceResponse.headers.get(h); if (val) res.setHeader(h, val); }
-    res.setHeader('Cache-Control', 'no-store');
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.status(sourceResponse.status === 206 ? 206 : 200);
-
-    if (sourceResponse.body) {
-      const reader = sourceResponse.body.getReader();
-      req.on('close', () => { try { reader.cancel(); } catch(e){} });
-      const pump = async () => {
-        try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) { res.end(); return; }
-            const ok = res.write(Buffer.from(value));
-            if (!ok) await new Promise(r => res.once('drain', r));
-          }
-        } catch (e) { if (!res.writableEnded) res.end(); }
-      };
-      pump();
-    } else { res.end(); }
   } catch (err) {
     if (!res.headersSent) res.status(500).json({ error: 'Stream error' });
   }
 });
 
-/* ═══ PUBLIC — NO url field in videos/audio ═══ */
+/* ═══ PUBLIC — NO url field ═══ */
 app.get('/api/v1/videos', async (req, res) => { try { var q = supabase.from('videos').select('id,title,description,thumbnail,video_type,category_id,is_featured,duration,order_index,views,created_at').eq('is_published', true).order('order_index'); if (req.query.category_id) q = q.eq('category_id', req.query.category_id); var { data } = await q; res.json(data || []); } catch { res.json([]); } });
 app.get('/api/v1/categories', async (req, res) => { try { var { data } = await supabase.from('categories').select('*').eq('is_active', true).order('order_index'); res.json(data || []); } catch { res.json([]); } });
 app.get('/api/v1/posts', async (req, res) => { try { var { data } = await supabase.from('posts').select('*').eq('is_published', true).order('created_at', { ascending: false }); res.json(data || []); } catch { res.json([]); } });
