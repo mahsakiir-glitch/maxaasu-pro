@@ -12,7 +12,6 @@ const crypto = require('crypto');
 const httpsReq = require('https');
 const httpReq = require('http');
 const { URL } = require('url');
-const ExpressBrute = require('express-brute'); // npm i express-brute
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,9 +33,9 @@ try {
 const viewedTokens = new Set();
 setInterval(() => viewedTokens.clear(), 300000);
 
-/* ═══ 1. PRODUCTION GRADE SECURITY HEADERS ═══ */
+/* ═══ PRODUCTION GRADE SECURITY HEADERS ═══ */
 app.use(helmet({
-  contentSecurityPolicy: false, // Keep false if using inline scripts, or define strict CSP
+  contentSecurityPolicy: false, 
   crossOriginEmbedderPolicy: false,
   hsts: { maxAge: 31536000, includeSubDomains: true, preload: true }, // Force HTTPS
   referrerPolicy: { policy: 'no-referrer' } // Hide referrer to prevent URL leakage
@@ -46,22 +45,21 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: '2mb' }));
 app.use(cookieParser());
 
-/* ═══ 2. ANTI-BOT & BRUTE FORCE PROTECTION ═══ */
-const bruteStore = new ExpressBrute.MemoryStore();
-const bruteForce = new ExpressBrute(bruteStore, {
-  freeRetries: 3,
-  minWait: 5000,
-  maxWait: 60000,
-  failCallback: (req, res, next, date) => {
-    res.status(429).json({ error: 'Too many attempts. Temporary block applied.' });
-  }
-});
-
+/* ═══ ADVANCED RATE LIMITING (Replaces express-brute) ═══ */
 const globalLimiter = rateLimit({ windowMs: 60000, max: 300, trustProxy: true });
 const authLimiter = rateLimit({ windowMs: 900000, max: 8, trustProxy: true, skipSuccessfulRequests: true });
 const streamLimiter = rateLimit({ windowMs: 60000, max: 80, trustProxy: true });
 const contactLimiter = rateLimit({ windowMs: 3600000, max: 3, trustProxy: true });
 const pinLimiter = rateLimit({ windowMs: 300000, max: 15, trustProxy: true });
+
+// Strict brute-force protection for login
+const loginBruteLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 attempts per IP per 15 minutes
+  trustProxy: true,
+  skipSuccessfulRequests: true,
+  message: { error: 'Too many login attempts. Please try again later.' }
+});
 
 app.use(globalLimiter);
 app.use(express.static(path.join(__dirname, 'public')));
@@ -115,9 +113,7 @@ async function setupAdmin() {
 }
 setupAdmin();
 
-/* ═══════════════════════════════════════════════════════
-   STREAM PROXY FUNCTION
-   ═══════════════════════════════════════════════════════ */
+/* ═══ STREAM PROXY FUNCTION ═══ */
 function proxyUrl(urlStr, req, res, maxRedirects) {
   if (maxRedirects === undefined) maxRedirects = 8;
   return new Promise((resolve, reject) => {
@@ -155,18 +151,13 @@ function proxyUrl(urlStr, req, res, maxRedirects) {
     const upstreamReq = mod.request(options, (upstreamRes) => {
       if (upstreamRes.statusCode >= 300 && upstreamRes.statusCode < 400 && upstreamRes.headers.location) {
         let location = upstreamRes.headers.location;
-
         if (location.startsWith('/')) {
           location = parsedUrl.protocol + '//' + parsedUrl.host + location;
         } else if (!location.startsWith('http')) {
           location = new URL(location, urlStr).href;
         }
-
         upstreamRes.resume();
-
-        return proxyUrl(location, req, res, maxRedirects - 1)
-          .then(resolve)
-          .catch(reject);
+        return proxyUrl(location, req, res, maxRedirects - 1).then(resolve).catch(reject);
       }
 
       if (upstreamRes.statusCode >= 400) {
@@ -197,52 +188,37 @@ function proxyUrl(urlStr, req, res, maxRedirects) {
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Headers', 'Range');
         res.setHeader('Access-Control-Expose-Headers', 'Content-Range, Content-Length, Content-Disposition');
+        
+        // Prevent mime sniffing & strict streaming
+        res.setHeader('X-Content-Type-Options', 'nosniff');
       }
 
       upstreamRes.pipe(res);
-
-      upstreamRes.on('end', () => {
-        resolve();
-      });
-
+      upstreamRes.on('end', resolve);
       upstreamRes.on('error', (err) => {
         upstreamRes.unpipe(res);
-        if (!res.headersSent) {
-          reject(err);
-        } else {
-          res.end();
-          resolve();
-        }
+        if (!res.headersSent) reject(err);
+        else { res.end(); resolve(); }
       });
     });
 
     upstreamReq.on('error', (err) => {
-      if (!res.headersSent) {
-        reject(err);
-      } else {
-        res.end();
-        resolve();
-      }
+      if (!res.headersSent) reject(err);
+      else { res.end(); resolve(); }
     });
 
     upstreamReq.setTimeout(30000, () => {
       upstreamReq.destroy();
-      if (!res.headersSent) {
-        reject(new Error('Upstream timeout'));
-      } else {
-        res.end();
-        resolve();
-      }
+      if (!res.headersSent) reject(new Error('Upstream timeout'));
+      else { res.end(); resolve(); }
     });
 
     upstreamReq.end();
   });
 }
 
-/* ═══════════════════════════════════════════════════════
-   AUTH ROUTES (With Anti-Brute Force Protection)
-   ═══════════════════════════════════════════════════════ */
-app.post('/api/v1/auth/check-pin', pinLimiter, bruteForce.prevent, async (req, res) => {
+/* ═══ AUTH ROUTES ═══ */
+app.post('/api/v1/auth/check-pin', pinLimiter, async (req, res) => {
   try {
     var { username, pin } = req.body;
     if (!username || !pin || pin.length !== 8) return res.json({ valid: false });
@@ -253,7 +229,7 @@ app.post('/api/v1/auth/check-pin', pinLimiter, bruteForce.prevent, async (req, r
   }
 });
 
-app.post('/api/v1/auth/login', authLimiter, bruteForce.prevent, async (req, res) => {
+app.post('/api/v1/auth/login', authLimiter, loginBruteLimiter, async (req, res) => {
   try {
     var { username, password, pin } = req.body;
     if (!username || !password || !pin) return res.status(400).json({ error: 'Missing fields' });
@@ -277,40 +253,35 @@ app.post('/api/v1/auth/logout', (req, res) => {
   res.clearCookie('token', { path: '/' }).json({ success: true });
 });
 
-/* ═══════════════════════════════════════════════════════
-   3. ENHANCED STREAM TOKEN GENERATOR (VIDEO)
-   ═══════════════════════════════════════════════════════ */
+/* ═══ STREAM TOKEN — VIDEO ═══ */
 app.post('/api/v1/videos/request-stream/:videoId', streamLimiter, async (req, res) => {
   try {
     const { videoId } = req.params;
     if (!videoId || videoId.length > 100) return res.status(400).json({ error: 'Invalid ID' });
-    
     const { data: v, error } = await supabase.from('videos').select('*').eq('id', videoId).single();
-    if (error || !v || !v.is_published) return res.status(404).json({ error: 'Not found' });
+    if (error || !v) return res.status(404).json({ error: 'Not found' });
+    if (!v.is_published) return res.status(403).json({ error: 'Unavailable' });
 
     const yid = extractYoutubeId(v.url);
+
     if (v.video_type === 'youtube' || yid) {
-      return res.json({ 
-        streamToken: null,
-        youtubeUrl: 'https://www.youtube-nocookie.com/embed/' + yid + '?autoplay=1&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3',
-        type: 'youtube', 
-        youtubeId: yid 
-      });
+      if (yid) {
+        return res.json({
+          streamToken: null,
+          youtubeUrl: 'https://www.youtube-nocookie.com/embed/' + yid + '?autoplay=1&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3',
+          type: 'youtube',
+          youtubeId: yid
+        });
+      }
     }
 
-    // Create a unique user fingerprint using IP and User-Agent
+    // Fingerprint binding: Hash IP + User-Agent
     const userFingerprint = crypto.createHash('sha256').update(req.ip + (req.headers['user-agent'] || '')).digest('hex');
 
     const streamToken = jwt.sign(
-      { 
-        videoId: v.id, 
-        type: v.video_type || 'mp4', 
-        media: 'video', 
-        fp: userFingerprint, // Fingerprint binding
-        uid: crypto.randomBytes(8).toString('hex') 
-      },
+      { videoId: v.id, type: v.video_type || 'mp4', media: 'video', fp: userFingerprint, uid: crypto.randomBytes(6).toString('hex') },
       STREAM_SECRET,
-      { expiresIn: '120s' } // Reduced to 2 minutes for security
+      { expiresIn: '300s' }
     );
     res.json({ streamToken, type: v.video_type || 'mp4' });
   } catch (e) {
@@ -318,28 +289,21 @@ app.post('/api/v1/videos/request-stream/:videoId', streamLimiter, async (req, re
   }
 });
 
-/* ═══════════════════════════════════════════════════════
-   STREAM TOKEN — AUDIO (Updated for Fingerprint Consistency)
-   ═══════════════════════════════════════════════════════ */
+/* ═══ STREAM TOKEN — AUDIO ═══ */
 app.post('/api/v1/audio/request-stream/:audioId', streamLimiter, async (req, res) => {
   try {
     const { audioId } = req.params;
     if (!audioId || audioId.length > 100) return res.status(400).json({ error: 'Invalid ID' });
     const { data: a, error } = await supabase.from('audio_tracks').select('*').eq('id', audioId).single();
-    if (error || !a || !a.is_published) return res.status(404).json({ error: 'Not found' });
+    if (error || !a) return res.status(404).json({ error: 'Not found' });
+    if (!a.is_published) return res.status(403).json({ error: 'Unavailable' });
 
     const userFingerprint = crypto.createHash('sha256').update(req.ip + (req.headers['user-agent'] || '')).digest('hex');
 
     const streamToken = jwt.sign(
-      { 
-        audioId: a.id, 
-        type: a.audio_type || 'mp3', 
-        media: 'audio', 
-        fp: userFingerprint, // Fingerprint binding
-        uid: crypto.randomBytes(8).toString('hex') 
-      },
+      { audioId: a.id, type: a.audio_type || 'mp3', media: 'audio', fp: userFingerprint, uid: crypto.randomBytes(6).toString('hex') },
       STREAM_SECRET,
-      { expiresIn: '120s' }
+      { expiresIn: '300s' }
     );
     res.json({ streamToken, type: a.audio_type || 'mp3' });
   } catch (e) {
@@ -347,16 +311,18 @@ app.post('/api/v1/audio/request-stream/:audioId', streamLimiter, async (req, res
   }
 });
 
-/* ═══════════════════════════════════════════════════════
-   4. ENHANCED STREAM PROXY VALIDATION
-   ═══════════════════════════════════════════════════════ */
+/* ═══ STREAM ENDPOINT — PROXY ═══ */
 app.get('/api/v1/stream/:token', streamLimiter, async (req, res) => {
   try {
+    const { token } = req.params;
+
     let decoded;
     try {
-      decoded = jwt.verify(req.params.token, STREAM_SECRET);
+      decoded = jwt.verify(token, STREAM_SECRET);
     } catch (err) {
-      return res.status(403).json({ error: 'Token invalid or expired' });
+      return res.status(403).json({
+        error: err.name === 'TokenExpiredError' ? 'Token expired' : 'Invalid token'
+      });
     }
 
     // Validate Fingerprint
@@ -372,7 +338,7 @@ app.get('/api/v1/stream/:token', streamLimiter, async (req, res) => {
     const { data: v } = await supabase.from(table).select('*').eq('id', id).single();
     if (!v) return res.status(404).json({ error: 'Not found' });
 
-    const vk = 'v_' + req.params.token;
+    const vk = 'v_' + token;
     if (!viewedTokens.has(vk)) {
       viewedTokens.add(vk);
       supabase.from(table).update({ views: (v.views || 0) + 1 }).eq('id', id).then(() => {}).catch(() => {});
@@ -381,45 +347,37 @@ app.get('/api/v1/stream/:token', streamLimiter, async (req, res) => {
     let realUrl = resolveUrl(v.url, decoded.type);
     if (!realUrl) return res.status(404).json({ error: 'No source' });
 
-    // Stream with strict headers
-    res.setHeader('X-Content-Type-Options', 'nosniff');
     await proxyUrl(realUrl, req, res);
 
   } catch (err) {
-    if (!res.headersSent) res.status(500).json({ error: 'Stream error' });
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Stream error' });
+    }
   }
 });
 
-/* ═══════════════════════════════════════════════════════
-   PUBLIC ROUTES
-   ═══════════════════════════════════════════════════════ */
+/* ═══ PUBLIC ROUTES ═══ */
 app.get('/api/v1/videos', async (req, res) => {
   try {
     var q = supabase.from('videos').select('id,title,description,thumbnail,video_type,category_id,is_featured,duration,order_index,views,created_at').eq('is_published', true).order('order_index');
     if (req.query.category_id) q = q.eq('category_id', req.query.category_id);
     var { data } = await q;
     res.json(data || []);
-  } catch {
-    res.json([]);
-  }
+  } catch { res.json([]); }
 });
 
 app.get('/api/v1/categories', async (req, res) => {
   try {
     var { data } = await supabase.from('categories').select('*').eq('is_active', true).order('order_index');
     res.json(data || []);
-  } catch {
-    res.json([]);
-  }
+  } catch { res.json([]); }
 });
 
 app.get('/api/v1/posts', async (req, res) => {
   try {
     var { data } = await supabase.from('posts').select('*').eq('is_published', true).order('created_at', { ascending: false });
     res.json(data || []);
-  } catch {
-    res.json([]);
-  }
+  } catch { res.json([]); }
 });
 
 app.post('/api/v1/posts/:id/view', streamLimiter, async (req, res) => {
@@ -428,18 +386,14 @@ app.post('/api/v1/posts/:id/view', streamLimiter, async (req, res) => {
     if (!p) return res.status(404);
     await supabase.from('posts').update({ views: (p.views || 0) + 1 }).eq('id', req.params.id);
     res.json({ success: true });
-  } catch {
-    res.status(500);
-  }
+  } catch { res.status(500); }
 });
 
 app.get('/api/v1/audio', async (req, res) => {
   try {
     var { data } = await supabase.from('audio_tracks').select('id,title,artist,cover_url,duration,category,views,created_at').eq('is_published', true).order('created_at', { ascending: false });
     res.json(data || []);
-  } catch {
-    res.json([]);
-  }
+  } catch { res.json([]); }
 });
 
 app.get('/api/v1/settings', async (req, res) => {
@@ -448,9 +402,7 @@ app.get('/api/v1/settings', async (req, res) => {
     var s = {};
     (data || []).forEach(i => s[i.key] = i.value);
     res.json(s);
-  } catch {
-    res.json({});
-  }
+  } catch { res.json({}); }
 });
 
 app.post('/api/v1/contacts', contactLimiter, async (req, res) => {
@@ -465,263 +417,76 @@ app.post('/api/v1/contacts', contactLimiter, async (req, res) => {
     }).select().single();
     if (error) throw error;
     res.json({ success: true, id: data.id });
-  } catch {
-    res.status(500);
-  }
+  } catch { res.status(500); }
 });
 
-/* ═══════════════════════════════════════════════════════
-   ADMIN ROUTES
-   ═══════════════════════════════════════════════════════ */
-
-/* Videos */
+/* ═══ ADMIN ROUTES ═══ */
 app.get('/api/v1/admin/videos', auth, async (req, res) => {
-  try {
-    var { data } = await supabase.from('videos').select('*').order('created_at', { ascending: false });
-    res.json(data || []);
-  } catch {
-    res.json([]);
-  }
+  try { var { data } = await supabase.from('videos').select('*').order('created_at', { ascending: false }); res.json(data || []); } catch { res.json([]); }
 });
-
 app.post('/api/v1/admin/videos', auth, async (req, res) => {
-  try {
-    var d = req.body;
-    if (!d.title || !d.url) return res.status(400);
-    var { data, error } = await supabase.from('videos').insert({
-      title: sanitize(d.title),
-      description: d.description || '',
-      url: d.url,
-      video_type: d.video_type || 'mp4',
-      thumbnail: d.thumbnail || '',
-      category_id: d.category_id || null,
-      is_featured: !!d.is_featured,
-      is_published: d.is_published !== false,
-      duration: d.duration || '0:00',
-      order_index: d.order_index || 0
-    }).select().single();
-    if (error) throw error;
-    res.json(data);
-  } catch {
-    res.status(500);
-  }
+  try { var d = req.body; if (!d.title || !d.url) return res.status(400); var { data, error } = await supabase.from('videos').insert({ title: sanitize(d.title), description: d.description || '', url: d.url, video_type: d.video_type || 'mp4', thumbnail: d.thumbnail || '', category_id: d.category_id || null, is_featured: !!d.is_featured, is_published: d.is_published !== false, duration: d.duration || '0:00', order_index: d.order_index || 0 }).select().single(); if (error) throw error; res.json(data); } catch { res.status(500); }
 });
-
 app.put('/api/v1/admin/videos/:id', auth, async (req, res) => {
-  try {
-    var { data, error } = await supabase.from('videos').update(req.body).eq('id', req.params.id).select().single();
-    if (error) throw error;
-    res.json(data);
-  } catch {
-    res.status(500);
-  }
+  try { var { data, error } = await supabase.from('videos').update(req.body).eq('id', req.params.id).select().single(); if (error) throw error; res.json(data); } catch { res.status(500); }
 });
-
 app.delete('/api/v1/admin/videos/:id', auth, async (req, res) => {
-  try {
-    await supabase.from('videos').delete().eq('id', req.params.id);
-    res.json({ success: true });
-  } catch {
-    res.status(500);
-  }
+  try { await supabase.from('videos').delete().eq('id', req.params.id); res.json({ success: true }); } catch { res.status(500); }
 });
 
-/* Categories */
 app.get('/api/v1/admin/categories', auth, async (req, res) => {
-  try {
-    var { data } = await supabase.from('categories').select('*').order('order_index');
-    res.json(data || []);
-  } catch {
-    res.json([]);
-  }
+  try { var { data } = await supabase.from('categories').select('*').order('order_index'); res.json(data || []); } catch { res.json([]); }
 });
-
 app.post('/api/v1/admin/categories', auth, async (req, res) => {
-  try {
-    var d = req.body;
-    if (!d.name) return res.status(400);
-    var { data, error } = await supabase.from('categories').insert({
-      name: sanitize(d.name),
-      description: d.description || '',
-      icon: d.icon || 'fa-folder',
-      order_index: d.order_index || 0
-    }).select().single();
-    if (error) throw error;
-    res.json(data);
-  } catch {
-    res.status(500);
-  }
+  try { var d = req.body; if (!d.name) return res.status(400); var { data, error } = await supabase.from('categories').insert({ name: sanitize(d.name), description: d.description || '', icon: d.icon || 'fa-folder', order_index: d.order_index || 0 }).select().single(); if (error) throw error; res.json(data); } catch { res.status(500); }
 });
-
 app.put('/api/v1/admin/categories/:id', auth, async (req, res) => {
-  try {
-    var { data, error } = await supabase.from('categories').update(req.body).eq('id', req.params.id).select().single();
-    if (error) throw error;
-    res.json(data);
-  } catch {
-    res.status(500);
-  }
+  try { var { data, error } = await supabase.from('categories').update(req.body).eq('id', req.params.id).select().single(); if (error) throw error; res.json(data); } catch { res.status(500); }
 });
-
 app.delete('/api/v1/admin/categories/:id', auth, async (req, res) => {
-  try {
-    await supabase.from('categories').delete().eq('id', req.params.id);
-    res.json({ success: true });
-  } catch {
-    res.status(500);
-  }
+  try { await supabase.from('categories').delete().eq('id', req.params.id); res.json({ success: true }); } catch { res.status(500); }
 });
 
-/* Posts */
 app.get('/api/v1/admin/posts', auth, async (req, res) => {
-  try {
-    var { data } = await supabase.from('posts').select('*').order('created_at', { ascending: false });
-    res.json(data || []);
-  } catch {
-    res.json([]);
-  }
+  try { var { data } = await supabase.from('posts').select('*').order('created_at', { ascending: false }); res.json(data || []); } catch { res.json([]); }
 });
-
 app.post('/api/v1/admin/posts', auth, async (req, res) => {
-  try {
-    var d = req.body;
-    if (!d.title || !d.content) return res.status(400);
-    var { data, error } = await supabase.from('posts').insert({
-      title: sanitize(d.title),
-      content: d.content,
-      author: sanitize(d.author || 'Maxaas.u'),
-      image_url: d.image_url || '',
-      is_published: d.is_published !== false
-    }).select().single();
-    if (error) throw error;
-    res.json(data);
-  } catch {
-    res.status(500);
-  }
+  try { var d = req.body; if (!d.title || !d.content) return res.status(400); var { data, error } = await supabase.from('posts').insert({ title: sanitize(d.title), content: d.content, author: sanitize(d.author || 'Maxaas.u'), image_url: d.image_url || '', is_published: d.is_published !== false }).select().single(); if (error) throw error; res.json(data); } catch { res.status(500); }
 });
-
 app.put('/api/v1/admin/posts/:id', auth, async (req, res) => {
-  try {
-    var { data, error } = await supabase.from('posts').update(req.body).eq('id', req.params.id).select().single();
-    if (error) throw error;
-    res.json(data);
-  } catch {
-    res.status(500);
-  }
+  try { var { data, error } = await supabase.from('posts').update(req.body).eq('id', req.params.id).select().single(); if (error) throw error; res.json(data); } catch { res.status(500); }
 });
-
 app.delete('/api/v1/admin/posts/:id', auth, async (req, res) => {
-  try {
-    await supabase.from('posts').delete().eq('id', req.params.id);
-    res.json({ success: true });
-  } catch {
-    res.status(500);
-  }
+  try { await supabase.from('posts').delete().eq('id', req.params.id); res.json({ success: true }); } catch { res.status(500); }
 });
 
-/* Audio */
 app.get('/api/v1/admin/audio', auth, async (req, res) => {
-  try {
-    var { data } = await supabase.from('audio_tracks').select('*').order('created_at', { ascending: false });
-    res.json(data || []);
-  } catch {
-    res.json([]);
-  }
+  try { var { data } = await supabase.from('audio_tracks').select('*').order('created_at', { ascending: false }); res.json(data || []); } catch { res.json([]); }
 });
-
 app.post('/api/v1/admin/audio', auth, async (req, res) => {
-  try {
-    var d = req.body;
-    if (!d.title || !d.url) return res.status(400);
-    var { data, error } = await supabase.from('audio_tracks').insert({
-      title: sanitize(d.title),
-      artist: sanitize(d.artist || 'Unknown'),
-      url: d.url,
-      audio_type: d.audio_type || 'mp3',
-      cover_url: d.cover_url || '',
-      duration: d.duration || '0:00',
-      category: d.category || 'General',
-      website_url: d.website_url || '',
-      is_published: d.is_published !== false
-    }).select().single();
-    if (error) throw error;
-    res.json(data);
-  } catch {
-    res.status(500);
-  }
+  try { var d = req.body; if (!d.title || !d.url) return res.status(400); var { data, error } = await supabase.from('audio_tracks').insert({ title: sanitize(d.title), artist: sanitize(d.artist || 'Unknown'), url: d.url, audio_type: d.audio_type || 'mp3', cover_url: d.cover_url || '', duration: d.duration || '0:00', category: d.category || 'General', website_url: d.website_url || '', is_published: d.is_published !== false }).select().single(); if (error) throw error; res.json(data); } catch { res.status(500); }
 });
-
 app.put('/api/v1/admin/audio/:id', auth, async (req, res) => {
-  try {
-    var d = req.body;
-    if (d.website_url === undefined) d.website_url = '';
-    var { data, error } = await supabase.from('audio_tracks').update(d).eq('id', req.params.id).select().single();
-    if (error) throw error;
-    res.json(data);
-  } catch {
-    res.status(500);
-  }
+  try { var d = req.body; if (d.website_url === undefined) d.website_url = ''; var { data, error } = await supabase.from('audio_tracks').update(d).eq('id', req.params.id).select().single(); if (error) throw error; res.json(data); } catch { res.status(500); }
 });
-
 app.delete('/api/v1/admin/audio/:id', auth, async (req, res) => {
-  try {
-    await supabase.from('audio_tracks').delete().eq('id', req.params.id);
-    res.json({ success: true });
-  } catch {
-    res.status(500);
-  }
+  try { await supabase.from('audio_tracks').delete().eq('id', req.params.id); res.json({ success: true }); } catch { res.status(500); }
 });
 
-/* Contacts */
 app.get('/api/v1/admin/contacts', auth, async (req, res) => {
-  try {
-    var { data } = await supabase.from('contacts').select('*').order('created_at', { ascending: false });
-    res.json(data || []);
-  } catch {
-    res.json([]);
-  }
+  try { var { data } = await supabase.from('contacts').select('*').order('created_at', { ascending: false }); res.json(data || []); } catch { res.json([]); }
 });
-
 app.put('/api/v1/admin/contacts/:id', auth, async (req, res) => {
-  try {
-    var u = {};
-    if (req.body.is_read !== undefined) u.is_read = !!req.body.is_read;
-    if (req.body.admin_response !== undefined) u.admin_response = req.body.admin_response;
-    var { data, error } = await supabase.from('contacts').update(u).eq('id', req.params.id).select().single();
-    if (error) throw error;
-    res.json(data);
-  } catch {
-    res.status(500);
-  }
+  try { var u = {}; if (req.body.is_read !== undefined) u.is_read = !!req.body.is_read; if (req.body.admin_response !== undefined) u.admin_response = req.body.admin_response; var { data, error } = await supabase.from('contacts').update(u).eq('id', req.params.id).select().single(); if (error) throw error; res.json(data); } catch { res.status(500); }
 });
-
 app.delete('/api/v1/admin/contacts/:id', auth, async (req, res) => {
-  try {
-    await supabase.from('contacts').delete().eq('id', req.params.id);
-    res.json({ success: true });
-  } catch {
-    res.status(500);
-  }
+  try { await supabase.from('contacts').delete().eq('id', req.params.id); res.json({ success: true }); } catch { res.status(500); }
 });
 
-/* Settings */
 app.put('/api/v1/admin/settings', auth, async (req, res) => {
-  try {
-    for (var [k, v] of Object.entries(req.body)) {
-      if (k.length > 50) continue;
-      await supabase.from('settings').upsert({
-        key: k,
-        value: typeof v === 'object' ? JSON.stringify(v) : String(v).substring(0, 5000),
-        updated_at: new Date().toISOString()
-      });
-    }
-    res.json({ success: true });
-  } catch {
-    res.status(500);
-  }
+  try { for (var [k, v] of Object.entries(req.body)) { if (k.length > 50) continue; await supabase.from('settings').upsert({ key: k, value: typeof v === 'object' ? JSON.stringify(v) : String(v).substring(0, 5000), updated_at: new Date().toISOString() }); } res.json({ success: true }); } catch { res.status(500); }
 });
 
-/* Credentials */
 app.put('/api/v1/admin/credentials', auth, async (req, res) => {
   try {
     var { pin, new_username, new_password, new_pin } = req.body;
@@ -755,12 +520,9 @@ app.put('/api/v1/admin/credentials', auth, async (req, res) => {
       maxAge: 8 * 60 * 60 * 1000,
       path: '/'
     }).json({ success: true });
-  } catch {
-    res.status(500);
-  }
+  } catch { res.status(500); }
 });
 
-/* Analytics */
 app.get('/api/v1/admin/analytics', auth, async (req, res) => {
   try {
     var { data: videos } = await supabase.from('videos').select('id,title,views,created_at').order('views', { ascending: false });
@@ -777,16 +539,8 @@ app.get('/api/v1/admin/analytics', auth, async (req, res) => {
     wAgo.setDate(wAgo.getDate() - 7);
     for (var v2 of (videos || [])) if (new Date(v2.created_at) >= wAgo) thisWeek++;
 
-    res.json({
-      totalViews,
-      topVideos: (videos || []).slice(0, 5),
-      totalVideos: (videos || []).length,
-      unread,
-      thisWeek
-    });
-  } catch {
-    res.json({ totalViews: 0, topVideos: [], totalVideos: 0, unread: 0, thisWeek: 0 });
-  }
+    res.json({ totalViews, topVideos: (videos || []).slice(0, 5), totalVideos: (videos || []).length, unread, thisWeek });
+  } catch { res.json({ totalViews: 0, topVideos: [], totalVideos: 0, unread: 0, thisWeek: 0 }); }
 });
 
 /* ═══ SPA Catch-all ═══ */
@@ -800,6 +554,6 @@ app.listen(PORT, () => {
   console.log('  Maxaas.u Server Running');
   console.log('  Port: ' + PORT);
   console.log('  Mode: ' + (process.env.NODE_ENV || 'development'));
-  console.log('  Stream: Proxy (Enhanced Security)');
+  console.log('  Stream: Secure Proxy + Fingerprint Binding');
   console.log('═══════════════════════════════════════');
 });
