@@ -1,1080 +1,2485 @@
 <!DOCTYPE html>
-<html lang="so" class="scroll-smooth">
+<html lang="so">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Maxaas.u</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<script>
-tailwind.config={theme:{extend:{colors:{brand:{50:'#EEF2FF',100:'#E0E7FF',200:'#C7D2FE',300:'#A5B4FC',400:'#818CF8',500:'#6366F1',600:'#4F46E5',700:'#4338CA',800:'#3730A3',900:'#312E81'},surface:{950:'#020617',900:'#0F172A',800:'#1E293B',700:'#334155',600:'#475569',500:'#64748B',400:'#94A3B8',300:'#CBD5E1',200:'#E2E8F0',100:'#F1F5F9',50:'#F8FAFC'}},fontFamily:{sans:['Inter','sans-serif'],serif:['Playfair Display','serif']}}}}
-</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maxaas.u — Admin Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:#0F172A;color:#F8FAFC;overflow-x:hidden}
-::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:#1E293B}
-::-webkit-scrollbar-thumb{background:#475569;border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:#64748B}
-.page{display:none;opacity:0;transform:translateY(12px);transition:opacity .4s ease,transform .4s ease}
-.page.active{display:block;opacity:1;transform:translateY(0)}
-.glass{background:rgba(30,41,59,.6);backdrop-filter:blur(16px);border:1px solid rgba(148,163,184,.08)}
-.glass-light{background:rgba(30,41,59,.4);backdrop-filter:blur(12px);border:1px solid rgba(148,163,184,.06)}
-.card-hover{transition:all .4s cubic-bezier(.4,0,.2,1)}
-.card-hover:hover{transform:translateY(-6px);box-shadow:0 25px 50px -12px rgba(0,0,0,.4)}
-.card-hover:hover .card-overlay{opacity:1}
-.card-overlay{opacity:0;transition:opacity .4s ease}
-.glow-indigo{box-shadow:0 0 60px rgba(99,102,241,.15)}
-.glow-indigo-strong{box-shadow:0 0 80px rgba(99,102,241,.25)}
-.text-gradient{background:linear-gradient(135deg,#818CF8,#6366F1,#4F46E5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.line-gradient{height:1px;background:linear-gradient(to right,transparent,#475569,transparent)}
-.pulse-dot{animation:pulseDot 2s ease-in-out infinite}
-@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.2)}}
-@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes slideUp{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
-.animate-fade-in-up{animation:fadeInUp .6s ease forwards}
-.toast-enter{animation:fadeInUp .3s ease forwards}
-.toast-exit{animation:fadeOut .3s ease forwards}
-@keyframes fadeOut{to{opacity:0;transform:translateY(-10px)}}
-.input-field{background:rgba(15,23,42,.6);border:1px solid rgba(148,163,184,.15);border-radius:8px;padding:10px 14px;color:#F8FAFC;font-size:14px;width:100%;transition:border-color .2s}
-.input-field:focus{outline:none;border-color:#6366F1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
-.input-field::placeholder{color:#64748B}
-.btn-primary{background:linear-gradient(135deg,#6366F1,#4F46E5);color:#fff;padding:10px 24px;border-radius:8px;font-weight:500;font-size:14px;border:none;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 25px rgba(99,102,241,.3)}
-.btn-primary:active{transform:translateY(0)}
-.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.btn-secondary{background:rgba(148,163,184,.1);color:#E2E8F0;padding:10px 24px;border-radius:8px;font-weight:500;font-size:14px;border:1px solid rgba(148,163,184,.15);cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
-.btn-secondary:hover{background:rgba(148,163,184,.2);border-color:rgba(148,163,184,.3)}
-.btn-danger{background:rgba(239,68,68,.15);color:#F87171;padding:10px 24px;border-radius:8px;font-weight:500;font-size:14px;border:1px solid rgba(239,68,68,.2);cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
-.btn-danger:hover{background:rgba(239,68,68,.25)}
-.btn-sm{padding:6px 14px;font-size:12px}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
-.badge-indigo{background:rgba(99,102,241,.15);color:#A5B4FC}
-.badge-emerald{background:rgba(16,185,129,.15);color:#6EE7B7}
-.badge-amber{background:rgba(245,158,11,.15);color:#FCD34D}
-.badge-red{background:rgba(239,68,68,.15);color:#FCA5A5}
-.tab-btn{padding:8px 20px;font-size:13px;font-weight:500;color:#94A3B8;border-bottom:2px solid transparent;cursor:pointer;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none}
-.tab-btn:hover{color:#E2E8F0}
-.tab-btn.active{color:#6366F1;border-bottom-color:#6366F1}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:16px}
-.modal-overlay.show{display:flex}
-.modal-box{background:#1E293B;border:1px solid rgba(148,163,184,.1);border-radius:16px;padding:28px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;animation:fadeInUp .3s ease}
-#audioPlayerBar{position:fixed;bottom:0;left:0;right:0;z-index:90;transform:translateY(100%);transition:transform .4s cubic-bezier(.4,0,.2,1)}
-#audioPlayerBar.show{transform:translateY(0)}
-.nav-link{position:relative;color:#94A3B8;transition:color .2s;font-size:14px;font-weight:500}
-.nav-link:hover,.nav-link.active{color:#F8FAFC}
-.nav-link.active::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:2px;background:#6366F1;border-radius:1px}
-.skeleton{background:linear-gradient(90deg,rgba(30,41,59,.6) 25%,rgba(51,65,85,.6) 50%,rgba(30,41,59,.6) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.admin-sidebar-link{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:8px;color:#94A3B8;font-size:14px;transition:all .2s;cursor:pointer}
-.admin-sidebar-link:hover{background:rgba(148,163,184,.08);color:#E2E8F0}
-.admin-sidebar-link.active{background:rgba(99,102,241,.12);color:#818CF8}
-.video-thumb{position:relative;overflow:hidden;border-radius:10px;aspect-ratio:16/9;background:#1E293B}
-.video-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
-.video-thumb:hover img{transform:scale(1.05)}
-.audio-item{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:10px;cursor:pointer;transition:background .2s}
-.audio-item:hover{background:rgba(148,163,184,.06)}
-.audio-item.playing{background:rgba(99,102,241,.1)}
-textarea.input-field{resize:vertical;min-height:80px}
-select.input-field{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
-@media(max-width:768px){.modal-box{padding:20px;margin:8px}}
+:root {
+  --bg: #0f0f0f;
+  --bg2: #161616;
+  --bg3: #1f1f1f;
+  --bg4: #2a2a2a;
+  --surface: #212121;
+  --surface2: #2d2d2d;
+  --border: #333;
+  --border2: #404040;
+  --red: #ff0000;
+  --red2: #cc0000;
+  --red-glow: rgba(255,0,0,0.15);
+  --text: #f1f1f1;
+  --text2: #aaa;
+  --text3: #666;
+  --accent: #ff4444;
+  --green: #00c853;
+  --blue: #2979ff;
+  --yellow: #ffd600;
+  --sidebar-w: 240px;
+  --header-h: 56px;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 4px 24px rgba(0,0,0,.5);
+  --font: 'Outfit', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --transition: 0.2s cubic-bezier(.4,0,.2,1);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ══════════════════ HEADER ══════════════════ */
+.header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  z-index: 200;
+  backdrop-filter: blur(12px);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.menu-btn {
+  width: 40px; height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: background var(--transition);
+  flex-shrink: 0;
+}
+.menu-btn:hover { background: var(--bg4); }
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.logo-icon {
+  width: 32px; height: 32px;
+  background: var(--red);
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #fff;
+}
+.logo-text {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+.logo-text span { color: var(--red); }
+
+.header-search {
+  flex: 1;
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 40px;
+  overflow: hidden;
+  transition: border-color var(--transition);
+}
+.header-search:focus-within { border-color: var(--blue); }
+.header-search input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 8px 16px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  outline: none;
+}
+.header-search input::placeholder { color: var(--text3); }
+.search-btn {
+  width: 56px; height: 38px;
+  background: var(--bg4);
+  border: none;
+  border-left: 1px solid var(--border);
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 14px;
+  transition: background var(--transition);
+}
+.search-btn:hover { background: var(--bg3); color: var(--text); }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.icon-btn {
+  width: 40px; height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--text2);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all var(--transition);
+  position: relative;
+  flex-shrink: 0;
+}
+.icon-btn:hover { background: var(--bg4); color: var(--text); }
+
+.badge {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 8px; height: 8px;
+  background: var(--red);
+  border-radius: 50%;
+  border: 2px solid var(--bg2);
+}
+
+.avatar {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--red), #ff6b6b);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ══════════════════ SIDEBAR ══════════════════ */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  z-index: 150;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.sidebar-overlay.show { opacity: 1; }
+
+.sidebar {
+  position: fixed;
+  top: var(--header-h);
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-w);
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 100;
+  transition: transform var(--transition), width var(--transition);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.sidebar.collapsed { width: 72px; }
+
+.sidebar-section {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-section:last-child { border-bottom: none; }
+
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 8px 20px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity var(--transition);
+}
+.sidebar.collapsed .section-label { opacity: 0; }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  margin: 2px 8px;
+  transition: all var(--transition);
+  text-decoration: none;
+  color: var(--text2);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+.nav-item:hover { background: var(--bg4); color: var(--text); }
+.nav-item.active {
+  background: var(--red-glow);
+  color: var(--text);
+}
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 20%; bottom: 20%;
+  width: 3px;
+  background: var(--red);
+  border-radius: 0 2px 2px 0;
+}
+.nav-icon {
+  width: 20px;
+  text-align: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.nav-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity var(--transition);
+}
+.sidebar.collapsed .nav-label { opacity: 0; pointer-events: none; }
+
+.nav-badge {
+  background: var(--red);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+.sidebar.collapsed .nav-badge { display: none; }
+
+/* Rename inline input */
+.nav-rename-input {
+  flex: 1;
+  background: var(--bg3);
+  border: 1px solid var(--blue);
+  border-radius: 4px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 2px 6px;
+  outline: none;
+  max-width: 120px;
+}
+
+/* ══════════════════ MAIN ══════════════════ */
+.main {
+  margin-left: var(--sidebar-w);
+  padding-top: var(--header-h);
+  transition: margin-left var(--transition);
+  min-height: 100vh;
+}
+.main.collapsed { margin-left: 72px; }
+
+/* ══════════════════ CONTENT AREA ══════════════════ */
+.page { display: none; padding: 24px; animation: fadeIn .25s ease; }
+.page.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════════ PAGE HEADER ══════════════════ */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+.page-subtitle {
+  font-size: 13px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+/* ══════════════════ STATS CARDS ══════════════════ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--transition), transform var(--transition);
+  cursor: default;
+}
+.stat-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.stat-card.red::before { background: var(--red); }
+.stat-card.blue::before { background: var(--blue); }
+.stat-card.green::before { background: var(--green); }
+.stat-card.yellow::before { background: var(--yellow); }
+
+.stat-icon {
+  width: 40px; height: 40px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-bottom: 14px;
+}
+.stat-icon.red { background: rgba(255,0,0,.12); color: var(--red); }
+.stat-icon.blue { background: rgba(41,121,255,.12); color: var(--blue); }
+.stat-icon.green { background: rgba(0,200,83,.12); color: var(--green); }
+.stat-icon.yellow { background: rgba(255,214,0,.12); color: var(--yellow); }
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+  font-family: var(--mono);
+}
+.stat-label {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 6px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.stat-change {
+  position: absolute;
+  top: 16px; right: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--green);
+}
+
+/* ══════════════════ TABLE CARD ══════════════════ */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.btn-primary { background: var(--red); color: #fff; }
+.btn-primary:hover { background: var(--red2); transform: translateY(-1px); }
+.btn-secondary { background: var(--bg4); color: var(--text2); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--bg3); color: var(--text); }
+.btn-ghost { background: transparent; color: var(--text3); padding: 6px 10px; }
+.btn-ghost:hover { color: var(--text); background: var(--bg4); }
+.btn-danger { background: rgba(255,0,0,.1); color: #ff4444; border: 1px solid rgba(255,0,0,.2); }
+.btn-danger:hover { background: rgba(255,0,0,.2); }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-icon { width: 32px; height: 32px; padding: 0; justify-content: center; }
+
+.table-wrap { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+thead tr { border-bottom: 1px solid var(--border); }
+thead th {
+  padding: 10px 16px;
+  text-align: left;
+  color: var(--text3);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  white-space: nowrap;
+}
+tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  transition: background var(--transition);
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--bg4); }
+td { padding: 12px 16px; color: var(--text2); vertical-align: middle; }
+td.text-main { color: var(--text); font-weight: 500; }
+td .mono { font-family: var(--mono); font-size: 12px; }
+
+.thumb {
+  width: 80px; height: 45px;
+  object-fit: cover;
+  border-radius: 4px;
+  background: var(--bg4);
+}
+.thumb-placeholder {
+  width: 80px; height: 45px;
+  background: var(--bg4);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text3);
+  font-size: 18px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.tag-red { background: rgba(255,0,0,.12); color: #ff6666; }
+.tag-blue { background: rgba(41,121,255,.12); color: #6699ff; }
+.tag-green { background: rgba(0,200,83,.12); color: #66ffaa; }
+.tag-gray { background: var(--bg4); color: var(--text3); }
+.tag-yellow { background: rgba(255,214,0,.12); color: #ffd600; }
+
+.actions-cell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ══════════════════ SEARCH BAR (TABLE) ══════════════════ */
+.table-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  min-width: 200px;
+}
+.table-search input {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  outline: none;
+  width: 100%;
+}
+.table-search input::placeholder { color: var(--text3); }
+
+/* ══════════════════ MODALS ══════════════════ */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  backdrop-filter: blur(4px);
+}
+.modal-backdrop.open { display: flex; }
+
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+  animation: modalIn .2s ease;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-title { font-size: 16px; font-weight: 700; }
+.modal-close {
+  width: 32px; height: 32px;
+  border: none;
+  background: var(--bg4);
+  color: var(--text2);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+.modal-close:hover { background: var(--border); color: var(--text); }
+
+.modal-body { padding: 20px; }
+.modal-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ══════════════════ FORM ══════════════════ */
+.form-group { margin-bottom: 16px; }
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.form-control {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  outline: none;
+  transition: border-color var(--transition);
+}
+.form-control:focus { border-color: var(--red); }
+.form-control::placeholder { color: var(--text3); }
+textarea.form-control { resize: vertical; min-height: 80px; }
+select.form-control { cursor: pointer; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text2);
+}
+.form-check input[type=checkbox] { accent-color: var(--red); width: 15px; height: 15px; cursor: pointer; }
+
+/* ══════════════════ RENAME MODAL ══════════════════ */
+.rename-list { display: flex; flex-direction: column; gap: 10px; }
+.rename-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.rename-item-icon {
+  width: 36px; height: 36px;
+  background: var(--bg4);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text3);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.rename-item-info { flex: 1; min-width: 0; }
+.rename-item-label {
+  font-size: 11px;
+  color: var(--text3);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.rename-item-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 5px 8px;
+  outline: none;
+  transition: border-color var(--transition);
+}
+.rename-item-input:focus { border-color: var(--blue); }
+
+/* ══════════════════ TOAST ══════════════════ */
+.toasts {
+  position: fixed;
+  bottom: 20px; right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow);
+  animation: toastIn .25s ease;
+  pointer-events: all;
+  max-width: 320px;
+}
+.toast.success { border-left: 3px solid var(--green); }
+.toast.error { border-left: 3px solid var(--red); }
+.toast.info { border-left: 3px solid var(--blue); }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ══════════════════ EMPTY STATE ══════════════════ */
+.empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text3);
+}
+.empty i { font-size: 40px; margin-bottom: 12px; opacity: .4; }
+.empty p { font-size: 14px; }
+
+/* ══════════════════ ANALYTICS ══════════════════ */
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 100px;
+  padding: 0 4px;
+}
+.bar {
+  flex: 1;
+  background: var(--red-glow);
+  border-radius: 4px 4px 0 0;
+  border: 1px solid rgba(255,0,0,.2);
+  position: relative;
+  cursor: pointer;
+  transition: background var(--transition);
+  min-height: 4px;
+}
+.bar:hover { background: rgba(255,0,0,.3); }
+.bar::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--text3);
+  white-space: nowrap;
+}
+
+/* ══════════════════ TOOLTIP ══════════════════ */
+[data-tooltip] {
+  position: relative;
+}
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  transform: translateX(-50%);
+  background: var(--bg4);
+  color: var(--text);
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .15s;
+  z-index: 999;
+}
+[data-tooltip]:hover::after { opacity: 1; }
+
+/* ══════════════════ LOGIN PAGE ══════════════════ */
+#login-page {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+#login-page.show { display: flex; }
+
+.login-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+}
+.login-logo {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.login-logo-icon {
+  width: 56px; height: 56px;
+  background: var(--red);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #fff;
+  margin: 0 auto 12px;
+}
+.login-title {
+  font-size: 22px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.login-sub {
+  text-align: center;
+  color: var(--text3);
+  font-size: 13px;
+  margin-bottom: 28px;
+}
+.login-error {
+  background: rgba(255,0,0,.1);
+  border: 1px solid rgba(255,0,0,.3);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #ff6666;
+  margin-bottom: 16px;
+  display: none;
+}
+.login-error.show { display: block; }
+
+/* ══════════════════ MOBILE RESPONSIVE ══════════════════ */
+@media (max-width: 768px) {
+  :root { --sidebar-w: 280px; }
+  
+  .sidebar {
+    transform: translateX(-100%);
+    top: var(--header-h);
+    z-index: 160;
+    width: var(--sidebar-w) !important;
+  }
+  .sidebar.mobile-open { transform: translateX(0); }
+  .sidebar-overlay { display: block; }
+  
+  .main { margin-left: 0 !important; }
+  .main.collapsed { margin-left: 0 !important; }
+  
+  .header-search { display: none; }
+  
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  
+  .page { padding: 16px; }
+  
+  .form-row { grid-template-columns: 1fr; }
+  
+  .page-header { margin-bottom: 16px; }
+  
+  .table-wrap table { min-width: 600px; }
+  
+  .card-header { flex-direction: column; align-items: stretch; }
+  .card-header .btn { justify-content: center; }
+}
+
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .login-card { padding: 28px 20px; margin: 16px; }
+  .page { padding: 12px; }
+}
+
+/* ══════════════════ SCROLLBAR ══════════════════ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border2); }
+
+/* ══════════════════ LOADING ══════════════════ */
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--red);
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.skeleton {
+  background: linear-gradient(90deg, var(--bg3) 25%, var(--bg4) 50%, var(--bg3) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+  border-radius: 4px;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* ══════════════════ SWITCH TOGGLE ══════════════════ */
+.switch {
+  position: relative;
+  width: 36px; height: 20px;
+  flex-shrink: 0;
+}
+.switch input { opacity: 0; width: 0; height: 0; }
+.switch-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--bg4);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.switch-slider::before {
+  content: '';
+  position: absolute;
+  height: 14px; width: 14px;
+  left: 3px; top: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform var(--transition);
+}
+.switch input:checked + .switch-slider { background: var(--green); }
+.switch input:checked + .switch-slider::before { transform: translateX(16px); }
+
+/* ══════════════════ HEADER MOBILE SEARCH ══════════════════ */
+.mobile-search-btn { display: none; }
+@media (max-width: 768px) { .mobile-search-btn { display: flex; } }
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 16px 0;
+}
+
+/* ══════════════════ ACTIVE PAGE INDICATOR ══════════════════ */
+.breadcrumb {
+  font-size: 12px;
+  color: var(--text3);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.breadcrumb span { color: var(--text2); }
+
+/* Right-click context menu */
+.ctx-menu {
+  position: fixed;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  z-index: 9999;
+  min-width: 160px;
+  box-shadow: var(--shadow);
+  display: none;
+  animation: fadeIn .12s ease;
+}
+.ctx-menu.show { display: block; }
+.ctx-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text2);
+  transition: all var(--transition);
+}
+.ctx-item:hover { background: var(--bg4); color: var(--text); }
+.ctx-item.danger { color: #ff4444; }
+.ctx-item.danger:hover { background: rgba(255,0,0,.1); }
 </style>
 </head>
 <body>
 
-<!-- Toast Container -->
-<div id="toastContainer" class="fixed top-4 right-4 z-[200] flex flex-col gap-2 pointer-events-none" style="max-width:380px"></div>
+<!-- ═══ LOGIN ═══ -->
+<div id="login-page" class="show">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon"><i class="fab fa-youtube"></i></div>
+      <div class="login-title">Maxaas.u</div>
+      <div class="login-sub">Admin Dashboard — Gal heskeega</div>
+    </div>
+    <div id="login-error" class="login-error"></div>
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <input class="form-control" id="l-user" type="text" placeholder="admin" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input class="form-control" id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div class="form-group">
+      <label class="form-label">PIN (8 digits)</label>
+      <input class="form-control" id="l-pin" type="text" placeholder="00000000" maxlength="8" autocomplete="off">
+    </div>
+    <button class="btn btn-primary" style="width:100%; justify-content:center; padding:12px;" onclick="doLogin()">
+      <i class="fas fa-sign-in-alt"></i> Gal
+    </button>
+  </div>
+</div>
 
-<!-- Navigation -->
-<nav id="mainNav" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<div class="flex items-center justify-between h-16">
-<a href="#/" class="flex items-center gap-2.5 group">
-<div class="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-lg shadow-brand-500/20">
-<span class="iconify text-white text-lg" data-icon="mdi:play-circle"></span>
-</div>
-<span class="text-lg font-bold tracking-tight">Maxaas<span class="text-brand-400">.u</span></span>
-</a>
-<div class="hidden md:flex items-center gap-1" id="desktopNav"></div>
-<div class="flex items-center gap-3">
-<button id="adminBtn" class="w-8 h-8 rounded-lg flex items-center justify-center text-surface-400 hover:text-surface-200 hover:bg-surface-800 transition" title="Admin">
-<span class="iconify text-lg" data-icon="mdi:shield-crown-outline"></span>
-</button>
-<button id="mobileMenuBtn" class="md:hidden w-8 h-8 rounded-lg flex items-center justify-center text-surface-400 hover:text-surface-200">
-<span class="iconify text-xl" data-icon="mdi:menu"></span>
-</button>
-</div>
-</div>
-</div>
-<!-- Mobile menu -->
-<div id="mobileMenu" class="md:hidden hidden border-t border-surface-700/50 px-4 pb-4 pt-2">
-<div class="flex flex-col gap-1" id="mobileNavLinks"></div>
-</div>
+<!-- ═══ HEADER ═══ -->
+<header class="header">
+  <div class="header-left">
+    <button class="menu-btn" onclick="toggleSidebar()" aria-label="Toggle menu">
+      <i class="fas fa-bars"></i>
+    </button>
+    <a href="#" class="logo">
+      <div class="logo-icon"><i class="fab fa-youtube"></i></div>
+      <div class="logo-text">Maxaas<span>.u</span></div>
+    </a>
+  </div>
+
+  <div class="header-search">
+    <input type="text" placeholder="Raadi video, post, audio..." id="global-search">
+    <button class="search-btn"><i class="fas fa-search"></i></button>
+  </div>
+
+  <div class="header-right">
+    <button class="icon-btn mobile-search-btn" onclick="toggleMobileSearch()" data-tooltip="Raadi">
+      <i class="fas fa-search"></i>
+    </button>
+    <button class="icon-btn" data-tooltip="Notifications" onclick="showPage('messages')">
+      <i class="fas fa-bell"></i>
+      <div class="badge" id="notif-badge"></div>
+    </button>
+    <button class="icon-btn" data-tooltip="Settings" onclick="showPage('settings')">
+      <i class="fas fa-cog"></i>
+    </button>
+    <div class="avatar" id="header-avatar" onclick="showPage('security')">A</div>
+  </div>
+</header>
+
+<!-- ═══ SIDEBAR OVERLAY (mobile) ═══ -->
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-section">
+    <div class="section-label" id="lbl-main">Ugu Weyn</div>
+    <a class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+      <div class="nav-icon"><i class="fas fa-th-large"></i></div>
+      <div class="nav-label" id="navlbl-dashboard">Dashboard</div>
+    </a>
+    <a class="nav-item" onclick="showPage('analytics')" id="nav-analytics">
+      <div class="nav-icon"><i class="fas fa-chart-bar"></i></div>
+      <div class="nav-label" id="navlbl-analytics">Analytics</div>
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label" id="lbl-content">Content</div>
+    <a class="nav-item" onclick="showPage('videos')" id="nav-videos">
+      <div class="nav-icon"><i class="fas fa-play-circle"></i></div>
+      <div class="nav-label" id="navlbl-videos">Videos</div>
+    </a>
+    <a class="nav-item" onclick="showPage('audio')" id="nav-audio">
+      <div class="nav-icon"><i class="fas fa-music"></i></div>
+      <div class="nav-label" id="navlbl-audio">Audio</div>
+    </a>
+    <a class="nav-item" onclick="showPage('posts')" id="nav-posts">
+      <div class="nav-icon"><i class="fas fa-newspaper"></i></div>
+      <div class="nav-label" id="navlbl-posts">Posts</div>
+    </a>
+    <a class="nav-item" onclick="showPage('categories')" id="nav-categories">
+      <div class="nav-icon"><i class="fas fa-folder"></i></div>
+      <div class="nav-label" id="navlbl-categories">Categories</div>
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label" id="lbl-manage">Manage</div>
+    <a class="nav-item" onclick="showPage('messages')" id="nav-messages">
+      <div class="nav-icon"><i class="fas fa-envelope"></i></div>
+      <div class="nav-label" id="navlbl-messages">Messages</div>
+      <div class="nav-badge" id="msg-badge" style="display:none"></div>
+    </a>
+    <a class="nav-item" onclick="showPage('settings')" id="nav-settings">
+      <div class="nav-icon"><i class="fas fa-sliders-h"></i></div>
+      <div class="nav-label" id="navlbl-settings">Settings</div>
+    </a>
+    <a class="nav-item" onclick="showPage('security')" id="nav-security">
+      <div class="nav-icon"><i class="fas fa-shield-alt"></i></div>
+      <div class="nav-label" id="navlbl-security">Security</div>
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <a class="nav-item" onclick="openRenameModal()" id="nav-rename" style="color:var(--blue)">
+      <div class="nav-icon"><i class="fas fa-edit"></i></div>
+      <div class="nav-label">Rename Menu</div>
+    </a>
+    <a class="nav-item" onclick="doLogout()" style="color:#ff4444">
+      <div class="nav-icon"><i class="fas fa-sign-out-alt"></i></div>
+      <div class="nav-label">Logout</div>
+    </a>
+  </div>
 </nav>
 
-<!-- Main Content -->
-<main id="app" class="min-h-screen pt-16"></main>
+<!-- ═══ MAIN ═══ -->
+<main class="main" id="main">
 
-<!-- Audio Player Bar -->
-<div id="audioPlayerBar" class="glass border-t border-surface-700/50">
-<div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
-<button id="apPrev" class="text-surface-400 hover:text-white transition hidden sm:block"><span class="iconify text-xl" data-icon="mdi:skip-previous"></span></button>
-<button id="apPlay" class="w-10 h-10 rounded-full bg-brand-500 flex items-center justify-center hover:bg-brand-400 transition shadow-lg shadow-brand-500/30">
-<span class="iconify text-xl text-white" data-icon="mdi:play" id="apPlayIcon"></span>
-</button>
-<button id="apNext" class="text-surface-400 hover:text-white transition hidden sm:block"><span class="iconify text-xl" data-icon="mdi:skip-next"></span></button>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-medium truncate" id="apTitle">—</p>
-<p class="text-xs text-surface-400 truncate" id="apArtist">—</p>
-</div>
-<div class="hidden sm:flex items-center gap-2 text-xs text-surface-400">
-<span id="apCurrentTime">0:00</span>
-<input type="range" id="apSeek" min="0" max="100" value="0" class="w-24 h-1 accent-brand-500 cursor-pointer">
-<span id="apDuration">0:00</span>
-</div>
-<button id="apClose" class="text-surface-500 hover:text-surface-300 transition"><span class="iconify text-lg" data-icon="mdi:close"></span></button>
-</div>
-<audio id="audioEl" preload="auto"></audio>
+  <!-- DASHBOARD PAGE -->
+  <div class="page active" id="page-dashboard">
+    <div class="page-header">
+      <div>
+        <div class="breadcrumb"><i class="fas fa-th-large"></i> <span id="title-dashboard">Dashboard</span></div>
+        <div class="page-title">Ku Soo Dhowow, <span id="admin-name">Admin</span> 👋</div>
+        <div class="page-subtitle">Halkan ayaad maamuli kartaa dhammaan waxyaabaha</div>
+      </div>
+      <button class="btn btn-primary" onclick="refreshDashboard()">
+        <i class="fas fa-sync-alt"></i> Cusboonaysii
+      </button>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card red">
+        <div class="stat-icon red"><i class="fas fa-eye"></i></div>
+        <div class="stat-value" id="stat-views">—</div>
+        <div class="stat-label">Wadarta Views</div>
+        <div class="stat-change">+12%</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-icon blue"><i class="fas fa-play-circle"></i></div>
+        <div class="stat-value" id="stat-videos">—</div>
+        <div class="stat-label">Videos</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon green"><i class="fas fa-envelope"></i></div>
+        <div class="stat-value" id="stat-messages">—</div>
+        <div class="stat-label">Farriin Cusub</div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-icon yellow"><i class="fas fa-video"></i></div>
+        <div class="stat-value" id="stat-week">—</div>
+        <div class="stat-label">Usbuuca Videos</div>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-fire" style="color:var(--red)"></i> Top Videos</div>
+        </div>
+        <div id="top-videos-list">
+          <div style="padding:20px;text-align:center;color:var(--text3)"><div class="spinner"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-chart-line" style="color:var(--blue)"></i> Views Chart</div>
+        </div>
+        <div style="padding:24px 16px 36px">
+          <div class="bar-chart" id="bar-chart">
+            <!-- Generated by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS PAGE -->
+  <div class="page" id="page-analytics">
+    <div class="page-header">
+      <div>
+        <div class="breadcrumb"><i class="fas fa-chart-bar"></i> <span id="title-analytics">Analytics</span></div>
+        <div class="page-title">Analytics</div>
+      </div>
+    </div>
+    <div class="stats-grid" id="analytics-stats">
+      <div class="stat-card red">
+        <div class="stat-icon red"><i class="fas fa-eye"></i></div>
+        <div class="stat-value" id="a-views">—</div>
+        <div class="stat-label">Total Views</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-icon blue"><i class="fas fa-video"></i></div>
+        <div class="stat-value" id="a-videos">—</div>
+        <div class="stat-label">Videos</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon green"><i class="fas fa-envelope-open"></i></div>
+        <div class="stat-value" id="a-unread">—</div>
+        <div class="stat-label">Unread Msgs</div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-icon yellow"><i class="fas fa-calendar-week"></i></div>
+        <div class="stat-value" id="a-week">—</div>
+        <div class="stat-label">This Week</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Top Performing Videos</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Title</th><th>Views</th><th>Qiimaha</th></tr>
+          </thead>
+          <tbody id="analytics-table"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIDEOS PAGE -->
+  <div class="page" id="page-videos">
+    <div class="page-header">
+      <div>
+        <div class="breadcrumb"><i class="fas fa-play-circle"></i> <span id="title-videos">Videos</span></div>
+        <div class="page-title">Maamul Videos</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div class="table-search">
+          <i class="fas fa-search" style="color:var(--text3)"></i>
+          <input type="text" placeholder="Raadi video..." id="video-search" oninput="filterVideos()">
+        </div>
+        <button class="btn btn-primary" onclick="openVideoModal()">
+          <i class="fas fa-plus"></i> Ku dar
+        </button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Thumbnail</th><th>Cinwaan</th><th>Nooc</th><th>Views</th><th>Status</th><th>Waxqabad</th></tr>
+          </thead>
+          <tbody id="videos-table"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUDIO PAGE -->
+  <div class="page" id="page-audio">
+    <div class="page-header">
+      <div>
+        <div class="breadcrumb"><i class="fas fa-music"></i> <span id="title-audio">Audio</span></div>
+        <div class="page-title">Maamul Audio</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div class="table-search">
+          <i class="fas fa-search" style="color:var(--text3)"></i>
+          <input type="text" placeholder="Raadi audio..." id="audio-search" oninput="filterAudio()">
+        </div>
+        <button class="btn btn-primary" onclick="openAudioModal()">
+          <i class="fas fa-plus"></i> Ku dar
+        </button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Cinwaan</th><th>Fannaanka</th><th>Nooc</th><th>Views</th><th>Status</th><th>Waxqabad</th></tr>
+          </thead>
+          <tbody id="audio-table"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- POSTS PAGE -->
+  <div class="page" id="page-posts">
+    <div class="page-header">
+      <div>
+        <div class="breadcrumb"><i class="fas fa-newspaper"></i> <span id="title-posts">Posts</span></div>
+        <div class="page-title">Maamul Posts</div>
+      </div>
+      <button class="btn btn-primary" onclick="openPostModal()">
+        <i class="fas fa-plus"></i> Post Cusub
+      </button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Cinwaan</th><th>Qore</th><th>Status</th><th>Taariikh</th><th>Waxqabad</th></tr>
+          </thead>
+          <tbody id="posts-table"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORIES PAGE -->
+  <div class="page" id="page-categories">
+    <div class="page-header">
+      <div>
+        <div class="breadcrumb"><i class="fas fa-folder"></i> <span id="title-categories">Categories</span></div>
+        <div class="page-title">Maamul Categories</div>
+      </div>
+      <button class="btn btn-primary" onclick="openCatModal()">
+        <i class="fas fa-plus"></i> Category Cusub
+      </button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Icon</th><th>Magac</th><th>Sharaxaad</th><th>Order</th><th>Waxqabad</th></tr>
+          </thead>
+          <tbody id="categories-table"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MESSAGES PAGE -->
+  <div class="page" id="page-messages">
+    <div class="page-header">
+      <div>
+        <div class="breadcrumb"><i class="fas fa-envelope"></i> <span id="title-messages">Messages</span></div>
+        <div class="page-title">Farriimaha</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Magac</th><th>Xiriir</th><th>Farriin</th><th>Taariikh</th><th>Status</th><th>Waxqabad</th></tr>
+          </thead>
+          <tbody id="messages-table"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS PAGE -->
+  <div class="page" id="page-settings">
+    <div class="page-header">
+      <div>
+        <div class="breadcrumb"><i class="fas fa-sliders-h"></i> <span id="title-settings">Settings</span></div>
+        <div class="page-title">Site Settings</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Guud</div></div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Site Name</label>
+          <input class="form-control" id="s-name" placeholder="Maxaas.u">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sharaxaad</label>
+          <textarea class="form-control" id="s-desc" rows="3" placeholder="Maxaas.u — Platform..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Logo URL</label>
+          <input class="form-control" id="s-logo" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact Email</label>
+          <input class="form-control" id="s-email" placeholder="admin@example.com">
+        </div>
+        <button class="btn btn-primary" onclick="saveSettings()">
+          <i class="fas fa-save"></i> Kaydi
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECURITY PAGE -->
+  <div class="page" id="page-security">
+    <div class="page-header">
+      <div>
+        <div class="breadcrumb"><i class="fas fa-shield-alt"></i> <span id="title-security">Security</span></div>
+        <div class="page-title">Security & Credentials</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Bedel Macluumaadka</div></div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">PIN Hadda (Xaqiijin)</label>
+          <input class="form-control" id="sec-pin" type="text" maxlength="8" placeholder="8 digits">
+        </div>
+        <div class="divider"></div>
+        <div class="form-group">
+          <label class="form-label">Username Cusub</label>
+          <input class="form-control" id="sec-user" placeholder="admin">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password Cusub</label>
+          <input class="form-control" id="sec-pass" type="password" placeholder="8+ characters">
+        </div>
+        <div class="form-group">
+          <label class="form-label">PIN Cusub (8 digits)</label>
+          <input class="form-control" id="sec-newpin" type="text" maxlength="8" placeholder="00000000">
+        </div>
+        <button class="btn btn-primary" onclick="saveCredentials()">
+          <i class="fas fa-save"></i> Kaydi
+        </button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══════════ MODALS ═══════════ -->
+
+<!-- Video Modal -->
+<div class="modal-backdrop" id="video-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="video-modal-title">Video Cusub</div>
+      <button class="modal-close" onclick="closeModal('video-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="v-id">
+      <div class="form-group">
+        <label class="form-label">Cinwaan *</label>
+        <input class="form-control" id="v-title" placeholder="Video title...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">URL *</label>
+        <input class="form-control" id="v-url" placeholder="https://... or youtube.com/watch?v=...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Thumbnail URL</label>
+        <input class="form-control" id="v-thumb" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sharaxaad</label>
+        <textarea class="form-control" id="v-desc" rows="2" placeholder="..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nooc</label>
+          <select class="form-control" id="v-type">
+            <option value="mp4">MP4</option>
+            <option value="youtube">YouTube</option>
+            <option value="hls">HLS</option>
+            <option value="archive">Archive.org</option>
+            <option value="ipfs">IPFS</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Muddo</label>
+          <input class="form-control" id="v-dur" placeholder="10:30">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Order Index</label>
+          <input class="form-control" id="v-order" type="number" value="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-control" id="v-cat">
+            <option value="">-- Xulo --</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap">
+        <label class="form-check">
+          <input type="checkbox" id="v-featured"> Featured
+        </label>
+        <label class="form-check">
+          <input type="checkbox" id="v-published" checked> Published
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('video-modal')">Jooji</button>
+      <button class="btn btn-primary" onclick="saveVideo()"><i class="fas fa-save"></i> Kaydi</button>
+    </div>
+  </div>
 </div>
 
-<!-- Modal -->
-<div id="modalOverlay" class="modal-overlay">
-<div class="modal-box" id="modalBox"></div>
+<!-- Audio Modal -->
+<div class="modal-backdrop" id="audio-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="audio-modal-title">Audio Cusub</div>
+      <button class="modal-close" onclick="closeModal('audio-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="a-id">
+      <div class="form-group">
+        <label class="form-label">Cinwaan *</label>
+        <input class="form-control" id="a-title" placeholder="Audio title...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fannaanka</label>
+        <input class="form-control" id="a-artist" placeholder="Artist name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">URL *</label>
+        <input class="form-control" id="a-url" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cover URL</label>
+        <input class="form-control" id="a-cover" placeholder="https://...">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nooc</label>
+          <select class="form-control" id="a-type">
+            <option value="mp3">MP3</option>
+            <option value="ogg">OGG</option>
+            <option value="aac">AAC</option>
+            <option value="hls">HLS</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Muddo</label>
+          <input class="form-control" id="a-dur" placeholder="3:45">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <input class="form-control" id="a-cat" placeholder="Music, Podcast...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Website URL</label>
+          <input class="form-control" id="a-web" placeholder="https://...">
+        </div>
+      </div>
+      <label class="form-check">
+        <input type="checkbox" id="a-published" checked> Published
+      </label>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('audio-modal')">Jooji</button>
+      <button class="btn btn-primary" onclick="saveAudio()"><i class="fas fa-save"></i> Kaydi</button>
+    </div>
+  </div>
+</div>
+
+<!-- Post Modal -->
+<div class="modal-backdrop" id="post-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="post-modal-title">Post Cusub</div>
+      <button class="modal-close" onclick="closeModal('post-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="p-id">
+      <div class="form-group">
+        <label class="form-label">Cinwaan *</label>
+        <input class="form-control" id="p-title" placeholder="Post title...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Content *</label>
+        <textarea class="form-control" id="p-content" rows="5" placeholder="Post content..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Qore</label>
+          <input class="form-control" id="p-author" placeholder="Maxaas.u">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Image URL</label>
+          <input class="form-control" id="p-img" placeholder="https://...">
+        </div>
+      </div>
+      <label class="form-check">
+        <input type="checkbox" id="p-published" checked> Published
+      </label>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('post-modal')">Jooji</button>
+      <button class="btn btn-primary" onclick="savePost()"><i class="fas fa-save"></i> Kaydi</button>
+    </div>
+  </div>
+</div>
+
+<!-- Category Modal -->
+<div class="modal-backdrop" id="cat-modal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <div class="modal-title" id="cat-modal-title">Category Cusub</div>
+      <button class="modal-close" onclick="closeModal('cat-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="c-id">
+      <div class="form-group">
+        <label class="form-label">Magac *</label>
+        <input class="form-control" id="c-name" placeholder="Category name...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sharaxaad</label>
+        <input class="form-control" id="c-desc" placeholder="...">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Icon (FA class)</label>
+          <input class="form-control" id="c-icon" placeholder="fa-folder">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Order</label>
+          <input class="form-control" id="c-order" type="number" value="0">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('cat-modal')">Jooji</button>
+      <button class="btn btn-primary" onclick="saveCat()"><i class="fas fa-save"></i> Kaydi</button>
+    </div>
+  </div>
+</div>
+
+<!-- RENAME MENU MODAL -->
+<div class="modal-backdrop" id="rename-modal">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-edit" style="color:var(--blue)"></i> Rename Menu Items</div>
+      <button class="modal-close" onclick="closeModal('rename-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--text3);font-size:13px;margin-bottom:16px">Badel magacyada menu-ga si aad u hesho kii aad doonto.</p>
+      <div class="rename-list" id="rename-list"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('rename-modal')">Jooji</button>
+      <button class="btn btn-primary" onclick="applyRename()"><i class="fas fa-check"></i> Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- Message View Modal -->
+<div class="modal-backdrop" id="msg-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Farriin</div>
+      <button class="modal-close" onclick="closeModal('msg-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="msg-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('msg-modal')">Xir</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Delete Modal -->
+<div class="modal-backdrop" id="confirm-modal">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header">
+      <div class="modal-title" style="color:#ff4444"><i class="fas fa-trash"></i> Tirtir</div>
+      <button class="modal-close" onclick="closeModal('confirm-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--text2);font-size:14px" id="confirm-text">Miyaad hubtaa inaad tirtirto?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('confirm-modal')">Jooji</button>
+      <button class="btn btn-danger" id="confirm-btn">Tirtir</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="toasts" id="toasts"></div>
+
+<!-- Context menu -->
+<div class="ctx-menu" id="ctx-menu">
+  <div class="ctx-item" id="ctx-rename"><i class="fas fa-edit"></i> Rename</div>
+  <div class="ctx-item" id="ctx-edit"><i class="fas fa-pencil-alt"></i> Edit</div>
+  <div class="ctx-item danger" id="ctx-delete"><i class="fas fa-trash"></i> Delete</div>
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════
    STATE
-   ═══════════════════════════════════════════════════════ */
-const S = {
-  page: '', params: {},
-  videos: [], categories: [], posts: [], audio: [], settings: {},
-  admin: null, // { username, token }
-  adminTab: 'dashboard',
-  audioQueue: [], audioIdx: -1, audioPlaying: false,
-  mobileMenuOpen: false
+═══════════════════════════════════════════ */
+const API = '';
+let state = {
+  loggedIn: false,
+  adminName: 'Admin',
+  sidebarCollapsed: false,
+  videos: [], audio: [], posts: [], categories: [], messages: [],
+  menuLabels: JSON.parse(localStorage.getItem('menuLabels') || 'null') || {
+    dashboard: 'Dashboard',
+    analytics: 'Analytics',
+    videos: 'Videos',
+    audio: 'Audio',
+    posts: 'Posts',
+    categories: 'Categories',
+    messages: 'Messages',
+    settings: 'Settings',
+    security: 'Security'
+  }
 };
 
-const NAV = [
-  { label: 'Bogga Hore', href: '#/', icon: 'mdi:home' },
-  { label: 'Fiidyowyada', href: '#/videos', icon: 'mdi:video' },
-  { label: 'Heesaha', href: '#/audio', icon: 'mdi:music' },
-  { label: 'Qoraallada', href: '#/posts', icon: 'mdi:newspaper' },
-  { label: 'Nala Xiriir', href: '#/contact', icon: 'mdi:message' }
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  applyMenuLabels();
+  checkSession();
+  window.addEventListener('resize', handleResize);
+  document.addEventListener('click', () => hideCtxMenu());
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-backdrop.open').forEach(m => m.classList.remove('open'));
+      hideCtxMenu();
+      closeSidebar();
+    }
+  });
+});
+
+async function checkSession() {
+  try {
+    const r = await fetch(API + '/api/v1/admin/analytics', { credentials: 'include' });
+    if (r.ok) { enterApp(); }
+    else { showLogin(); }
+  } catch { showLogin(); }
+}
+
+function showLogin() {
+  document.getElementById('login-page').classList.add('show');
+}
+function hideLogin() {
+  document.getElementById('login-page').classList.remove('show');
+}
+
+async function doLogin() {
+  const u = document.getElementById('l-user').value.trim();
+  const p = document.getElementById('l-pass').value;
+  const pin = document.getElementById('l-pin').value.trim();
+  const errEl = document.getElementById('login-error');
+  errEl.classList.remove('show');
+
+  if (!u || !p || !pin) { errEl.textContent = 'Dhammaan xogta buuxi'; errEl.classList.add('show'); return; }
+
+  try {
+    const r = await fetch(API + '/api/v1/auth/login', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: u, password: p, pin })
+    });
+    const d = await r.json();
+    if (!r.ok) { errEl.textContent = d.error || 'Khalad'; errEl.classList.add('show'); return; }
+    state.adminName = d.username || u;
+    enterApp();
+  } catch { errEl.textContent = 'Server khalad ah'; errEl.classList.add('show'); }
+}
+
+function enterApp() {
+  hideLogin();
+  state.loggedIn = true;
+  document.getElementById('admin-name').textContent = state.adminName;
+  document.getElementById('header-avatar').textContent = state.adminName[0].toUpperCase();
+  loadAll();
+}
+
+async function doLogout() {
+  await fetch(API + '/api/v1/auth/logout', { method: 'POST', credentials: 'include' });
+  state.loggedIn = false;
+  showLogin();
+  toast('Logout successful', 'info');
+}
+
+/* Enter on login inputs */
+['l-user','l-pass','l-pin'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+});
+
+/* ═══════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════ */
+function toggleSidebar() {
+  if (window.innerWidth <= 768) {
+    const s = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    if (s.classList.contains('mobile-open')) {
+      s.classList.remove('mobile-open');
+      ov.classList.remove('show');
+    } else {
+      s.classList.add('mobile-open');
+      ov.classList.add('show');
+    }
+  } else {
+    state.sidebarCollapsed = !state.sidebarCollapsed;
+    document.getElementById('sidebar').classList.toggle('collapsed', state.sidebarCollapsed);
+    document.getElementById('main').classList.toggle('collapsed', state.sidebarCollapsed);
+  }
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('overlay').classList.remove('show');
+}
+function handleResize() {
+  if (window.innerWidth > 768) {
+    document.getElementById('overlay').classList.remove('show');
+    document.getElementById('sidebar').classList.remove('mobile-open');
+  }
+}
+
+/* ═══════════════════════════════════════════
+   PAGES
+═══════════════════════════════════════════ */
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name)?.classList.add('active');
+  document.getElementById('nav-' + name)?.classList.add('active');
+  if (window.innerWidth <= 768) closeSidebar();
+  // Breadcrumb
+  const lbl = state.menuLabels[name] || name;
+  const el = document.getElementById('title-' + name);
+  if (el) el.textContent = lbl;
+}
+
+/* ═══════════════════════════════════════════
+   RENAME MENU
+═══════════════════════════════════════════ */
+const RENAME_KEYS = [
+  { key: 'dashboard', icon: 'fa-th-large', label: 'Dashboard' },
+  { key: 'analytics', icon: 'fa-chart-bar', label: 'Analytics' },
+  { key: 'videos', icon: 'fa-play-circle', label: 'Videos' },
+  { key: 'audio', icon: 'fa-music', label: 'Audio' },
+  { key: 'posts', icon: 'fa-newspaper', label: 'Posts' },
+  { key: 'categories', icon: 'fa-folder', label: 'Categories' },
+  { key: 'messages', icon: 'fa-envelope', label: 'Messages' },
+  { key: 'settings', icon: 'fa-sliders-h', label: 'Settings' },
+  { key: 'security', icon: 'fa-shield-alt', label: 'Security' }
 ];
 
-/* ═══════════════════════════════════════════════════════
-   HELPERS
-   ═══════════════════════════════════════════════════════ */
-const $ = s => document.querySelector(s);
-const $$ = s => document.querySelectorAll(s);
-const api = async (url, opts = {}) => {
+function openRenameModal() {
+  const list = document.getElementById('rename-list');
+  list.innerHTML = RENAME_KEYS.map(item => `
+    <div class="rename-item">
+      <div class="rename-item-icon"><i class="fas ${item.icon}"></i></div>
+      <div class="rename-item-info">
+        <div class="rename-item-label">${item.label}</div>
+        <input class="rename-item-input" data-key="${item.key}" value="${state.menuLabels[item.key] || item.label}" placeholder="${item.label}">
+      </div>
+    </div>
+  `).join('');
+  openModal('rename-modal');
+}
+
+function applyRename() {
+  document.querySelectorAll('.rename-item-input').forEach(inp => {
+    const key = inp.dataset.key;
+    const val = inp.value.trim() || key;
+    state.menuLabels[key] = val;
+  });
+  localStorage.setItem('menuLabels', JSON.stringify(state.menuLabels));
+  applyMenuLabels();
+  closeModal('rename-modal');
+  toast('Menu labels updated!', 'success');
+}
+
+function applyMenuLabels() {
+  Object.entries(state.menuLabels).forEach(([key, val]) => {
+    const el = document.getElementById('navlbl-' + key);
+    if (el) el.textContent = val;
+  });
+}
+
+/* ═══════════════════════════════════════════
+   MODALS
+═══════════════════════════════════════════ */
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+/* Close on backdrop click */
+document.querySelectorAll('.modal-backdrop').forEach(m => {
+  m.addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+});
+
+/* ═══════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════ */
+function toast(msg, type = 'success') {
+  const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle' };
+  const colors = { success: 'var(--green)', error: 'var(--red)', info: 'var(--blue)' };
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.innerHTML = `<i class="fas ${icons[type]}" style="color:${colors[type]}"></i> ${msg}`;
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+/* ═══════════════════════════════════════════
+   CONFIRM DELETE
+═══════════════════════════════════════════ */
+function confirmDelete(text, cb) {
+  document.getElementById('confirm-text').textContent = text;
+  const btn = document.getElementById('confirm-btn');
+  btn.onclick = () => { cb(); closeModal('confirm-modal'); };
+  openModal('confirm-modal');
+}
+
+/* ═══════════════════════════════════════════
+   API HELPERS
+═══════════════════════════════════════════ */
+async function api(method, path, body) {
+  const opts = { method, credentials: 'include', headers: {} };
+  if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+  const r = await fetch(API + path, opts);
+  if (!r.ok) throw new Error(await r.text());
+  return r.json().catch(() => ({}));
+}
+
+/* ═══════════════════════════════════════════
+   LOAD ALL
+═══════════════════════════════════════════ */
+async function loadAll() {
+  await Promise.allSettled([
+    loadVideos(), loadAudio(), loadPosts(), loadCategories(),
+    loadMessages(), loadAnalytics(), loadSettings()
+  ]);
+}
+
+async function refreshDashboard() {
+  await loadAnalytics();
+  toast('Dashboard refreshed', 'success');
+}
+
+/* ═══════════════════════════════════════════
+   ANALYTICS
+═══════════════════════════════════════════ */
+async function loadAnalytics() {
   try {
-    const r = await fetch(url, { headers: { 'Content-Type': 'application/json', ...opts.headers }, ...opts });
-    if (r.status === 401 && S.admin) { S.admin = null; toast('Fadlan soo geli mar kale', 'error'); navigate('/admin'); }
-    const d = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(d.error || 'Khalad');
-    return d;
-  } catch (e) { throw e; }
+    const d = await api('GET', '/api/v1/admin/analytics');
+    document.getElementById('stat-views').textContent = fmtNum(d.totalViews || 0);
+    document.getElementById('stat-videos').textContent = d.totalVideos || 0;
+    document.getElementById('stat-messages').textContent = d.unread || 0;
+    document.getElementById('stat-week').textContent = d.thisWeek || 0;
+    document.getElementById('a-views').textContent = fmtNum(d.totalViews || 0);
+    document.getElementById('a-videos').textContent = d.totalVideos || 0;
+    document.getElementById('a-unread').textContent = d.unread || 0;
+    document.getElementById('a-week').textContent = d.thisWeek || 0;
+
+    if (d.unread > 0) {
+      document.getElementById('notif-badge').style.display = 'block';
+      document.getElementById('msg-badge').style.display = 'flex';
+      document.getElementById('msg-badge').textContent = d.unread;
+    }
+
+    // Top videos list
+    const top = document.getElementById('top-videos-list');
+    if (!d.topVideos?.length) { top.innerHTML = '<div class="empty"><i class="fas fa-video"></i><p>Video ma jiro</p></div>'; }
+    else {
+      top.innerHTML = d.topVideos.map((v,i) => `
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)">
+          <div style="width:24px;height:24px;background:var(--bg4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:${i===0?'var(--yellow)':'var(--text3)'}">${i+1}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(v.title)}</div>
+          </div>
+          <div style="font-size:13px;color:var(--text2);font-family:var(--mono)">${fmtNum(v.views||0)}</div>
+        </div>
+      `).join('');
+    }
+
+    // Bar chart
+    renderBarChart(d.topVideos || []);
+
+    // Analytics table
+    const at = document.getElementById('analytics-table');
+    at.innerHTML = (d.topVideos||[]).map((v,i) => `
+      <tr>
+        <td>${i+1}</td>
+        <td class="text-main">${esc(v.title)}</td>
+        <td class="mono">${fmtNum(v.views||0)}</td>
+        <td>${viewBar(v.views, d.totalViews)}</td>
+      </tr>
+    `).join('');
+  } catch(e) { console.error('Analytics:', e); }
+}
+
+function renderBarChart(videos) {
+  const bc = document.getElementById('bar-chart');
+  if (!videos.length) { bc.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px">No data</div>'; return; }
+  const maxV = Math.max(...videos.map(v => v.views||0)) || 1;
+  bc.innerHTML = videos.map(v => {
+    const h = Math.round(((v.views||0) / maxV) * 90);
+    return `<div class="bar" style="height:${Math.max(h,4)}px" data-label="${(v.title||'').substring(0,8)}"></div>`;
+  }).join('');
+}
+
+function viewBar(views, total) {
+  const pct = total ? Math.round((views/total)*100) : 0;
+  return `<div style="display:flex;align-items:center;gap:8px">
+    <div style="flex:1;height:4px;background:var(--bg4);border-radius:2px">
+      <div style="width:${pct}%;height:100%;background:var(--red);border-radius:2px"></div>
+    </div>
+    <span style="font-size:11px;color:var(--text3);width:28px">${pct}%</span>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════
+   VIDEOS
+═══════════════════════════════════════════ */
+async function loadVideos() {
+  try {
+    state.videos = await api('GET', '/api/v1/admin/videos');
+    renderVideos(state.videos);
+    // Populate category select
+    const sel = document.getElementById('v-cat');
+    sel.innerHTML = '<option value="">-- Xulo --</option>' +
+      state.categories.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  } catch(e) { console.error(e); }
+}
+
+function filterVideos() {
+  const q = document.getElementById('video-search').value.toLowerCase();
+  renderVideos(state.videos.filter(v => v.title?.toLowerCase().includes(q)));
+}
+
+function renderVideos(videos) {
+  const tb = document.getElementById('videos-table');
+  if (!videos.length) { tb.innerHTML = `<tr><td colspan="6"><div class="empty"><i class="fas fa-video"></i><p>Video ma jiro</p></div></td></tr>`; return; }
+  tb.innerHTML = videos.map(v => `
+    <tr>
+      <td>${v.thumbnail ? `<img src="${esc(v.thumbnail)}" class="thumb" onerror="this.style.display='none'">` : `<div class="thumb-placeholder"><i class="fas fa-video"></i></div>`}</td>
+      <td class="text-main">${esc(v.title)}</td>
+      <td><span class="tag tag-blue"><i class="fas fa-play"></i> ${v.video_type||'mp4'}</span></td>
+      <td class="mono">${fmtNum(v.views||0)}</td>
+      <td>${v.is_published ? `<span class="tag tag-green"><i class="fas fa-circle" style="font-size:7px"></i> Live</span>` : `<span class="tag tag-gray">Draft</span>`}</td>
+      <td>
+        <div class="actions-cell">
+          <button class="btn btn-ghost btn-sm btn-icon" onclick="editVideo('${v.id}')" data-tooltip="Edit"><i class="fas fa-edit"></i></button>
+          <label class="switch" title="${v.is_published?'Unpublish':'Publish'}">
+            <input type="checkbox" ${v.is_published?'checked':''} onchange="toggleVideo('${v.id}',this.checked)">
+            <div class="switch-slider"></div>
+          </label>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteVideo('${v.id}')" data-tooltip="Delete"><i class="fas fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openVideoModal(v) {
+  document.getElementById('video-modal-title').textContent = v ? 'Video Wax ka Bedel' : 'Video Cusub';
+  document.getElementById('v-id').value = v?.id || '';
+  document.getElementById('v-title').value = v?.title || '';
+  document.getElementById('v-url').value = v?.url || '';
+  document.getElementById('v-thumb').value = v?.thumbnail || '';
+  document.getElementById('v-desc').value = v?.description || '';
+  document.getElementById('v-type').value = v?.video_type || 'mp4';
+  document.getElementById('v-dur').value = v?.duration || '';
+  document.getElementById('v-order').value = v?.order_index || 0;
+  document.getElementById('v-cat').value = v?.category_id || '';
+  document.getElementById('v-featured').checked = !!v?.is_featured;
+  document.getElementById('v-published').checked = v ? !!v.is_published : true;
+  openModal('video-modal');
+}
+
+function editVideo(id) {
+  const v = state.videos.find(x => x.id == id);
+  if (v) openVideoModal(v);
+}
+
+async function saveVideo() {
+  const id = document.getElementById('v-id').value;
+  const data = {
+    title: document.getElementById('v-title').value.trim(),
+    url: document.getElementById('v-url').value.trim(),
+    thumbnail: document.getElementById('v-thumb').value.trim(),
+    description: document.getElementById('v-desc').value.trim(),
+    video_type: document.getElementById('v-type').value,
+    duration: document.getElementById('v-dur').value.trim(),
+    order_index: parseInt(document.getElementById('v-order').value) || 0,
+    category_id: document.getElementById('v-cat').value || null,
+    is_featured: document.getElementById('v-featured').checked,
+    is_published: document.getElementById('v-published').checked
+  };
+  if (!data.title || !data.url) { toast('Cinwaan iyo URL buuxi', 'error'); return; }
+  try {
+    if (id) await api('PUT', '/api/v1/admin/videos/' + id, data);
+    else await api('POST', '/api/v1/admin/videos', data);
+    closeModal('video-modal');
+    await loadVideos();
+    toast(id ? 'Video la update gareeyay' : 'Video la sameeyay', 'success');
+  } catch(e) { toast('Khalad: ' + e.message, 'error'); }
+}
+
+async function toggleVideo(id, pub) {
+  try {
+    await api('PUT', '/api/v1/admin/videos/' + id, { is_published: pub });
+    const v = state.videos.find(x => x.id == id);
+    if (v) v.is_published = pub;
+    toast(pub ? 'Video la baahiyay' : 'Video la qariiyay', 'info');
+  } catch(e) { toast('Khalad', 'error'); }
+}
+
+async function deleteVideo(id) {
+  confirmDelete('Miyaad hubtaa inaad tirtirto videogan?', async () => {
+    try { await api('DELETE', '/api/v1/admin/videos/' + id); await loadVideos(); toast('Video la tirtirday', 'success'); }
+    catch(e) { toast('Khalad', 'error'); }
+  });
+}
+
+/* ═══════════════════════════════════════════
+   AUDIO
+═══════════════════════════════════════════ */
+async function loadAudio() {
+  try {
+    state.audio = await api('GET', '/api/v1/admin/audio');
+    renderAudio(state.audio);
+  } catch(e) { console.error(e); }
+}
+
+function filterAudio() {
+  const q = document.getElementById('audio-search').value.toLowerCase();
+  renderAudio(state.audio.filter(a => a.title?.toLowerCase().includes(q) || a.artist?.toLowerCase().includes(q)));
+}
+
+function renderAudio(tracks) {
+  const tb = document.getElementById('audio-table');
+  if (!tracks.length) { tb.innerHTML = `<tr><td colspan="6"><div class="empty"><i class="fas fa-music"></i><p>Audio ma jiro</p></div></td></tr>`; return; }
+  tb.innerHTML = tracks.map(a => `
+    <tr>
+      <td class="text-main">${a.cover_url ? `<span style="display:flex;align-items:center;gap:8px"><img src="${esc(a.cover_url)}" style="width:36px;height:36px;border-radius:4px;object-fit:cover">${esc(a.title)}</span>` : esc(a.title)}</td>
+      <td>${esc(a.artist||'Unknown')}</td>
+      <td><span class="tag tag-yellow">${a.audio_type||'mp3'}</span></td>
+      <td class="mono">${fmtNum(a.views||0)}</td>
+      <td>${a.is_published ? `<span class="tag tag-green"><i class="fas fa-circle" style="font-size:7px"></i> Live</span>` : `<span class="tag tag-gray">Draft</span>`}</td>
+      <td>
+        <div class="actions-cell">
+          <button class="btn btn-ghost btn-sm btn-icon" onclick="editAudio('${a.id}')"><i class="fas fa-edit"></i></button>
+          <label class="switch">
+            <input type="checkbox" ${a.is_published?'checked':''} onchange="toggleAudio('${a.id}',this.checked)">
+            <div class="switch-slider"></div>
+          </label>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteAudio('${a.id}')"><i class="fas fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openAudioModal(a) {
+  document.getElementById('audio-modal-title').textContent = a ? 'Audio Wax ka Bedel' : 'Audio Cusub';
+  document.getElementById('a-id').value = a?.id || '';
+  document.getElementById('a-title').value = a?.title || '';
+  document.getElementById('a-artist').value = a?.artist || '';
+  document.getElementById('a-url').value = a?.url || '';
+  document.getElementById('a-cover').value = a?.cover_url || '';
+  document.getElementById('a-type').value = a?.audio_type || 'mp3';
+  document.getElementById('a-dur').value = a?.duration || '';
+  document.getElementById('a-cat').value = a?.category || '';
+  document.getElementById('a-web').value = a?.website_url || '';
+  document.getElementById('a-published').checked = a ? !!a.is_published : true;
+  openModal('audio-modal');
+}
+function editAudio(id) { openAudioModal(state.audio.find(x => x.id == id)); }
+async function saveAudio() {
+  const id = document.getElementById('a-id').value;
+  const data = {
+    title: document.getElementById('a-title').value.trim(),
+    artist: document.getElementById('a-artist').value.trim(),
+    url: document.getElementById('a-url').value.trim(),
+    cover_url: document.getElementById('a-cover').value.trim(),
+    audio_type: document.getElementById('a-type').value,
+    duration: document.getElementById('a-dur').value.trim(),
+    category: document.getElementById('a-cat').value.trim(),
+    website_url: document.getElementById('a-web').value.trim(),
+    is_published: document.getElementById('a-published').checked
+  };
+  if (!data.title || !data.url) { toast('Cinwaan iyo URL buuxi', 'error'); return; }
+  try {
+    if (id) await api('PUT', '/api/v1/admin/audio/' + id, data);
+    else await api('POST', '/api/v1/admin/audio', data);
+    closeModal('audio-modal'); await loadAudio();
+    toast(id ? 'Audio la update gareeyay' : 'Audio la sameeyay', 'success');
+  } catch(e) { toast('Khalad: ' + e.message, 'error'); }
+}
+async function toggleAudio(id, pub) {
+  try { await api('PUT', '/api/v1/admin/audio/' + id, { is_published: pub }); toast(pub ? 'Audio la baahiyay' : 'Audio la qariiyay', 'info'); }
+  catch { toast('Khalad', 'error'); }
+}
+async function deleteAudio(id) {
+  confirmDelete('Miyaad hubtaa inaad tirtirto audiodan?', async () => {
+    try { await api('DELETE', '/api/v1/admin/audio/' + id); await loadAudio(); toast('Audio la tirtirday', 'success'); }
+    catch { toast('Khalad', 'error'); }
+  });
+}
+
+/* ═══════════════════════════════════════════
+   POSTS
+═══════════════════════════════════════════ */
+async function loadPosts() {
+  try {
+    state.posts = await api('GET', '/api/v1/admin/posts');
+    renderPosts();
+  } catch(e) { console.error(e); }
+}
+function renderPosts() {
+  const tb = document.getElementById('posts-table');
+  if (!state.posts.length) { tb.innerHTML = `<tr><td colspan="5"><div class="empty"><i class="fas fa-newspaper"></i><p>Post ma jiro</p></div></td></tr>`; return; }
+  tb.innerHTML = state.posts.map(p => `
+    <tr>
+      <td class="text-main">${esc(p.title)}</td>
+      <td>${esc(p.author||'—')}</td>
+      <td>${p.is_published ? `<span class="tag tag-green">Live</span>` : `<span class="tag tag-gray">Draft</span>`}</td>
+      <td style="font-size:12px;color:var(--text3)">${new Date(p.created_at).toLocaleDateString()}</td>
+      <td>
+        <div class="actions-cell">
+          <button class="btn btn-ghost btn-sm btn-icon" onclick="editPost('${p.id}')"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="deletePost('${p.id}')"><i class="fas fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+function openPostModal(p) {
+  document.getElementById('post-modal-title').textContent = p ? 'Post Wax ka Bedel' : 'Post Cusub';
+  document.getElementById('p-id').value = p?.id || '';
+  document.getElementById('p-title').value = p?.title || '';
+  document.getElementById('p-content').value = p?.content || '';
+  document.getElementById('p-author').value = p?.author || '';
+  document.getElementById('p-img').value = p?.image_url || '';
+  document.getElementById('p-published').checked = p ? !!p.is_published : true;
+  openModal('post-modal');
+}
+function editPost(id) { openPostModal(state.posts.find(x => x.id == id)); }
+async function savePost() {
+  const id = document.getElementById('p-id').value;
+  const data = {
+    title: document.getElementById('p-title').value.trim(),
+    content: document.getElementById('p-content').value.trim(),
+    author: document.getElementById('p-author').value.trim(),
+    image_url: document.getElementById('p-img').value.trim(),
+    is_published: document.getElementById('p-published').checked
+  };
+  if (!data.title || !data.content) { toast('Cinwaan iyo content buuxi', 'error'); return; }
+  try {
+    if (id) await api('PUT', '/api/v1/admin/posts/' + id, data);
+    else await api('POST', '/api/v1/admin/posts', data);
+    closeModal('post-modal'); await loadPosts();
+    toast(id ? 'Post la update gareeyay' : 'Post la sameeyay', 'success');
+  } catch(e) { toast('Khalad', 'error'); }
+}
+async function deletePost(id) {
+  confirmDelete('Miyaad hubtaa inaad tirtirto postgan?', async () => {
+    try { await api('DELETE', '/api/v1/admin/posts/' + id); await loadPosts(); toast('Post la tirtirday', 'success'); }
+    catch { toast('Khalad', 'error'); }
+  });
+}
+
+/* ═══════════════════════════════════════════
+   CATEGORIES
+═══════════════════════════════════════════ */
+async function loadCategories() {
+  try {
+    state.categories = await api('GET', '/api/v1/admin/categories');
+    renderCategories();
+  } catch(e) { console.error(e); }
+}
+function renderCategories() {
+  const tb = document.getElementById('categories-table');
+  if (!state.categories.length) { tb.innerHTML = `<tr><td colspan="5"><div class="empty"><i class="fas fa-folder"></i><p>Category ma jiro</p></div></td></tr>`; return; }
+  tb.innerHTML = state.categories.map(c => `
+    <tr>
+      <td><i class="fas ${c.icon||'fa-folder'}" style="color:var(--text2);font-size:18px"></i></td>
+      <td class="text-main">${esc(c.name)}</td>
+      <td>${esc(c.description||'—')}</td>
+      <td class="mono">${c.order_index||0}</td>
+      <td>
+        <div class="actions-cell">
+          <button class="btn btn-ghost btn-sm btn-icon" onclick="editCat('${c.id}')"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteCat('${c.id}')"><i class="fas fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+function openCatModal(c) {
+  document.getElementById('cat-modal-title').textContent = c ? 'Category Wax ka Bedel' : 'Category Cusub';
+  document.getElementById('c-id').value = c?.id || '';
+  document.getElementById('c-name').value = c?.name || '';
+  document.getElementById('c-desc').value = c?.description || '';
+  document.getElementById('c-icon').value = c?.icon || 'fa-folder';
+  document.getElementById('c-order').value = c?.order_index || 0;
+  openModal('cat-modal');
+}
+function editCat(id) { openCatModal(state.categories.find(x => x.id == id)); }
+async function saveCat() {
+  const id = document.getElementById('c-id').value;
+  const data = {
+    name: document.getElementById('c-name').value.trim(),
+    description: document.getElementById('c-desc').value.trim(),
+    icon: document.getElementById('c-icon').value.trim() || 'fa-folder',
+    order_index: parseInt(document.getElementById('c-order').value) || 0
+  };
+  if (!data.name) { toast('Magaca buuxi', 'error'); return; }
+  try {
+    if (id) await api('PUT', '/api/v1/admin/categories/' + id, data);
+    else await api('POST', '/api/v1/admin/categories', data);
+    closeModal('cat-modal'); await loadCategories();
+    toast(id ? 'Category la update gareeyay' : 'Category la sameeyay', 'success');
+  } catch(e) { toast('Khalad', 'error'); }
+}
+async function deleteCat(id) {
+  confirmDelete('Miyaad hubtaa inaad tirtirto categorydan?', async () => {
+    try { await api('DELETE', '/api/v1/admin/categories/' + id); await loadCategories(); toast('Category la tirtirday', 'success'); }
+    catch { toast('Khalad', 'error'); }
+  });
+}
+
+/* ═══════════════════════════════════════════
+   MESSAGES
+═══════════════════════════════════════════ */
+async function loadMessages() {
+  try {
+    state.messages = await api('GET', '/api/v1/admin/contacts');
+    renderMessages();
+  } catch(e) { console.error(e); }
+}
+function renderMessages() {
+  const tb = document.getElementById('messages-table');
+  if (!state.messages.length) { tb.innerHTML = `<tr><td colspan="6"><div class="empty"><i class="fas fa-envelope"></i><p>Farriin ma jiro</p></div></td></tr>`; return; }
+  tb.innerHTML = state.messages.map(m => `
+    <tr style="${!m.is_read ? 'background:rgba(255,255,255,.02)' : ''}">
+      <td class="text-main" style="${!m.is_read ? 'font-weight:700' : ''}">${esc(m.alias_name||'—')}</td>
+      <td style="font-size:12px;color:var(--text3)">${esc(m.contact_method||'—')}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc((m.message||'').substring(0,60))}${(m.message||'').length>60?'...':''}</td>
+      <td style="font-size:12px;color:var(--text3)">${new Date(m.created_at).toLocaleDateString()}</td>
+      <td>${m.is_read ? `<span class="tag tag-gray">Akhristay</span>` : `<span class="tag tag-yellow">Cusub</span>`}</td>
+      <td>
+        <div class="actions-cell">
+          <button class="btn btn-ghost btn-sm btn-icon" onclick="viewMessage('${m.id}')" title="Eeg"><i class="fas fa-eye"></i></button>
+          ${!m.is_read ? `<button class="btn btn-ghost btn-sm btn-icon" onclick="markRead('${m.id}')" title="Mark read"><i class="fas fa-check"></i></button>` : ''}
+          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteMessage('${m.id}')"><i class="fas fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+function viewMessage(id) {
+  const m = state.messages.find(x => x.id == id);
+  if (!m) return;
+  document.getElementById('msg-modal-body').innerHTML = `
+    <div style="margin-bottom:16px">
+      <div class="form-label">Magac</div>
+      <div style="font-size:15px;font-weight:600">${esc(m.alias_name)}</div>
+    </div>
+    <div style="margin-bottom:16px">
+      <div class="form-label">Xiriir</div>
+      <div>${esc(m.contact_method||'—')}</div>
+    </div>
+    <div style="margin-bottom:16px">
+      <div class="form-label">Nooca Farriin</div>
+      <div>${esc(m.message_type||'—')}</div>
+    </div>
+    <div style="margin-bottom:16px">
+      <div class="form-label">Farriin</div>
+      <div style="background:var(--bg3);border-radius:8px;padding:12px;font-size:14px;line-height:1.6">${esc(m.message||'')}</div>
+    </div>
+    <div style="font-size:12px;color:var(--text3)">${new Date(m.created_at).toLocaleString()}</div>
+  `;
+  openModal('msg-modal');
+  if (!m.is_read) markRead(id);
+}
+async function markRead(id) {
+  try {
+    await api('PUT', '/api/v1/admin/contacts/' + id, { is_read: true });
+    const m = state.messages.find(x => x.id == id);
+    if (m) m.is_read = true;
+    renderMessages();
+    toast('Farriinta la akhristay', 'info');
+  } catch { toast('Khalad', 'error'); }
+}
+async function deleteMessage(id) {
+  confirmDelete('Miyaad hubtaa inaad tirtirto farriintan?', async () => {
+    try { await api('DELETE', '/api/v1/admin/contacts/' + id); await loadMessages(); toast('Farriin la tirtirday', 'success'); }
+    catch { toast('Khalad', 'error'); }
+  });
+}
+
+/* ═══════════════════════════════════════════
+   SETTINGS
+═══════════════════════════════════════════ */
+async function loadSettings() {
+  try {
+    const d = await api('GET', '/api/v1/settings');
+    if (d.site_name) document.getElementById('s-name').value = d.site_name;
+    if (d.site_description) document.getElementById('s-desc').value = d.site_description;
+    if (d.logo_url) document.getElementById('s-logo').value = d.logo_url;
+    if (d.contact_email) document.getElementById('s-email').value = d.contact_email;
+  } catch {}
+}
+async function saveSettings() {
+  const data = {
+    site_name: document.getElementById('s-name').value.trim(),
+    site_description: document.getElementById('s-desc').value.trim(),
+    logo_url: document.getElementById('s-logo').value.trim(),
+    contact_email: document.getElementById('s-email').value.trim()
+  };
+  try {
+    await api('PUT', '/api/v1/admin/settings', data);
+    toast('Settings la keydsday', 'success');
+  } catch(e) { toast('Khalad', 'error'); }
+}
+
+/* ═══════════════════════════════════════════
+   SECURITY
+═══════════════════════════════════════════ */
+async function saveCredentials() {
+  const pin = document.getElementById('sec-pin').value.trim();
+  const nu = document.getElementById('sec-user').value.trim();
+  const np = document.getElementById('sec-pass').value;
+  const npin = document.getElementById('sec-newpin').value.trim();
+  if (!pin || pin.length !== 8) { toast('PIN 8 digits ah geli', 'error'); return; }
+  if (!nu && !np && !npin) { toast('Mid ka mid ah buuxi', 'error'); return; }
+  const data = { pin };
+  if (nu) data.new_username = nu;
+  if (np) data.new_password = np;
+  if (npin) { if (npin.length !== 8) { toast('PIN cusub 8 digits', 'error'); return; } data.new_pin = npin; }
+  try {
+    await api('PUT', '/api/v1/admin/credentials', data);
+    toast('Macluumaadka la beddelay', 'success');
+    ['sec-pin','sec-user','sec-pass','sec-newpin'].forEach(id => document.getElementById(id).value = '');
+  } catch(e) { toast('Khalad: PIN saxi', 'error'); }
+}
+
+/* ═══════════════════════════════════════════
+   CONTEXT MENU (right-click on nav items)
+═══════════════════════════════════════════ */
+let ctxTarget = null;
+const ctxMenu = document.getElementById('ctx-menu');
+
+document.querySelectorAll('.nav-item[id^="nav-"]').forEach(item => {
+  item.addEventListener('contextmenu', e => {
+    e.preventDefault();
+    ctxTarget = item;
+    ctxMenu.style.left = e.clientX + 'px';
+    ctxMenu.style.top = Math.min(e.clientY, window.innerHeight - 120) + 'px';
+    ctxMenu.classList.add('show');
+  });
+});
+
+document.getElementById('ctx-rename').onclick = () => {
+  hideCtxMenu();
+  openRenameModal();
 };
-function toast(msg, type = 'info') {
-  const c = $('#toastContainer');
-  const colors = { info: 'border-brand-500/50 bg-brand-500/10', error: 'border-red-500/50 bg-red-500/10', success: 'border-emerald-500/50 bg-emerald-500/10' };
-  const icons = { info: 'mdi:information', error: 'mdi:alert-circle', success: 'mdi:check-circle' };
-  const el = document.createElement('div');
-  el.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border ${colors[type] || colors.info} glass toast-enter`;
-  el.innerHTML = `<span class="iconify text-lg" data-icon="${icons[type] || icons.info}"></span><span class="text-sm">${esc(msg)}</span>`;
-  c.appendChild(el);
-  setTimeout(() => { el.classList.replace('toast-enter', 'toast-exit'); setTimeout(() => el.remove(), 300); }, 3500);
+document.getElementById('ctx-edit').onclick = () => hideCtxMenu();
+document.getElementById('ctx-delete').onclick = () => hideCtxMenu();
+
+function hideCtxMenu() { ctxMenu.classList.remove('show'); }
+
+/* ═══════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════ */
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
-function fmtDate(d) { if (!d) return ''; return new Date(d).toLocaleDateString('so-KE', { year: 'numeric', month: 'short', day: 'numeric' }); }
-function fmtViews(n) { if (!n) return '0'; if (n >= 1e6) return (n/1e6).toFixed(1) + 'M'; if (n >= 1e3) return (n/1e3).toFixed(1) + 'K'; return String(n); }
-function fmtTime(s) { if (!s || s === '0:00') return '0:00'; return s; }
-function secsToTime(secs) { if (!secs || isNaN(secs)) return '0:00'; const m = Math.floor(secs/60), s = Math.floor(secs%60); return m + ':' + String(s).padStart(2,'0'); }
-function thumbUrl(v) { return v.thumbnail || `https://picsum.photos/seed/${v.id}/640/360`; }
-function coverUrl(a) { return a.cover_url || `https://picsum.photos/seed/audio${a.id}/400/400`; }
-
-/* ═══════════════════════════════════════════════════════
-   ROUTER
-   ═══════════════════════════════════════════════════════ */
-function navigate(path) { window.location.hash = path; }
-function parseRoute() {
-  const h = window.location.hash.slice(1) || '/';
-  const routes = [
-    { re: /^\/$/, page: 'home' },
-    { re: /^\/videos$/, page: 'videos' },
-    { re: /^\/videos\/(.+)$/, page: 'video-detail' },
-    { re: /^\/audio$/, page: 'audio' },
-    { re: /^\/posts$/, page: 'posts' },
-    { re: /^\/posts\/(.+)$/, page: 'post-detail' },
-    { re: /^\/contact$/, page: 'contact' },
-    { re: /^\/admin$/, page: 'admin' },
-  ];
-  for (const r of routes) {
-    const m = h.match(r.re);
-    if (m) return { page: r.page, params: m[1] ? { id: m[1] } : {} };
-  }
-  return { page: 'home', params: {} };
+function fmtNum(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n/1000).toFixed(1) + 'K';
+  return String(n);
 }
-
-async function router() {
-  const { page, params } = parseRoute();
-  S.page = page; S.params = params;
-  updateNav();
-  closeMobileMenu();
-  const app = $('#app');
-  app.style.opacity = '0';
-  app.style.transform = 'translateY(12px)';
-
-  try {
-    switch (page) {
-      case 'home': await renderHome(); break;
-      case 'videos': await renderVideos(); break;
-      case 'video-detail': await renderVideoDetail(params.id); break;
-      case 'audio': await renderAudio(); break;
-      case 'posts': await renderPosts(); break;
-      case 'post-detail': await renderPostDetail(params.id); break;
-      case 'contact': renderContact(); break;
-      case 'admin': await renderAdmin(); break;
-      default: await renderHome();
-    }
-  } catch (e) {
-    app.innerHTML = `<div class="flex flex-col items-center justify-center min-h-[60vh] gap-4"><span class="iconify text-5xl text-surface-600" data-icon="mdi:alert-circle-outline"></span><p class="text-surface-400">Khalad ayaa dhacay</p><button class="btn-primary btn-sm" onclick="navigate('/')">Bogga Hore</button></div>`;
-  }
-
-  requestAnimationFrame(() => { app.style.opacity = '1'; app.style.transform = 'translateY(0)'; });
-  window.scrollTo(0, 0);
-}
-
-/* ═══════════════════════════════════════════════════════
-   NAVIGATION
-   ═══════════════════════════════════════════════════════ */
-function updateNav() {
-  const currentHash = window.location.hash;
-  const dn = $('#desktopNav');
-  dn.innerHTML = NAV.map(n => `<a href="${n.href}" class="nav-link px-3 py-2 rounded-lg hover:bg-surface-800/50 ${currentHash === n.href ? 'active' : ''}">${n.label}</a>`).join('');
-  const mn = $('#mobileNavLinks');
-  mn.innerHTML = NAV.map(n => `<a href="${n.href}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm ${currentHash === n.href ? 'bg-brand-500/10 text-brand-300' : 'text-surface-400 hover:text-white hover:bg-surface-800/50'}"><span class="iconify text-lg" data-icon="${n.icon}"></span>${n.label}</a>`).join('');
-  // Nav scroll
-  const nav = $('#mainNav');
-  if (window.scrollY > 20) { nav.classList.add('glass'); nav.style.borderBottom = '1px solid rgba(148,163,184,.06)'; }
-  else { nav.classList.remove('glass'); nav.style.borderBottom = 'none'; nav.style.background = S.page === 'home' ? 'transparent' : ''; }
-}
-function closeMobileMenu() { S.mobileMenuOpen = false; $('#mobileMenu').classList.add('hidden'); }
- $('#mobileMenuBtn').onclick = () => { S.mobileMenuOpen = !S.mobileMenuOpen; $('#mobileMenu').classList.toggle('hidden', !S.mobileMenuOpen); };
- $('#adminBtn').onclick = () => navigate('/admin');
-window.addEventListener('scroll', () => { const nav = $('#mainNav'); if (window.scrollY > 20) { nav.classList.add('glass'); nav.style.borderBottom = '1px solid rgba(148,163,184,.06)'; } else if (S.page === 'home') { nav.classList.remove('glass'); nav.style.borderBottom = 'none'; nav.style.background = 'transparent'; } });
-
-/* ═══════════════════════════════════════════════════════
-   DATA LOADERS
-   ═══════════════════════════════════════════════════════ */
-async function loadVideos() { try { S.videos = await api('/api/v1/videos'); } catch { S.videos = []; } return S.videos; }
-async function loadCategories() { try { S.categories = await api('/api/v1/categories'); } catch { S.categories = []; } return S.categories; }
-async function loadPosts() { try { S.posts = await api('/api/v1/posts'); } catch { S.posts = []; } return S.posts; }
-async function loadAudio() { try { S.audio = await api('/api/v1/audio'); } catch { S.audio = []; } return S.audio; }
-async function loadSettings() { try { S.settings = await api('/api/v1/settings'); } catch { S.settings = {}; } return S.settings; }
-
-/* ═══════════════════════════════════════════════════════
-   HOME PAGE
-   ═══════════════════════════════════════════════════════ */
-async function renderHome() {
-  const [videos, cats, posts, audio] = await Promise.all([loadVideos(), loadCategories(), loadPosts(), loadAudio()]);
-  const featured = videos.filter(v => v.is_featured).slice(0, 4);
-  const recentVid = videos.slice(0, 8);
-  const recentAudio = audio.slice(0, 6);
-  const recentPosts = posts.slice(0, 3);
-
-  $('#app').innerHTML = `
-  <!-- Hero -->
-  <section class="relative h-[85vh] flex items-center justify-center overflow-hidden">
-    <div class="absolute inset-0">
-      <img src="${featured[0] ? thumbUrl(featured[0]) : 'https://picsum.photos/seed/maxaas-hero/1920/1080'}" class="w-full h-full object-cover" alt="">
-      <div class="absolute inset-0 bg-gradient-to-t from-surface-900 via-surface-900/70 to-surface-900/30"></div>
-      <div class="absolute inset-0 bg-gradient-to-r from-surface-900/60 to-transparent"></div>
-    </div>
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <div class="inline-flex items-center gap-2 badge badge-indigo mb-6">
-        <span class="pulse-dot w-1.5 h-1.5 rounded-full bg-brand-400"></span> La jacaysteyaal cusub
-      </div>
-      <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight leading-tight mb-6">
-        <span class="text-gradient">Maxaas</span><span class="text-surface-300">.u</span>
-      </h1>
-      <p class="text-lg sm:text-xl text-surface-300 max-w-2xl mx-auto mb-10 leading-relaxed">
-        Wuxuu kuu keenayaa fiidyowyada, heesaha iyo qoraallada ugu fiican. Daawo, maqal, akhri — waqtigaaga kula jacayl.
-      </p>
-      <div class="flex flex-wrap items-center justify-center gap-4">
-        <button onclick="navigate('/videos')" class="btn-primary text-base px-8 py-3">
-          <span class="iconify text-lg" data-icon="mdi:play"></span> Daawo Fiidyowyada
-        </button>
-        <button onclick="navigate('/audio')" class="btn-secondary text-base px-8 py-3">
-          <span class="iconify text-lg" data-icon="mdi:headphones"></span> Maqal Heesaha
-        </button>
-      </div>
-    </div>
-    <div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-surface-900 to-transparent"></div>
-  </section>
-
-  ${featured.length ? `
-  <!-- Featured -->
-  <section class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-    <div class="flex items-center justify-between mb-10">
-      <div>
-        <p class="text-xs font-semibold uppercase tracking-widest text-brand-400 mb-2">La soo jiitey</p>
-        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">Fiidyowyada Laynka Hore</h2>
-      </div>
-      <a href="#/videos" class="btn-secondary btn-sm">Dhammaan <span class="iconify" data-icon="mdi:arrow-right"></span></a>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      ${featured.map(v => videoCard(v)).join('')}
-    </div>
-  </section>` : ''}
-
-  ${recentAudio.length ? `
-  <!-- Audio Section -->
-  <section class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-    <div class="line-gradient mb-20"></div>
-    <div class="flex items-center justify-between mb-10">
-      <div>
-        <p class="text-xs font-semibold uppercase tracking-widest text-brand-400 mb-2">Heesaha</p>
-        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">Kuwa Cusub</h2>
-      </div>
-      <a href="#/audio" class="btn-secondary btn-sm">Dhammaan <span class="iconify" data-icon="mdi:arrow-right"></span></a>
-    </div>
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-      ${recentAudio.map(a => audioCard(a)).join('')}
-    </div>
-  </section>` : ''}
-
-  ${recentPosts.length ? `
-  <!-- Posts -->
-  <section class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-    <div class="line-gradient mb-20"></div>
-    <div class="flex items-center justify-between mb-10">
-      <div>
-        <p class="text-xs font-semibold uppercase tracking-widest text-brand-400 mb-2">Qoraallada</p>
-        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">Akhri Wixii Cusub</h2>
-      </div>
-      <a href="#/posts" class="btn-secondary btn-sm">Dhammaan <span class="iconify" data-icon="mdi:arrow-right"></span></a>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      ${recentPosts.map(p => postCard(p)).join('')}
-    </div>
-  </section>` : ''}
-
-  <!-- Stats -->
-  <section class="py-20 px-4 sm:px-6 lg:px-8">
-    <div class="line-gradient mb-20"></div>
-    <div class="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-      <div class="glass rounded-2xl p-6"><p class="text-3xl font-bold text-gradient">${videos.length}</p><p class="text-sm text-surface-400 mt-1">Fiidyowyada</p></div>
-      <div class="glass rounded-2xl p-6"><p class="text-3xl font-bold text-gradient">${audio.length}</p><p class="text-sm text-surface-400 mt-1">Heesaha</p></div>
-      <div class="glass rounded-2xl p-6"><p class="text-3xl font-bold text-gradient">${posts.length}</p><p class="text-sm text-surface-400 mt-1">Qoraallada</p></div>
-      <div class="glass rounded-2xl p-6"><p class="text-3xl font-bold text-gradient">${fmtViews(videos.reduce((a, v) => a + (v.views || 0), 0))}</p><p class="text-sm text-surface-400 mt-1">Daawasho</p></div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  ${footerHTML()}`;
-}
-
-function videoCard(v) {
-  const cat = S.categories.find(c => c.id === v.category_id);
-  return `<div class="card-hover cursor-pointer group" onclick="navigate('/videos/${v.id}')">
-    <div class="video-thumb">
-      <img src="${thumbUrl(v)}" alt="${esc(v.title)}" loading="lazy">
-      <div class="card-overlay absolute inset-0 bg-black/40 flex items-center justify-center">
-        <div class="w-14 h-14 rounded-full bg-brand-500/90 flex items-center justify-center shadow-xl"><span class="iconify text-2xl text-white" data-icon="mdi:play"></span></div>
-      </div>
-      <div class="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-0.5 rounded">${fmtTime(v.duration)}</div>
-      ${v.video_type === 'youtube' ? '<div class="absolute top-2 left-2"><span class="badge badge-red text-[10px]">YouTube</span></div>' : ''}
-    </div>
-    <div class="mt-3 px-0.5">
-      <h3 class="text-sm font-semibold text-surface-100 truncate group-hover:text-brand-300 transition">${esc(v.title)}</h3>
-      <div class="flex items-center gap-2 mt-1 text-xs text-surface-500">
-        <span class="iconify text-sm" data-icon="mdi:eye-outline"></span>${fmtViews(v.views)}
-        ${cat ? `<span class="text-surface-600">·</span><span class="text-surface-500">${esc(cat.name)}</span>` : ''}
-      </div>
-    </div>
-  </div>`;
-}
-
-function audioCard(a) {
-  const playing = S.audioQueue[S.audioIdx]?.id === a.id && S.audioPlaying;
-  return `<div class="card-hover cursor-pointer group" onclick="playAudioTrack('${a.id}')">
-    <div class="relative aspect-square rounded-xl overflow-hidden bg-surface-800">
-      <img src="${coverUrl(a)}" alt="${esc(a.title)}" class="w-full h-full object-cover" loading="lazy">
-      <div class="card-overlay absolute inset-0 bg-black/40 flex items-center justify-center">
-        <div class="w-12 h-12 rounded-full ${playing ? 'bg-brand-500' : 'bg-white/20 backdrop-blur-sm'} flex items-center justify-center">
-          <span class="iconify text-xl text-white" data-icon="${playing ? 'mdi:pause' : 'mdi:play'}"></span>
-        </div>
-      </div>
-    </div>
-    <div class="mt-2.5 px-0.5">
-      <h3 class="text-sm font-medium text-surface-100 truncate">${esc(a.title)}</h3>
-      <p class="text-xs text-surface-500 truncate">${esc(a.artist)}</p>
-    </div>
-  </div>`;
-}
-
-function postCard(p) {
-  return `<article class="card-hover cursor-pointer group glass rounded-2xl overflow-hidden" onclick="navigate('/posts/${p.id}')">
-    ${p.image_url ? `<div class="aspect-video overflow-hidden"><img src="${p.image_url}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy"></div>` : '<div class="aspect-video bg-gradient-to-br from-brand-600/20 to-surface-800 flex items-center justify-center"><span class="iconify text-4xl text-brand-400/30" data-icon="mdi:newspaper-variant-outline"></span></div>'}
-    <div class="p-6">
-      <p class="text-xs text-surface-500 mb-2">${fmtDate(p.created_at)}</p>
-      <h3 class="text-lg font-semibold text-surface-100 group-hover:text-brand-300 transition leading-snug mb-2">${esc(p.title)}</h3>
-      <p class="text-sm text-surface-400 line-clamp-2 leading-relaxed">${esc((p.content || '').substring(0, 120))}…</p>
-    </div>
-  </article>`;
-}
-
-function footerHTML() {
-  return `<footer class="border-t border-surface-800 py-12 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-    <div class="flex items-center gap-2"><div class="w-7 h-7 rounded-md bg-brand-500/20 flex items-center justify-center"><span class="iconify text-brand-400 text-sm" data-icon="mdi:play-circle"></span></div><span class="text-sm font-semibold">Maxaas<span class="text-brand-400">.u</span></span></div>
-    <p class="text-xs text-surface-600">© ${new Date().getFullYear()} Maxaas.u — Dhammaan xuquuqda waa la ilaaliyay</p>
-    <div class="flex items-center gap-4">
-      <a href="#/contact" class="text-xs text-surface-500 hover:text-brand-400 transition">Nala Xiriir</a>
-      <a href="#/admin" class="text-xs text-surface-500 hover:text-brand-400 transition">Maamul</a>
-    </div>
-  </div>
-</footer>`;
-}
-
-/* ═══════════════════════════════════════════════════════
-   VIDEOS PAGE
-   ═══════════════════════════════════════════════════════ */
-async function renderVideos(catId) {
-  const [videos, cats] = await Promise.all([loadVideos(), loadCategories()]);
-  const filtered = catId ? videos.filter(v => v.category_id === catId) : videos;
-
-  $('#app').innerHTML = `
-  <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-    <div class="mb-10">
-      <p class="text-xs font-semibold uppercase tracking-widest text-brand-400 mb-2">Fiidyowyada</p>
-      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight">Dhammaan Fiidyowyada</h1>
-    </div>
-    <div class="flex flex-wrap gap-2 mb-10">
-      <button onclick="renderVideos()" class="badge ${!catId ? 'badge-indigo' : 'bg-surface-800 text-surface-400 hover:text-white'} cursor-pointer transition text-xs px-4 py-1.5">Dhammaan</button>
-      ${cats.map(c => `<button onclick="renderVideos('${c.id}')" class="badge ${catId === c.id ? 'badge-indigo' : 'bg-surface-800 text-surface-400 hover:text-white'} cursor-pointer transition text-xs px-4 py-1.5">${esc(c.name)}</button>`).join('')}
-    </div>
-    ${filtered.length ? `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">${filtered.map(v => videoCard(v)).join('')}</div>` : `<div class="text-center py-20"><span class="iconify text-5xl text-surface-700 mx-auto block mb-4" data-icon="mdi:video-off-outline"></span><p class="text-surface-500">Wali fiidyow ma jiro</p></div>`}
-  </section>
-  ${footerHTML()}`;
-}
-
-/* ═══════════════════════════════════════════════════════
-   VIDEO DETAIL
-   ═══════════════════════════════════════════════════════ */
-async function renderVideoDetail(id) {
-  const videos = await loadVideos();
-  const v = videos.find(x => x.id === id);
-  if (!v) { $('#app').innerHTML = `<div class="flex flex-col items-center justify-center min-h-[60vh] gap-4"><span class="iconify text-5xl text-surface-600" data-icon="mdi:video-off-outline"></span><p class="text-surface-400">Fiidyowgan lama helin</p><button class="btn-primary btn-sm" onclick="navigate('/videos')">Dib u noqo</button></div>`; return; }
-  const related = videos.filter(x => x.id !== id && x.category_id === v.category_id).slice(0, 4);
-  const cat = S.categories.find(c => c.id === v.category_id);
-
-  $('#app').innerHTML = `
-  <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-    <button onclick="navigate('/videos')" class="flex items-center gap-2 text-sm text-surface-400 hover:text-white transition mb-6">
-      <span class="iconify" data-icon="mdi:arrow-left"></span> Dib u noqo
-    </button>
-    <!-- Player -->
-    <div class="bg-black rounded-2xl overflow-hidden aspect-video mb-8 flex items-center justify-center glow-indigo" id="videoPlayerWrap">
-      <div class="text-center text-surface-500"><span class="iconify text-5xl mb-2 block mx-auto" data-icon="mdi:loading" data-inline="false"></span><p class="text-sm">Shaqeynayaa…</p></div>
-    </div>
-    <!-- Info -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
-      <div class="lg:col-span-2">
-        <div class="flex flex-wrap items-center gap-3 mb-3">
-          ${cat ? `<span class="badge badge-indigo">${esc(cat.name)}</span>` : ''}
-          ${v.video_type ? `<span class="badge badge-amber">${esc(v.video_type)}</span>` : ''}
-        </div>
-        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight mb-4">${esc(v.title)}</h1>
-        <div class="flex items-center gap-4 text-sm text-surface-400 mb-6">
-          <span class="flex items-center gap-1.5"><span class="iconify" data-icon="mdi:eye-outline"></span>${fmtViews(v.views)} daawasho</span>
-          <span class="flex items-center gap-1.5"><span class="iconify" data-icon="mdi:clock-outline"></span>${fmtTime(v.duration)}</span>
-          <span>${fmtDate(v.created_at)}</span>
-        </div>
-        ${v.description ? `<p class="text-surface-300 leading-relaxed">${esc(v.description)}</p>` : ''}
-      </div>
-      <div>
-        ${related.length ? `<h3 class="text-sm font-semibold text-surface-300 mb-4">Kuwa la mid ah</h3><div class="flex flex-col gap-4">${related.map(r => `<div class="flex gap-3 cursor-pointer group" onclick="navigate('/videos/${r.id}')"><div class="w-32 flex-shrink-0 aspect-video rounded-lg overflow-hidden bg-surface-800"><img src="${thumbUrl(r)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy"></div><div class="min-w-0"><p class="text-sm font-medium text-surface-200 group-hover:text-brand-300 transition truncate">${esc(r.title)}</p><p class="text-xs text-surface-500 mt-1">${fmtViews(r.views)} daawasho</p></div></div>`).join('')}</div>` : ''}
-      </div>
-    </div>
-  </section>
-  ${footerHTML()}`;
-
-  // Load stream token
-  try {
-    const res = await api(`/api/v1/videos/request-stream/${id}`, { method: 'POST' });
-    const wrap = $('#videoPlayerWrap');
-    if (res.youtubeUrl) {
-      wrap.innerHTML = `<iframe src="${res.youtubeUrl}" class="w-full h-full" frameborder="0" allow="autoplay;encrypted-media;picture-in-picture" allowfullscreen></iframe>`;
-    } else if (res.streamToken) {
-      wrap.innerHTML = `<video controls autoplay class="w-full h-full" src="/api/v1/stream/${res.streamToken}"></video>`;
-    } else {
-      wrap.innerHTML = `<div class="text-center text-surface-500"><span class="iconify text-5xl mb-2 block mx-auto" data-icon="mdi:video-off-outline"></span><p class="text-sm">Fiidyowgan waa la xiray</p></div>`;
-    }
-  } catch {
-    $('#videoPlayerWrap').innerHTML = `<div class="text-center text-surface-500"><span class="iconify text-5xl mb-2 block mx-auto" data-icon="mdi:alert-circle-outline"></span><p class="text-sm">Khalad ayaa dhacay</p></div>`;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════
-   AUDIO PAGE
-   ═══════════════════════════════════════════════════════ */
-async function renderAudio() {
-  const audio = await loadAudio();
-
-  $('#app').innerHTML = `
-  <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-    <div class="mb-10">
-      <p class="text-xs font-semibold uppercase tracking-widest text-brand-400 mb-2">Heesaha</p>
-      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight">Dhammaan Heesaha</h1>
-    </div>
-    ${audio.length ? `
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
-      ${audio.map(a => audioCard(a)).join('')}
-    </div>` : `<div class="text-center py-20"><span class="iconify text-5xl text-surface-700 mx-auto block mb-4" data-icon="mdi:music-off"></span><p class="text-surface-500">Wali hees ma jiro</p></div>`}
-  </section>
-  ${footerHTML()}`;
-}
-
-/* ═══════════════════════════════════════════════════════
-   AUDIO PLAYER LOGIC
-   ═══════════════════════════════════════════════════════ */
-const audioEl = $('#audioEl');
-async function playAudioTrack(id) {
-  const track = S.audio.find(a => a.id === id);
-  if (!track) { toast('Heestan lama helin', 'error'); return; }
-  try {
-    const res = await api(`/api/v1/audio/request-stream/${id}`, { method: 'POST' });
-    if (!res.streamToken) throw new Error('No token');
-    S.audioQueue = S.audio.slice();
-    S.audioIdx = S.audio.findIndex(a => a.id === id);
-    audioEl.src = `/api/v1/stream/${res.streamToken}`;
-    audioEl.play().catch(() => {});
-    S.audioPlaying = true;
-    updateAudioBar();
-    $('#audioPlayerBar').classList.add('show');
-  } catch { toast('Khalad ayaa dhacay', 'error'); }
-}
-
-function updateAudioBar() {
-  const t = S.audioQueue[S.audioIdx];
-  if (!t) return;
-  $('#apTitle').textContent = t.title;
-  $('#apArtist').textContent = t.artist;
-  $('#apPlayIcon').setAttribute('data-icon', S.audioPlaying ? 'mdi:pause' : 'mdi:play');
-  // Re-render audio page if visible
-  if (S.page === 'audio') {
-    $$('.audio-item').forEach(el => el.classList.remove('playing'));
-    $$('.audio-card-playing').forEach(el => el.classList.remove('audio-card-playing'));
-  }
-}
-
- $('#apPlay').onclick = () => { S.audioPlaying ? audioEl.pause() : audioEl.play(); S.audioPlaying = !S.audioPlaying; updateAudioBar(); };
- $('#apClose').onclick = () => { audioEl.pause(); audioEl.src = ''; S.audioPlaying = false; S.audioIdx = -1; $('#audioPlayerBar').classList.remove('show'); };
- $('#apPrev').onclick = () => { if (S.audioIdx > 0) playAudioTrack(S.audioQueue[S.audioIdx - 1].id); };
- $('#apNext').onclick = () => { if (S.audioIdx < S.audioQueue.length - 1) playAudioTrack(S.audioQueue[S.audioIdx + 1].id); };
-audioEl.addEventListener('timeupdate', () => {
-  if (!audioEl.duration) return;
-  $('#apSeek').value = (audioEl.currentTime / audioEl.duration) * 100;
-  $('#apCurrentTime').textContent = secsToTime(audioEl.currentTime);
-  $('#apDuration').textContent = secsToTime(audioEl.duration);
-});
-audioEl.addEventListener('ended', () => { if (S.audioIdx < S.audioQueue.length - 1) playAudioTrack(S.audioQueue[S.audioIdx + 1].id); else { S.audioPlaying = false; updateAudioBar(); } });
- $('#apSeek').oninput = () => { if (audioEl.duration) audioEl.currentTime = ($('#apSeek').value / 100) * audioEl.duration; };
-
-/* ═══════════════════════════════════════════════════════
-   POSTS PAGE
-   ═══════════════════════════════════════════════════════ */
-async function renderPosts() {
-  const posts = await loadPosts();
-  $('#app').innerHTML = `
-  <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-    <div class="mb-10">
-      <p class="text-xs font-semibold uppercase tracking-widest text-brand-400 mb-2">Qoraallada</p>
-      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight">Akhri Wixii Cusub</h1>
-    </div>
-    ${posts.length ? `<div class="grid grid-cols-1 md:grid-cols-3 gap-8">${posts.map(p => postCard(p)).join('')}</div>` : `<div class="text-center py-20"><span class="iconify text-5xl text-surface-700 mx-auto block mb-4" data-icon="mdi:newspaper-variant-outline"></span><p class="text-surface-500">Wali qoraal ma jiro</p></div>`}
-  </section>
-  ${footerHTML()}`;
-}
-
-async function renderPostDetail(id) {
-  const posts = await loadPosts();
-  const p = posts.find(x => x.id === id);
-  if (!p) { $('#app').innerHTML = `<div class="flex flex-col items-center justify-center min-h-[60vh] gap-4"><p class="text-surface-400">Qoraalkan lama helin</p></div>`; return; }
-  try { await api(`/api/v1/posts/${id}/view`, { method: 'POST' }); } catch {}
-
-  $('#app').innerHTML = `
-  <article class="py-24 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto">
-    <button onclick="navigate('/posts')" class="flex items-center gap-2 text-sm text-surface-400 hover:text-white transition mb-8">
-      <span class="iconify" data-icon="mdi:arrow-left"></span> Dib u noqo
-    </button>
-    ${p.image_url ? `<img src="${p.image_url}" class="w-full aspect-video object-cover rounded-2xl mb-8" alt="" loading="lazy">` : ''}
-    <div class="flex items-center gap-3 text-sm text-surface-400 mb-4">
-      <span>${fmtDate(p.created_at)}</span>
-      <span class="text-surface-600">·</span>
-      <span class="flex items-center gap-1"><span class="iconify" data-icon="mdi:eye-outline"></span>${fmtViews(p.views)}</span>
-      ${p.author ? `<span class="text-surface-600">·</span><span>${esc(p.author)}</span>` : ''}
-    </div>
-    <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-8 leading-tight">${esc(p.title)}</h1>
-    <div class="prose prose-invert max-w-none text-surface-300 leading-relaxed whitespace-pre-wrap">${esc(p.content)}</div>
-  </article>
-  ${footerHTML()}`;
-}
-
-/* ═══════════════════════════════════════════════════════
-   CONTACT PAGE
-   ═══════════════════════════════════════════════════════ */
-function renderContact() {
-  $('#app').innerHTML = `
-  <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-2xl mx-auto">
-    <div class="mb-10 text-center">
-      <p class="text-xs font-semibold uppercase tracking-widest text-brand-400 mb-2">Nala Xiriir</p>
-      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight">Waad Naga Suurin Kartaa</h1>
-      <p class="text-surface-400 mt-3">Fikrad, su'aal ama wada sheekayn — nala soo wadaag.</p>
-    </div>
-    <form id="contactForm" class="glass rounded-2xl p-8 space-y-5">
-      <div>
-        <label class="block text-sm font-medium text-surface-300 mb-1.5">Magacaaga</label>
-        <input name="alias_name" class="input-field" placeholder="Magacaaga ama naanays" required maxlength="50">
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-surface-300 mb-1.5">La xiriir (ikhtiyaari)</label>
-        <input name="contact_method" class="input-field" placeholder="Email, taleefon, ama xagge kale" maxlength="100">
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-surface-300 mb-1.5">Nooca</label>
-        <select name="message_type" class="input-field">
-          <option value="general">Guud</option>
-          <option value="feedback">Fikrad</option>
-          <option value="complaint">Cabasho</option>
-          <option value="business">Ganacsi</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-surface-300 mb-1.5">Fariinta</label>
-        <textarea name="message" class="input-field" rows="5" placeholder="Fariintaada halkan ku qor…" required maxlength="2000"></textarea>
-      </div>
-      <button type="submit" class="btn-primary w-full justify-center">
-        <span class="iconify" data-icon="mdi:send"></span> Dir Fariinta
-      </button>
-    </form>
-  </section>
-  ${footerHTML()}`;
-
-  $('#contactForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const f = e.target;
-    const btn = f.querySelector('button[type=submit]');
-    btn.disabled = true; btn.innerHTML = '<span class="iconify animate-spin" data-icon="mdi:loading"></span> Dirayaa…';
-    try {
-      await api('/api/v1/contacts', { method: 'POST', body: JSON.stringify({ alias_name: f.alias_name.value, contact_method: f.contact_method.value, message_type: f.message_type.value, message: f.message.value }) });
-      toast('Fariintii waa la diray! Mahadsanid.', 'success');
-      f.reset();
-    } catch { toast('Khalad ayaa dhacay. Mar kale isku day.', 'error'); }
-    finally { btn.disabled = false; btn.innerHTML = '<span class="iconify" data-icon="mdi:send"></span> Dir Fariinta'; }
-  };
-}
-
-/* ═══════════════════════════════════════════════════════
-   ADMIN
-   ═══════════════════════════════════════════════════════ */
-async function renderAdmin() {
-  if (!S.admin) { renderAdminLogin(); return; }
-  await loadSettings();
-  renderAdminPanel();
-}
-
-function renderAdminLogin() {
-  $('#app').innerHTML = `
-  <section class="min-h-screen flex items-center justify-center px-4">
-    <div class="glass rounded-2xl p-8 sm:p-10 w-full max-w-md glow-indigo">
-      <div class="text-center mb-8">
-        <div class="w-16 h-16 rounded-2xl bg-brand-500/10 flex items-center justify-center mx-auto mb-4">
-          <span class="iconify text-3xl text-brand-400" data-icon="mdi:shield-crown-outline"></span>
-        </div>
-        <h1 class="text-2xl font-bold">Maamulka Sooto</h1>
-        <p class="text-sm text-surface-400 mt-1">Fadlan soo geli si aad u maamusho</p>
-      </div>
-      <form id="loginForm" class="space-y-4">
-        <div><label class="block text-sm font-medium text-surface-300 mb-1.5">Magaca</label><input name="username" class="input-field" placeholder="admin" required></div>
-        <div><label class="block text-sm font-medium text-surface-300 mb-1.5">Furaha</label><input name="password" type="password" class="input-field" placeholder="••••••••" required></div>
-        <div><label class="block text-sm font-medium text-surface-300 mb-1.5">PIN (8 xaraf)</label><input name="pin" class="input-field" placeholder="00000000" maxlength="8" required></div>
-        <button type="submit" class="btn-primary w-full justify-center"><span class="iconify" data-icon="mdi:login"></span> Soo Geli</button>
-      </form>
-    </div>
-  </section>`;
-
-  $('#loginForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const f = e.target;
-    const btn = f.querySelector('button');
-    btn.disabled = true; btn.innerHTML = '<span class="iconify animate-spin" data-icon="mdi:loading"></span> Saxayaa…';
-    try {
-      const d = await api('/api/v1/auth/login', { method: 'POST', body: JSON.stringify({ username: f.username.value, password: f.password.value, pin: f.pin.value }) });
-      S.admin = { username: d.username };
-      toast('Ku soo dhawow, ' + d.username + '!', 'success');
-      renderAdminPanel();
-    } catch (err) { toast(err.message || ' Khalad', 'error'); }
-    finally { btn.disabled = false; btn.innerHTML = '<span class="iconify" data-icon="mdi:login"></span> Soo Geli'; }
-  };
-}
-
-function renderAdminPanel() {
-  const tabs = [
-    { id: 'dashboard', label: 'Dashboard', icon: 'mdi:view-dashboard' },
-    { id: 'videos', label: 'Fiidyowyada', icon: 'mdi:video' },
-    { id: 'audio', label: 'Heesaha', icon: 'mdi:music' },
-    { id: 'posts', label: 'Qoraallada', icon: 'mdi:newspaper' },
-    { id: 'categories', label: 'Qaybaha', icon: 'mdi:folder' },
-    { id: 'contacts', label: 'Fariimaha', icon: 'mdi:message' },
-    { id: 'settings', label: 'Settings', icon: 'mdi:cog' },
-    { id: 'credentials', label: 'Xirfadeeynta', icon: 'mdi:key' },
-  ];
-
-  $('#app').innerHTML = `
-  <div class="flex min-h-screen pt-16">
-    <!-- Sidebar -->
-    <aside class="hidden md:flex flex-col w-60 border-r border-surface-800 p-4 sticky top-16 h-[calc(100vh-4rem)]">
-      <p class="text-xs font-semibold uppercase tracking-widest text-surface-600 mb-4 px-3">Maamulka</p>
-      <div class="flex flex-col gap-1" id="adminSidebar">
-        ${tabs.map(t => `<button onclick="setAdminTab('${t.id}')" class="admin-sidebar-link ${S.adminTab === t.id ? 'active' : ''}" data-tab="${t.id}"><span class="iconify text-lg" data-icon="${t.icon}"></span>${t.label}</button>`).join('')}
-      </div>
-      <div class="mt-auto pt-4 border-t border-surface-800">
-        <button onclick="adminLogout()" class="admin-sidebar-link text-red-400 hover:text-red-300"><span class="iconify text-lg" data-icon="mdi:logout"></span>Ka Bax</button>
-      </div>
-    </aside>
-    <!-- Mobile tabs -->
-    <div class="md:hidden fixed bottom-0 left-0 right-0 z-50 glass border-t border-surface-800 flex overflow-x-auto" id="adminMobileTabs" style="${S.audioPlaying ? 'bottom:64px' : ''}">
-      ${tabs.map(t => `<button onclick="setAdminTab('${t.id}')" class="flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2 text-[10px] ${S.adminTab === t.id ? 'text-brand-400' : 'text-surface-500'}" data-tab="${t.id}"><span class="iconify text-lg" data-icon="${t.icon}"></span>${t.label}</button>`).join('')}
-    </div>
-    <!-- Content -->
-    <div class="flex-1 p-4 sm:p-6 lg:p-8 pb-24 md:pb-8" id="adminContent"></div>
-  </div>`;
-
-  loadAdminTab();
-}
-
-async function setAdminTab(tab) {
-  S.adminTab = tab;
-  $$('.admin-sidebar-link').forEach(el => el.classList.toggle('active', el.dataset.tab === tab));
-  $$('#adminMobileTabs button').forEach(el => { el.classList.toggle('text-brand-400', el.dataset.tab === tab); el.classList.toggle('text-surface-500', el.dataset.tab !== tab); });
-  loadAdminTab();
-}
-
-async function loadAdminTab() {
-  const c = $('#adminContent');
-  c.innerHTML = '<div class="flex justify-center py-20"><span class="iconify text-3xl text-surface-600 animate-spin" data-icon="mdi:loading"></span></div>';
-  try {
-    switch (S.adminTab) {
-      case 'dashboard': await adminDashboard(c); break;
-      case 'videos': await adminVideos(c); break;
-      case 'audio': await adminAudio(c); break;
-      case 'posts': await adminPosts(c); break;
-      case 'categories': await adminCategories(c); break;
-      case 'contacts': await adminContacts(c); break;
-      case 'settings': await adminSettings(c); break;
-      case 'credentials': adminCredentials(c); break;
-    }
-  } catch { c.innerHTML = '<p class="text-red-400">Khalad ayaa dhacay</p>'; }
-}
-
-async function adminDashboard(c) {
-  const d = await api('/api/v1/admin/analytics');
-  c.innerHTML = `
-  <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-    <div class="glass rounded-xl p-5"><p class="text-2xl font-bold text-gradient">${fmtViews(d.totalViews)}</p><p class="text-xs text-surface-500 mt-1">Dhammaan Daawasho</p></div>
-    <div class="glass rounded-xl p-5"><p class="text-2xl font-bold text-gradient">${d.totalVideos || 0}</p><p class="text-xs text-surface-500 mt-1">Fiidyowyada</p></div>
-    <div class="glass rounded-xl p-5"><p class="text-2xl font-bold text-gradient">${d.unread || 0}</p><p class="text-xs text-surface-500 mt-1">Fariimaha Aan La Akhrin</p></div>
-    <div class="glass rounded-xl p-5"><p class="text-2xl font-bold text-gradient">${d.thisWeek || 0}</p><p class="text-xs text-surface-500 mt-1">Usbuucan</p></div>
-  </div>
-  ${d.topVideos?.length ? `<h3 class="text-lg font-semibold mb-4">Fiidyowyada Ugu Badan</h3><div class="glass rounded-xl overflow-hidden"><table class="w-full text-sm"><thead><tr class="border-b border-surface-700/50 text-left text-surface-400"><th class="p-3">Title</th><th class="p-3 text-right">Views</th></tr></thead><tbody>${d.topVideos.map(v => `<tr class="border-b border-surface-700/30"><td class="p-3 text-surface-200">${esc(v.title)}</td><td class="p-3 text-right text-brand-300 font-medium">${fmtViews(v.views)}</td></tr>`).join('')}</tbody></table></div>` : ''}`;
-}
-
-/* ═══ ADMIN VIDEOS ═══ */
-async function adminVideos(c) {
-  const [videos, cats] = await Promise.all([api('/api/v1/admin/videos'), loadCategories()]);
-  c.innerHTML = `
-  <div class="flex items-center justify-between mb-6">
-    <h2 class="text-2xl font-bold">Fiidyowyada</h2>
-    <button onclick="videoModal()" class="btn-primary btn-sm"><span class="iconify" data-icon="mdi:plus"></span> Cusub</button>
-  </div>
-  <div class="glass rounded-xl overflow-hidden overflow-x-auto">
-    <table class="w-full text-sm min-w-[700px]">
-      <thead><tr class="border-b border-surface-700/50 text-left text-surface-400 text-xs uppercase tracking-wider">
-        <th class="p-3">Title</th><th class="p-3">Nooca</th><th class="p-3">Category</th><th class="p-3 text-center">Published</th><th class="p-3 text-right">Views</th><th class="p-3 text-right">Ficil</th>
-      </tr></thead>
-      <tbody>${videos.map(v => `<tr class="border-b border-surface-700/30 hover:bg-surface-800/30">
-        <td class="p-3"><div class="flex items-center gap-3"><img src="${thumbUrl(v)}" class="w-16 h-10 rounded object-cover flex-shrink-0"><span class="font-medium text-surface-200 truncate max-w-[200px] block">${esc(v.title)}</span></div></td>
-        <td class="p-3"><span class="badge badge-amber">${esc(v.video_type || 'mp4')}</span></td>
-        <td class="p-3 text-surface-400">${esc(cats.find(c=>c.id===v.category_id)?.name || '—')}</td>
-        <td class="p-3 text-center">${v.is_published ? '<span class="badge badge-emerald">Haa</span>' : '<span class="badge badge-red">Maya</span>'}</td>
-        <td class="p-3 text-right text-surface-400">${fmtViews(v.views)}</td>
-        <td class="p-3 text-right"><div class="flex justify-end gap-1">
-          <button onclick="videoModal('${v.id}')" class="btn-secondary btn-sm"><span class="iconify" data-icon="mdi:pencil"></span></button>
-          <button onclick="deleteItem('videos','${v.id}')" class="btn-danger btn-sm"><span class="iconify" data-icon="mdi:delete"></span></button>
-        </div></td>
-      </tr>`).join('')}</tbody>
-    </table>
-  </div>
-  ${!videos.length ? '<p class="text-center text-surface-500 py-8">Wali fiidyow ma jiro</p>' : ''}`;
-  window._adminVideos = videos;
-}
-
-function videoModal(id) {
-  const v = id ? window._adminVideos.find(x => x.id === id) : null;
-  const cats = S.categories;
-  openModal(`
-    <h3 class="text-lg font-bold mb-6">${v ? 'Wax ka bedel' : 'Fiidyow Cusub'}</h3>
-    <form id="videoForm" class="space-y-4">
-      <div><label class="block text-sm font-medium text-surface-300 mb-1">Title *</label><input name="title" class="input-field" value="${v ? esc(v.title) : ''}" required></div>
-      <div><label class="block text-sm font-medium text-surface-300 mb-1">URL *</label><input name="url" class="input-field" value="${v ? esc(v.url) : ''}" placeholder="https://…" required></div>
-      <div class="grid grid-cols-2 gap-4">
-        <div><label class="block text-sm font-medium text-surface-300 mb-1">Nooca</label><select name="video_type" class="input-field"><option value="mp4" ${v?.video_type==='mp4'?'selected':''}>MP4</option><option value="youtube" ${v?.video_type==='youtube'?'selected':''}>YouTube</option><option value="archive" ${v?.video_type==='archive'?'selected':''}>Archive.org</option><option value="ipfs" ${v?.video_type==='ipfs'?'selected':''}>IPFS</option></select></div>
-        <div><label class="block text-sm font-medium text-surface-300 mb-1">Qaybta</label><select name="category_id" class="input-field"><option value="">—</option>${cats.map(c=>`<option value="${c.id}" ${v?.category_id===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
-      </div>
-      <div><label class="block text-sm font-medium text-surface-300 mb-1">Thumbnail URL</label><input name="thumbnail" class="input-field" value="${v ? esc(v.thumbnail||'') : ''}"></div>
-      <div><label class="block text-sm font-medium text-surface-300 mb-1">Sharaxaad</label><textarea name="description" class="input-field" rows="3">${v ? esc(v.description||'') : ''}</textarea></div>
-      <div class="grid grid-cols-3 gap-4">
-        <div><label class="block text-sm font-medium text-surface-300 mb-1">Waqtiga</label><input name="duration" class="input-field" value="${v ? esc(v.duration||'0:00') : '0:00'}"></div>
-        <div><label class="block text-sm font-medium text-surface-300 mb-1">Order</label><input name="order_index" type="number" class="input-field" value="${v ? v.order_index||0 : 0}"></div>
-        <div class="flex flex-col gap-2 pt-5">
-          <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="is_published" ${!v || v.is_published ? 'checked' : ''} class="accent-brand-500"> Published</label>
-          <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="is_featured" ${v?.is_featured ? 'checked' : ''} class="accent-brand-500"> Featured</label>
-        </div>
-      </div>
-      <div class="flex justify-end gap-3 pt-2"><button type="button" onclick="closeModal()" class="btn-secondary">Kansal</button><button type="submit" class="btn-primary">${v ? 'Keydi' : 'Ku Dar'}</button></div>
-    </form>
-  `);
-  $('#videoForm').onsubmit = async (e) => {
-    e.preventDefault(); const f = e.target; const d = { title: f.title.value, url: f.url.value, video_type: f.video_type.value, category_id: f.category_id.value || null, thumbnail: f.thumbnail.value, description: f.description.value, duration: f.duration.value, order_index: parseInt(f.order_index.value)||0, is_published: f.is_published.checked, is_featured: f.is_featured.checked };
-    try { if (v) await api(`/api/v1/admin/videos/${id}`, { method: 'PUT', body: JSON.stringify(d) }); else await api('/api/v1/admin/videos', { method: 'POST', body: JSON.stringify(d) }); toast(v ? 'Waa la keydiyay!' : 'Waa lagu daray!', 'success'); closeModal(); loadAdminTab(); } catch (err) { toast(err.message, 'error'); }
-  };
-}
-
-/* ═══ ADMIN AUDIO ═══ */
-async function adminAudio(c) {
-  const audio = await api('/api/v1/admin/audio');
-  c.innerHTML = `
-  <div class="flex items-center justify-between mb-6"><h2 class="text-2xl font-bold">Heesaha</h2><button onclick="audioModal()" class="btn-primary btn-sm"><span class="iconify" data-icon="mdi:plus"></span> Cusub</button></div>
-  <div class="glass rounded-xl overflow-hidden overflow-x-auto"><table class="w-full text-sm min-w-[600px]"><thead><tr class="border-b border-surface-700/50 text-left text-surface-400 text-xs uppercase tracking-wider"><th class="p-3">Title</th><th class="p-3">Artist</th><th class="p-3">Nooca</th><th class="p-3 text-center">Published</th><th class="p-3 text-right">Views</th><th class="p-3 text-right">Ficil</th></tr></thead>
-  <tbody>${audio.map(a => `<tr class="border-b border-surface-700/30 hover:bg-surface-800/30"><td class="p-3"><div class="flex items-center gap-3"><img src="${coverUrl(a)}" class="w-10 h-10 rounded object-cover flex-shrink-0"><span class="font-medium text-surface-200">${esc(a.title)}</span></div></td><td class="p-3 text-surface-400">${esc(a.artist)}</td><td class="p-3"><span class="badge badge-amber">${esc(a.audio_type||'mp3')}</span></td><td class="p-3 text-center">${a.is_published?'<span class="badge badge-emerald">Haa</span>':'<span class="badge badge-red">Maya</span>'}</td><td class="p-3 text-right text-surface-400">${fmtViews(a.views)}</td><td class="p-3 text-right"><div class="flex justify-end gap-1"><button onclick="audioModal('${a.id}')" class="btn-secondary btn-sm"><span class="iconify" data-icon="mdi:pencil"></span></button><button onclick="deleteItem('audio','${a.id}')" class="btn-danger btn-sm"><span class="iconify" data-icon="mdi:delete"></span></button></div></td></tr>`).join('')}</tbody></table></div>
-  ${!audio.length ? '<p class="text-center text-surface-500 py-8">Wali hees ma jiro</p>' : ''}`;
-  window._adminAudio = audio;
-}
-
-function audioModal(id) {
-  const a = id ? window._adminAudio.find(x => x.id === id) : null;
-  openModal(`
-    <h3 class="text-lg font-bold mb-6">${a ? 'Wax ka bedel' : 'Hees Cusub'}</h3>
-    <form id="audioForm" class="space-y-4">
-      <div class="grid grid-cols-2 gap-4">
-        <div><label class="block text-sm font-medium text-surface-300 mb-1">Title *</label><input name="title" class="input-field" value="${a?esc(a.title):''}" required></div>
-        <div><label class="block text-sm font-medium text-surface-300 mb-1">Artist *</label><input name="artist" class="input-field" value="${a?esc(a.artist||''):''}"></div>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div><label class="block text-sm font-medium text-surface-300 mb-1">URL *</label><input name="url" class="input-field" value="${a?esc(a.url):''}" required></div>
-        <div><label class="block text-sm font-medium text-surface-300 mb-1">Nooca</label><select name="audio_type" class="input-field"><option value="mp3" ${a?.audio_type==='mp3'?'selected':''}>MP3</option><option value="ogg" ${a?.audio_type==='ogg'?'selected':''}>OGG</option><option value="wav" ${a?.audio_type==='wav'?'selected':''}>WAV</option><option value="m4a" ${a?.audio_type==='m4a'?'selected':''}>M4A</option></select></div>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div><label class="block text-sm font-medium text-surface-300 mb-1">Cover URL</label><input name="cover_url" class="input-field" value="${a?esc(a.cover_url||''):''}"></div>
-        <div><label class="block text-sm font-medium text-surface-300 mb-1">Category</label><input name="category" class="input-field" value="${a?esc(a.category||''):''}"></div>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div><label class="block text-sm font-medium text-surface-300 mb-1">Duration</label><input name="duration" class="input-field" value="${a?esc(a.duration||'0:00'):'0:00'}"></div>
-        <div><label class="block text-sm font-medium text-surface-300 mb-1">Website URL</label><input name="website_url" class="input-field" value="${a?esc(a.website_url||''):''}"></div>
-      </div>
-      <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="is_published" ${!a||a.is_published?'checked':''} class="accent-brand-500"> Published</label>
-      <div class="flex justify-end gap-3 pt-2"><button type="button" onclick="closeModal()" class="btn-secondary">Kansal</button><button type="submit" class="btn-primary">${a?'Keydi':'Ku Dar'}</button></div>
-    </form>`);
-  $('#audioForm').onsubmit = async (e) => {
-    e.preventDefault(); const f = e.target; const d = { title: f.title.value, artist: f.artist.value, url: f.url.value, audio_type: f.audio_type.value, cover_url: f.cover_url.value, category: f.category.value, duration: f.duration.value, website_url: f.website_url.value, is_published: f.is_published.checked };
-    try { if (a) await api(`/api/v1/admin/audio/${id}`, { method: 'PUT', body: JSON.stringify(d) }); else await api('/api/v1/admin/audio', { method: 'POST', body: JSON.stringify(d) }); toast(a?'Waa la keydiyay!':'Waa lagu daray!','success'); closeModal(); loadAdminTab(); } catch(err) { toast(err.message,'error'); }
-  };
-}
-
-/* ═══ ADMIN POSTS ═══ */
-async function adminPosts(c) {
-  const posts = await api('/api/v1/admin/posts');
-  c.innerHTML = `
-  <div class="flex items-center justify-between mb-6"><h2 class="text-2xl font-bold">Qoraallada</h2><button onclick="postModal()" class="btn-primary btn-sm"><span class="iconify" data-icon="mdi:plus"></span> Cusub</button></div>
-  <div class="glass rounded-xl overflow-hidden overflow-x-auto"><table class="w-full text-sm min-w-[500px]"><thead><tr class="border-b border-surface-700/50 text-left text-surface-400 text-xs uppercase tracking-wider"><th class="p-3">Title</th><th class="p-3">Author</th><th class="p-3 text-center">Published</th><th class="p-3 text-right">Views</th><th class="p-3 text-right">Ficil</th></tr></thead>
-  <tbody>${posts.map(p=>`<tr class="border-b border-surface-700/30 hover:bg-surface-800/30"><td class="p-3 text-surface-200 font-medium">${esc(p.title)}</td><td class="p-3 text-surface-400">${esc(p.author||'—')}</td><td class="p-3 text-center">${p.is_published?'<span class="badge badge-emerald">Haa</span>':'<span class="badge badge-red">Maya</span>'}</td><td class="p-3 text-right text-surface-400">${fmtViews(p.views)}</td><td class="p-3 text-right"><div class="flex justify-end gap-1"><button onclick="postModal('${p.id}')" class="btn-secondary btn-sm"><span class="iconify" data-icon="mdi:pencil"></span></button><button onclick="deleteItem('posts','${p.id}')" class="btn-danger btn-sm"><span class="iconify" data-icon="mdi:delete"></span></button></div></td></tr>`).join('')}</tbody></table></div>`;
-  window._adminPosts = posts;
-}
-
-function postModal(id) {
-  const p = id ? window._adminPosts.find(x => x.id === id) : null;
-  openModal(`
-    <h3 class="text-lg font-bold mb-6">${p?'Wax ka bedel':'Qoraal Cusub'}</h3>
-    <form id="postForm" class="space-y-4">
-      <div><label class="block text-sm font-medium text-surface-300 mb-1">Title *</label><input name="title" class="input-field" value="${p?esc(p.title):''}" required></div>
-      <div class="grid grid-cols-2 gap-4">
-        <div><label class="block text-sm font-medium text-surface-300 mb-1">Author</label><input name="author" class="input-field" value="${p?esc(p.author||''):''}"></div>
-        <div><label class="block text-sm font-medium text-surface-300 mb-1">Image URL</label><input name="image_url" class="input-field" value="${p?esc(p.image_url||''):''}"></div>
-      </div>
-      <div><label class="block text-sm font-medium text-surface-300 mb-1">Content *</label><textarea name="content" class="input-field" rows="8" required>${p?esc(p.content||''):''}</textarea></div>
-      <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="is_published" ${!p||p.is_published?'checked':''} class="accent-brand-500"> Published</label>
-      <div class="flex justify-end gap-3 pt-2"><button type="button" onclick="closeModal()" class="btn-secondary">Kansal</button><button type="submit" class="btn-primary">${p?'Keydi':'Ku Dar'}</button></div>
-    </form>`);
-  $('#postForm').onsubmit = async(e)=>{
-    e.preventDefault();const f=e.target;const d={title:f.title.value,content:f.content.value,author:f.author.value,image_url:f.image_url.value,is_published:f.is_published.checked};
-    try{if(p)await api(`/api/v1/admin/posts/${id}`,{method:'PUT',body:JSON.stringify(d)});else await api('/api/v1/admin/posts',{method:'POST',body:JSON.stringify(d)});toast(p?'Waa la keydiyay!':'Waa lagu daray!','success');closeModal();loadAdminTab();}catch(err){toast(err.message,'error');}
-  };
-}
-
-/* ═══ ADMIN CATEGORIES ═══ */
-async function adminCategories(c) {
-  const cats = await api('/api/v1/admin/categories');
-  c.innerHTML = `
-  <div class="flex items-center justify-between mb-6"><h2 class="text-2xl font-bold">Qaybaha</h2><button onclick="catModal()" class="btn-primary btn-sm"><span class="iconify" data-icon="mdi:plus"></span> Cusub</button></div>
-  <div class="glass rounded-xl overflow-hidden"><table class="w-full text-sm"><thead><tr class="border-b border-surface-700/50 text-left text-surface-400 text-xs uppercase tracking-wider"><th class="p-3">Magaca</th><th class="p-3">Icon</th><th class="p-3 text-center">Order</th><th class="p-3 text-center">Active</th><th class="p-3 text-right">Ficil</th></tr></thead>
-  <tbody>${cats.map(ct=>`<tr class="border-b border-surface-700/30 hover:bg-surface-800/30"><td class="p-3 text-surface-200 font-medium">${esc(ct.name)}</td><td class="p-3 text-surface-400"><span class="iconify" data-icon="${ct.icon||'mdi:folder'}"></span></td><td class="p-3 text-center text-surface-400">${ct.order_index||0}</td><td class="p-3 text-center">${ct.is_active?'<span class="badge badge-emerald">Haa</span>':'<span class="badge badge-red">Maya</span>'}</td><td class="p-3 text-right"><div class="flex justify-end gap-1"><button onclick="catModal('${ct.id}')" class="btn-secondary btn-sm"><span class="iconify" data-icon="mdi:pencil"></span></button><button onclick="deleteItem('categories','${ct.id}')" class="btn-danger btn-sm"><span class="iconify" data-icon="mdi:delete"></span></button></div></td></tr>`).join('')}</tbody></table></div>`;
-  window._adminCats = cats; S.categories = cats;
-}
-
-function catModal(id) {
-  const ct = id ? window._adminCats.find(x => x.id === id) : null;
-  openModal(`
-    <h3 class="text-lg font-bold mb-6">${ct?'Wax ka bedel':'Qayb Cusub'}</h3>
-    <form id="catForm" class="space-y-4">
-      <div><label class="block text-sm font-medium text-surface-300 mb-1">Magaca *</label><input name="name" class="input-field" value="${ct?esc(ct.name):''}" required></div>
-      <div><label class="block text-sm font-medium text-surface-300 mb-1">Sharaxaad</label><textarea name="description" class="input-field" rows="2">${ct?esc(ct.description||''):''}</textarea></div>
-      <div class="grid grid-cols-2 gap-4">
-        <div><label class="block text-sm font-medium text-surface-300 mb-1">Icon</label><input name="icon" class="input-field" value="${ct?esc(ct.icon||'mdi:folder'):'mdi:folder'}" placeholder="mdi:folder"></div>
-        <div><label class="block text-sm font-medium text-surface-300 mb-1">Order</label><input name="order_index" type="number" class="input-field" value="${ct?ct.order_index||0:0}"></div>
-      </div>
-      <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="is_active" ${!ct||ct.is_active?'checked':''} class="accent-brand-500"> Active</label>
-      <div class="flex justify-end gap-3 pt-2"><button type="button" onclick="closeModal()" class="btn-secondary">Kansal</button><button type="submit" class="btn-primary">${ct?'Keydi':'Ku Dar'}</button></div>
-    </form>`);
-  $('#catForm').onsubmit = async(e)=>{
-    e.preventDefault();const f=e.target;const d={name:f.name.value,description:f.description.value,icon:f.icon.value,order_index:parseInt(f.order_index.value)||0,is_active:f.is_active.checked};
-    try{if(ct)await api(`/api/v1/admin/categories/${id}`,{method:'PUT',body:JSON.stringify(d)});else await api('/api/v1/admin/categories',{method:'POST',body:JSON.stringify(d)});toast(ct?'Waa la keydiyay!':'Waa lagu daray!','success');closeModal();loadAdminTab();}catch(err){toast(err.message,'error');}
-  };
-}
-
-/* ═══ ADMIN CONTACTS ═══ */
-async function adminContacts(c) {
-  const contacts = await api('/api/v1/admin/contacts');
-  c.innerHTML = `
-  <h2 class="text-2xl font-bold mb-6">Fariimaha</h2>
-  ${contacts.length ? `<div class="space-y-3">${contacts.map(ct => `
-  <div class="glass rounded-xl p-5 ${!ct.is_read ? 'border-l-4 border-brand-500' : ''}">
-    <div class="flex items-start justify-between gap-4">
-      <div class="min-w-0 flex-1">
-        <div class="flex items-center gap-2 flex-wrap mb-1">
-          <span class="font-semibold text-surface-200">${esc(ct.alias_name)}</span>
-          ${ct.message_type ? `<span class="badge badge-indigo">${esc(ct.message_type)}</span>` : ''}
-          ${!ct.is_read ? '<span class="badge badge-amber">Cusub</span>' : ''}
-          <span class="text-xs text-surface-600">${fmtDate(ct.created_at)}</span>
-        </div>
-        ${ct.contact_method ? `<p class="text-xs text-surface-500 mb-2">Xiriir: ${esc(ct.contact_method)}</p>` : ''}
-        <p class="text-sm text-surface-300 whitespace-pre-wrap">${esc(ct.message)}</p>
-        ${ct.admin_response ? `<div class="mt-3 p-3 rounded-lg bg-brand-500/5 border border-brand-500/10"><p class="text-xs text-surface-500 mb-1">Jawaabta Maamulka:</p><p class="text-sm text-surface-300">${esc(ct.admin_response)}</p></div>` : ''}
-      </div>
-      <div class="flex flex-col gap-1 flex-shrink-0">
-        ${!ct.is_read ? `<button onclick="markContactRead('${ct.id}')" class="btn-secondary btn-sm"><span class="iconify" data-icon="mdi:check"></span></button>` : ''}
-        <button onclick="respondContact('${ct.id}')" class="btn-secondary btn-sm"><span class="iconify" data-icon="mdi:reply"></span></button>
-        <button onclick="deleteItem('contacts','${ct.id}')" class="btn-danger btn-sm"><span class="iconify" data-icon="mdi:delete"></span></button>
-      </div>
-    </div>
-  </div>`).join('')}</div>` : '<p class="text-center text-surface-500 py-8">Wali fariin ma jiro</p>'}`;
-  window._adminContacts = contacts;
-}
-
-async function markContactRead(id) {
-  try { await api(`/api/v1/admin/contacts/${id}`, { method: 'PUT', body: JSON.stringify({ is_read: true }) }); loadAdminTab(); } catch (e) { toast(e.message, 'error'); }
-}
-
-function respondContact(id) {
-  openModal(`
-    <h3 class="text-lg font-bold mb-4">Jawaab</h3>
-    <textarea id="adminResponse" class="input-field mb-4" rows="4" placeholder="Qor jawaabtaada…"></textarea>
-    <div class="flex justify-end gap-3"><button onclick="closeModal()" class="btn-secondary">Kansal</button><button onclick="sendResponse('${id}')" class="btn-primary">Dir</button></div>`);
-}
-
-async function sendResponse(id) {
-  const resp = $('#adminResponse').value;
-  if (!resp) return;
-  try { await api(`/api/v1/admin/contacts/${id}`, { method: 'PUT', body: JSON.stringify({ admin_response: resp, is_read: true }) }); toast('Jawaabta waa la diray!', 'success'); closeModal(); loadAdminTab(); } catch (e) { toast(e.message, 'error'); }
-}
-
-/* ═══ ADMIN SETTINGS ═══ */
-async function adminSettings(c) {
-  await loadSettings();
-  const s = S.settings;
-  c.innerHTML = `
-  <h2 class="text-2xl font-bold mb-6">Settings</h2>
-  <form id="settingsForm" class="glass rounded-2xl p-6 space-y-4 max-w-xl">
-    <div><label class="block text-sm font-medium text-surface-300 mb-1">Site Name</label><input name="site_name" class="input-field" value="${esc(s.site_name || 'Maxaas.u')}"></div>
-    <div><label class="block text-sm font-medium text-surface-300 mb-1">Description</label><textarea name="site_description" class="input-field" rows="2">${esc(s.site_description || '')}</textarea></div>
-    <div><label class="block text-sm font-medium text-surface-300 mb-1">Hero Title</label><input name="hero_title" class="input-field" value="${esc(s.hero_title || '')}"></div>
-    <div><label class="block text-sm font-medium text-surface-300 mb-1">Hero Subtitle</label><input name="hero_subtitle" class="input-field" value="${esc(s.hero_subtitle || '')}"></div>
-    <button type="submit" class="btn-primary"><span class="iconify" data-icon="mdi:content-save"></span> Keydi</button>
-  </form>`;
-  $('#settingsForm').onsubmit = async (e) => {
-    e.preventDefault(); const f = e.target; const d = {};
-    ['site_name','site_description','hero_title','hero_subtitle'].forEach(k => d[k] = f[k].value);
-    try { await api('/api/v1/admin/settings', { method: 'PUT', body: JSON.stringify(d) }); toast('Settings waa la keydiyay!', 'success'); } catch (e) { toast(e.message, 'error'); }
-  };
-}
-
-/* ═══ ADMIN CREDENTIALS ═══ */
-function adminCredentials(c) {
-  c.innerHTML = `
-  <h2 class="text-2xl font-bold mb-6">Xirfadeeynta</h2>
-  <div class="glass rounded-2xl p-6 max-w-md space-y-4">
-    <p class="text-sm text-surface-400 mb-2">Wax ka bedel magacaaga, furaha, ama PIN-ka.</p>
-    <form id="credForm" class="space-y-4">
-      <div><label class="block text-sm font-medium text-surface-300 mb-1">PIN-ka Hadda *</label><input name="pin" class="input-field" placeholder="8 xaraf" maxlength="8" required></div>
-      <div class="line-gradient"></div>
-      <div><label class="block text-sm font-medium text-surface-300 mb-1">Magac Cusub</label><input name="new_username" class="input-field" placeholder="Khaatiif ah"></div>
-      <div><label class="block text-sm font-medium text-surface-300 mb-1">Furaha Cusub (8+ xaraf)</label><input name="new_password" type="password" class="input-field" placeholder="Khaatiif ah"></div>
-      <div><label class="block text-sm font-medium text-surface-300 mb-1">PIN Cusub (8 xaraf)</label><input name="new_pin" class="input-field" placeholder="Khaatiif ah" maxlength="8"></div>
-      <button type="submit" class="btn-primary"><span class="iconify" data-icon="mdi:content-save"></span> Keydi</button>
-    </form>
-  </div>`;
-  $('#credForm').onsubmit = async (e) => {
-    e.preventDefault(); const f = e.target;
-    const d = { pin: f.pin.value };
-    if (f.new_username.value) d.new_username = f.new_username.value;
-    if (f.new_password.value) d.new_password = f.new_password.value;
-    if (f.new_pin.value) d.new_pin = f.new_pin.value;
-    try { await api('/api/v1/admin/credentials', { method: 'PUT', body: JSON.stringify(d) }); toast('Xirfadeeynta waa la cusbooneysiiyay!', 'success'); f.reset(); } catch (e) { toast(e.message, 'error'); }
-  };
-}
-
-/* ═══ DELETE ═══ */
-async function deleteItem(type, id) {
-  if (!confirm('Ma hubtaa inaad tirtirto?')) return;
-  const endpoints = { videos: 'videos', audio: 'audio', posts: 'posts', categories: 'categories', contacts: 'contacts' };
-  try { await api(`/api/v1/admin/${endpoints[type]}/${id}`, { method: 'DELETE' }); toast('Waa la tirtiray!', 'success'); loadAdminTab(); } catch (e) { toast(e.message, 'error'); }
-}
-
-async function adminLogout() {
-  try { await api('/api/v1/auth/logout', { method: 'POST' }); } catch {}
-  S.admin = null;
-  toast('Waad ka baxday', 'success');
-  renderAdminLogin();
-}
-
-/* ═══ MODAL ═══ */
-function openModal(html) { $('#modalBox').innerHTML = html; $('#modalOverlay').classList.add('show'); }
-function closeModal() { $('#modalOverlay').classList.remove('show'); }
- $('#modalOverlay').onclick = (e) => { if (e.target === $('#modalOverlay')) closeModal(); };
-
-/* ═══ INIT ═══ */
-window.addEventListener('hashchange', router);
-window.addEventListener('DOMContentLoaded', () => {
-  router();
-  // Preload categories
-  loadCategories();
-});
 </script>
 </body>
 </html>
