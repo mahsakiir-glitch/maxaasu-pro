@@ -40,7 +40,13 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false,
   xFrameOptions: { action: 'deny' }
 }));
-app.use(cors({ origin: FRONTEND_URL, credentials: true }));
+app.use(cors({
+  origin: function (origin, callback) {
+    // Wuxuu ogolaanayaa dhammaan domains (maxaas.u, IPFS, Pinata) si fudud
+    callback(null, true);
+  },
+  credentials: true
+}));
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 
@@ -139,7 +145,7 @@ app.post('/api/v1/auth/logout', (req, res) => {
    ══════════════════════════════════════ */
 
 // Step 1: Request a temporary stream token
-app.post('/api/v1/videos/request-stream/:videoId', auth, streamLimiter, async (req, res) => {
+app.post('/api/v1/videos/request-stream/:videoId', streamLimiter, async (req, res) => {
   try {
     const { videoId } = req.params;
     const { data: v } = await supabase.from('videos').select('*').eq('id', videoId).single();
