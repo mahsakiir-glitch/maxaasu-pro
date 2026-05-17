@@ -299,7 +299,11 @@ function pV(c){var vid=S.pm.vid;if(!vid){go('home');return}var video=S.V.find(fu
     for(var i=0;i<others.length;i++){var ov=others[i];sh+='<div class="sv-item" onclick="go(\'video\',{vid:\''+ov.id+'\'})"><div class="sv-thumb"><img src="'+gTh(ov)+'" loading="lazy"><span class="sv-dur">'+es(ov.duration||'0:00')+'</span></div><div class="sv-info"><h4>'+es(ov.title)+'</h4><p>'+fN(ov.views)+' views</p></div></div>';}
     document.querySelector('.watch-sidebar').innerHTML=sh;
 
-  }).catch(function(e){ tk('Stream failed: '+e.message,'e'); });
+  }).catch(function(e){ 
+    tk('Stream failed: '+e.message,'e'); 
+    var playerDiv = document.getElementById('watchPlayer');
+    if(playerDiv) playerDiv.innerHTML='<div style="text-align:center;padding-top:30vh;color:#dc3c3c"><i class="fa-solid fa-triangle-exclamation" style="font-size:3rem;display:block;margin-bottom:10px"></i><h3 style="font-family:var(--fd)">Video-gu ma shaqeynayo</h3><p style="color:var(--mt);font-size:.9rem">'+es(e.message)+'</p></div>';
+  });
 }
 
 function toggleLike(vid){S._likes[vid]=!S._likes[vid];localStorage.setItem('mx_lk',JSON.stringify(S._likes));var btn=document.getElementById('likeBtn');var cnt=document.getElementById('likeCount');if(!btn||!cnt)return;var video=S.V.find(function(v){return v.id===vid});var base=video?Math.floor((video.views||0)*0.1):0;if(S._likes[vid]){btn.classList.add('liked');cnt.textContent=fN(base+1)}else{btn.classList.remove('liked');cnt.textContent=fN(base)}}
