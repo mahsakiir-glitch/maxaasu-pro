@@ -40,13 +40,7 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false,
   xFrameOptions: { action: 'deny' }
 }));
-app.use(cors({
-  origin: function (origin, callback) {
-    // Wuxuu ogolaanayaa dhammaan domains (maxaas.u, IPFS, Pinata) si fudud
-    callback(null, true);
-  },
-  credentials: true
-}));
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 
@@ -188,9 +182,15 @@ app.get('/api/v1/stream/:token', streamLimiter, async (req, res) => {
 
     if (!realUrl) return res.status(404).json({ error: 'No source URL' });
 
+    // 15-second timeout si video-gu aanu wareegin haddii server-ka la xiro
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    
     const response = await fetch(realUrl, {
-      headers: { Range: req.headers.range || '' }
+      headers: { Range: req.headers.range || '' },
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
 
     res.setHeader('Content-Type', response.headers.get('content-type') || 'video/mp4');
     if (response.headers.has('content-length')) res.setHeader('Content-Length', response.headers.get('content-length'));
