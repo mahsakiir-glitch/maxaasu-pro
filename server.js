@@ -12,6 +12,7 @@ const crypto = require('crypto');
 const httpsReq = require('https');
 const httpReq = require('http');
 const { URL } = require('url');
+const ExpressBrute = require('express-brute'); // npm i express-brute
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,11 +34,28 @@ try {
 const viewedTokens = new Set();
 setInterval(() => viewedTokens.clear(), 300000);
 
-/* ═══ CSP DISABLED for inline scripts ═══ */
-app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
+/* ═══ 1. PRODUCTION GRADE SECURITY HEADERS ═══ */
+app.use(helmet({
+  contentSecurityPolicy: false, // Keep false if using inline scripts, or define strict CSP
+  crossOriginEmbedderPolicy: false,
+  hsts: { maxAge: 31536000, includeSubDomains: true, preload: true }, // Force HTTPS
+  referrerPolicy: { policy: 'no-referrer' } // Hide referrer to prevent URL leakage
+}));
+
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: '2mb' }));
 app.use(cookieParser());
+
+/* ═══ 2. ANTI-BOT & BRUTE FORCE PROTECTION ═══ */
+const bruteStore = new ExpressBrute.MemoryStore();
+const bruteForce = new ExpressBrute(bruteStore, {
+  freeRetries: 3,
+  minWait: 5000,
+  maxWait: 60000,
+  failCallback: (req, res, next, date) => {
+    res.status(429).json({ error: 'Too many attempts. Temporary block applied.' });
+  }
+});
 
 const globalLimiter = rateLimit({ windowMs: 60000, max: 300, trustProxy: true });
 const authLimiter = rateLimit({ windowMs: 900000, max: 8, trustProxy: true, skipSuccessfulRequests: true });
@@ -99,14 +117,6 @@ setupAdmin();
 
 /* ═══════════════════════════════════════════════════════
    STREAM PROXY FUNCTION
-   
-   Follows redirects, supports range requests (seeking),
-   sets proper headers so browser can play the media.
-   
-   This fixes:
-   - archive.gnews.to links (they redirect, CORS blocks direct)
-   - Any HTTPS source with CORS restrictions
-   - Range requests for video/audio seeking
    ═══════════════════════════════════════════════════════ */
 function proxyUrl(urlStr, req, res, maxRedirects) {
   if (maxRedirects === undefined) maxRedirects = 8;
@@ -130,7 +140,6 @@ function proxyUrl(urlStr, req, res, maxRedirects) {
       'Connection': 'close'
     };
 
-    /* Forward range header for seeking */
     if (req.headers.range) {
       requestHeaders['Range'] = req.headers.range;
     }
@@ -144,18 +153,15 @@ function proxyUrl(urlStr, req, res, maxRedirects) {
     };
 
     const upstreamReq = mod.request(options, (upstreamRes) => {
-      /* Handle redirects (301, 302, 303, 307, 308) */
       if (upstreamRes.statusCode >= 300 && upstreamRes.statusCode < 400 && upstreamRes.headers.location) {
         let location = upstreamRes.headers.location;
 
-        /* Resolve relative redirects */
         if (location.startsWith('/')) {
           location = parsedUrl.protocol + '//' + parsedUrl.host + location;
         } else if (!location.startsWith('http')) {
           location = new URL(location, urlStr).href;
         }
 
-        /* Consume response body to free up connection */
         upstreamRes.resume();
 
         return proxyUrl(location, req, res, maxRedirects - 1)
@@ -163,7 +169,6 @@ function proxyUrl(urlStr, req, res, maxRedirects) {
           .catch(reject);
       }
 
-      /* Error responses */
       if (upstreamRes.statusCode >= 400) {
         upstreamRes.resume();
         if (!res.headersSent) {
@@ -173,11 +178,9 @@ function proxyUrl(urlStr, req, res, maxRedirects) {
         return resolve();
       }
 
-      /* Stream the response to client */
       if (!res.headersSent) {
         res.status(upstreamRes.statusCode);
 
-        /* Forward important headers */
         const forwardHeaders = [
           'content-type', 'content-length', 'content-range',
           'accept-ranges', 'content-disposition', 'cache-control',
@@ -191,13 +194,11 @@ function proxyUrl(urlStr, req, res, maxRedirects) {
           }
         });
 
-        /* CORS header for direct browser access */
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Headers', 'Range');
         res.setHeader('Access-Control-Expose-Headers', 'Content-Range, Content-Length, Content-Disposition');
       }
 
-      /* Pipe upstream response to client */
       upstreamRes.pipe(res);
 
       upstreamRes.on('end', () => {
@@ -239,9 +240,9 @@ function proxyUrl(urlStr, req, res, maxRedirects) {
 }
 
 /* ═══════════════════════════════════════════════════════
-   AUTH ROUTES
+   AUTH ROUTES (With Anti-Brute Force Protection)
    ═══════════════════════════════════════════════════════ */
-app.post('/api/v1/auth/check-pin', pinLimiter, async (req, res) => {
+app.post('/api/v1/auth/check-pin', pinLimiter, bruteForce.prevent, async (req, res) => {
   try {
     var { username, pin } = req.body;
     if (!username || !pin || pin.length !== 8) return res.json({ valid: false });
@@ -252,7 +253,7 @@ app.post('/api/v1/auth/check-pin', pinLimiter, async (req, res) => {
   }
 });
 
-app.post('/api/v1/auth/login', authLimiter, async (req, res) => {
+app.post('/api/v1/auth/login', authLimiter, bruteForce.prevent, async (req, res) => {
   try {
     var { username, password, pin } = req.body;
     if (!username || !password || !pin) return res.status(400).json({ error: 'Missing fields' });
@@ -277,35 +278,39 @@ app.post('/api/v1/auth/logout', (req, res) => {
 });
 
 /* ═══════════════════════════════════════════════════════
-   STREAM TOKEN — VIDEO
+   3. ENHANCED STREAM TOKEN GENERATOR (VIDEO)
    ═══════════════════════════════════════════════════════ */
 app.post('/api/v1/videos/request-stream/:videoId', streamLimiter, async (req, res) => {
   try {
     const { videoId } = req.params;
     if (!videoId || videoId.length > 100) return res.status(400).json({ error: 'Invalid ID' });
+    
     const { data: v, error } = await supabase.from('videos').select('*').eq('id', videoId).single();
-    if (error || !v) return res.status(404).json({ error: 'Not found' });
-    if (!v.is_published) return res.status(403).json({ error: 'Unavailable' });
+    if (error || !v || !v.is_published) return res.status(404).json({ error: 'Not found' });
 
     const yid = extractYoutubeId(v.url);
-
-    /* YouTube: return embed URL (no proxy needed, iframe handles it) */
     if (v.video_type === 'youtube' || yid) {
-      if (yid) {
-        return res.json({
-          streamToken: null,
-          youtubeUrl: 'https://www.youtube-nocookie.com/embed/' + yid + '?autoplay=1&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3',
-          type: 'youtube',
-          youtubeId: yid
-        });
-      }
+      return res.json({ 
+        streamToken: null,
+        youtubeUrl: 'https://www.youtube-nocookie.com/embed/' + yid + '?autoplay=1&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3',
+        type: 'youtube', 
+        youtubeId: yid 
+      });
     }
 
-    /* Everything else: issue a stream token for proxy */
+    // Create a unique user fingerprint using IP and User-Agent
+    const userFingerprint = crypto.createHash('sha256').update(req.ip + (req.headers['user-agent'] || '')).digest('hex');
+
     const streamToken = jwt.sign(
-      { videoId: v.id, type: v.video_type || 'mp4', media: 'video', ip: req.ip, uid: crypto.randomBytes(6).toString('hex') },
+      { 
+        videoId: v.id, 
+        type: v.video_type || 'mp4', 
+        media: 'video', 
+        fp: userFingerprint, // Fingerprint binding
+        uid: crypto.randomBytes(8).toString('hex') 
+      },
       STREAM_SECRET,
-      { expiresIn: '300s' }
+      { expiresIn: '120s' } // Reduced to 2 minutes for security
     );
     res.json({ streamToken, type: v.video_type || 'mp4' });
   } catch (e) {
@@ -314,20 +319,27 @@ app.post('/api/v1/videos/request-stream/:videoId', streamLimiter, async (req, re
 });
 
 /* ═══════════════════════════════════════════════════════
-   STREAM TOKEN — AUDIO
+   STREAM TOKEN — AUDIO (Updated for Fingerprint Consistency)
    ═══════════════════════════════════════════════════════ */
 app.post('/api/v1/audio/request-stream/:audioId', streamLimiter, async (req, res) => {
   try {
     const { audioId } = req.params;
     if (!audioId || audioId.length > 100) return res.status(400).json({ error: 'Invalid ID' });
     const { data: a, error } = await supabase.from('audio_tracks').select('*').eq('id', audioId).single();
-    if (error || !a) return res.status(404).json({ error: 'Not found' });
-    if (!a.is_published) return res.status(403).json({ error: 'Unavailable' });
+    if (error || !a || !a.is_published) return res.status(404).json({ error: 'Not found' });
+
+    const userFingerprint = crypto.createHash('sha256').update(req.ip + (req.headers['user-agent'] || '')).digest('hex');
 
     const streamToken = jwt.sign(
-      { audioId: a.id, type: a.audio_type || 'mp3', media: 'audio', ip: req.ip, uid: crypto.randomBytes(6).toString('hex') },
+      { 
+        audioId: a.id, 
+        type: a.audio_type || 'mp3', 
+        media: 'audio', 
+        fp: userFingerprint, // Fingerprint binding
+        uid: crypto.randomBytes(8).toString('hex') 
+      },
       STREAM_SECRET,
-      { expiresIn: '300s' }
+      { expiresIn: '120s' }
     );
     res.json({ streamToken, type: a.audio_type || 'mp3' });
   } catch (e) {
@@ -336,73 +348,50 @@ app.post('/api/v1/audio/request-stream/:audioId', streamLimiter, async (req, res
 });
 
 /* ═══════════════════════════════════════════════════════
-   STREAM ENDPOINT — PROXY (not redirect!)
-   
-   Why proxy instead of redirect:
-   - archive.gnews.to redirects multiple times → CORS blocks browser
-   - Some CDNs reject requests without proper User-Agent
-   - Range requests (seeking) need proper header forwarding
-   - Keeps real URL hidden from client
-   
-   Flow:
-   1. Verify JWT token
-   2. Check IP binding
-   3. Fetch media from database
-   4. Count view (once per token)
-   5. Resolve real URL
-   6. Proxy the media stream to client
+   4. ENHANCED STREAM PROXY VALIDATION
    ═══════════════════════════════════════════════════════ */
 app.get('/api/v1/stream/:token', streamLimiter, async (req, res) => {
   try {
-    const { token } = req.params;
-
-    /* Verify token */
     let decoded;
     try {
-      decoded = jwt.verify(token, STREAM_SECRET);
+      decoded = jwt.verify(req.params.token, STREAM_SECRET);
     } catch (err) {
-      return res.status(403).json({
-        error: err.name === 'TokenExpiredError' ? 'Token expired' : 'Invalid token'
-      });
+      return res.status(403).json({ error: 'Token invalid or expired' });
     }
 
-    /* IP binding check */
-    if (decoded.ip && decoded.ip !== req.ip) {
-      return res.status(403).json({ error: 'IP mismatch' });
+    // Validate Fingerprint
+    const currentFingerprint = crypto.createHash('sha256').update(req.ip + (req.headers['user-agent'] || '')).digest('hex');
+    if (decoded.fp !== currentFingerprint) {
+      return res.status(403).json({ error: 'Session mismatch' });
     }
 
-    /* Determine table and ID */
     const isVideo = decoded.media === 'video';
     const id = isVideo ? decoded.videoId : decoded.audioId;
     const table = isVideo ? 'videos' : 'audio_tracks';
 
-    /* Fetch from database */
     const { data: v } = await supabase.from(table).select('*').eq('id', id).single();
     if (!v) return res.status(404).json({ error: 'Not found' });
 
-    /* View counting — once per token */
-    const vk = 'v_' + token;
+    const vk = 'v_' + req.params.token;
     if (!viewedTokens.has(vk)) {
       viewedTokens.add(vk);
       supabase.from(table).update({ views: (v.views || 0) + 1 }).eq('id', id).then(() => {}).catch(() => {});
     }
 
-    /* Resolve the real URL */
     let realUrl = resolveUrl(v.url, decoded.type);
     if (!realUrl) return res.status(404).json({ error: 'No source' });
 
-    /* PROXY the stream — this is the key change from redirect */
+    // Stream with strict headers
+    res.setHeader('X-Content-Type-Options', 'nosniff');
     await proxyUrl(realUrl, req, res);
 
   } catch (err) {
-    if (!res.headersSent) {
-      res.status(500).json({ error: 'Stream error' });
-    }
+    if (!res.headersSent) res.status(500).json({ error: 'Stream error' });
   }
 });
 
 /* ═══════════════════════════════════════════════════════
-   PUBLIC ROUTES (no url field exposed)
+   PUBLIC ROUTES
    ═══════════════════════════════════════════════════════ */
 app.get('/api/v1/videos', async (req, res) => {
   try {
@@ -811,6 +800,6 @@ app.listen(PORT, () => {
   console.log('  Maxaas.u Server Running');
   console.log('  Port: ' + PORT);
   console.log('  Mode: ' + (process.env.NODE_ENV || 'development'));
-  console.log('  Stream: Proxy (redirect replaced)');
+  console.log('  Stream: Proxy (Enhanced Security)');
   console.log('═══════════════════════════════════════');
 });
