@@ -17,9 +17,9 @@ app.set('trust proxy', 1);
 // ═══ SECRETS ═══
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
 const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || JWT_SECRET + '_admin';
-const STREAM_SECRET = process.env.STREAM_SECRET || JWT_SECRET + '_stream'; // Secret for video tokens
+const STREAM_SECRET = process.env.STREAM_SECRET || JWT_SECRET + '_stream';
 const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY; // SERVICE KEY BACKEND ONLY!
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://maxaas.u';
 
 let supabase;
@@ -38,33 +38,26 @@ setInterval(() => usedStreamTokens.clear(), 120000); // Clear used tokens every 
 app.use(helmet({ 
   contentSecurityPolicy: false, 
   crossOriginEmbedderPolicy: false,
-  xFrameOptions: { action: 'deny' } // Prevent iframe embedding (Clickjacking)
+  xFrameOptions: { action: 'deny' }
 }));
-app.use(cors({ origin: FRONTEND_URL, credentials: true })); // LOCKED TO maxaas.u
+app.use(cors({ origin: FRONTEND_URL, credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 
 // ═══ RATE LIMITERS ═══
 const globalLimiter = rateLimit({ windowMs: 60000, max: 300, trustProxy: true });
-const authLimiter = rateLimit({ windowMs: 900000, max: 10, trustProxy: true }); // 10 login attempts per 15 mins
-const streamLimiter = rateLimit({ windowMs: 60000, max: 30, trustProxy: true }); // 30 stream requests per min
+const authLimiter = rateLimit({ windowMs: 900000, max: 10, trustProxy: true });
+const streamLimiter = rateLimit({ windowMs: 60000, max: 30, trustProxy: true });
 
 app.use(globalLimiter);
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ═══ AUTH MIDDLEWARE (HTTPONLY COOKIE) ═══
+// ═══ AUTH MIDDLEWARE (HTTPONLY COOKIE - VPN FRIENDLY) ═══
 function auth(req, res, next) {
   const t = req.cookies?.token; 
   if (!t) return res.status(401).json({ error: 'Authentication required' });
   try {
-    const decoded = jwt.verify(t, ADMIN_JWT_SECRET);
-    // Session Fingerprinting (IP + User-Agent)
-    const currentFingerprint = crypto.createHash('sha256').update(req.ip + req.headers['user-agent']).digest('hex');
-    if (decoded.fp !== currentFingerprint) {
-      res.clearCookie('token');
-      return res.status(403).json({ error: 'Session changed. Re-login required.' });
-    }
-    req.admin = decoded;
+    req.admin = jwt.verify(t, ADMIN_JWT_SECRET);
     next();
   } catch {
     res.clearCookie('token');
@@ -124,11 +117,9 @@ app.post('/api/v1/auth/login', authLimiter, async (req, res) => {
       return res.status(401).json({ error: 'Invalid PIN' });
     }
     
-    // Create Session Fingerprint (IP + User-Agent)
-    const fingerprint = crypto.createHash('sha256').update(req.ip + req.headers['user-agent']).digest('hex');
-    const token = jwt.sign({ id: admin.id, username: admin.username, fp: fingerprint }, ADMIN_JWT_SECRET, { expiresIn: '24h' });
+    // Token WITHOUT IP fingerprint (VPN friendly)
+    const token = jwt.sign({ id: admin.id, username: admin.username }, ADMIN_JWT_SECRET, { expiresIn: '24h' });
     
-    // SET HTTPONLY COOKIE
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -147,54 +138,43 @@ app.post('/api/v1/auth/logout', (req, res) => {
    SECURE VIDEO STREAMING PROXY
    ══════════════════════════════════════ */
 
-// Step 1: Request a temporary stream token (Requires Admin Auth Cookie)
+// Step 1: Request a temporary stream token
 app.post('/api/v1/videos/request-stream/:videoId', auth, streamLimiter, async (req, res) => {
   try {
     const { videoId } = req.params;
     const { data: v } = await supabase.from('videos').select('*').eq('id', videoId).single();
     if (!v) return res.status(404).json({ error: 'Video not found' });
 
-    // Generate 60-second Signed Stream Token bound to IP and User-Agent
+    // 60s Token WITHOUT IP binding (VPN friendly)
     const streamToken = jwt.sign({
       videoId: v.id,
-      ip: req.ip,
-      ua: req.headers['user-agent'],
       type: v.video_type
-    }, STREAM_SECRET, { expiresIn: '60s' }); // EXPIRES IN 60 SECONDS!
+    }, STREAM_SECRET, { expiresIn: '60s' });
 
     res.json({ streamToken });
   } catch { res.status(500).json({ error: 'Failed to generate stream token' }); }
 });
 
-// Step 2: Stream the video using the token (No Auth Cookie needed so <video> tag can play it)
+// Step 2: Stream the video using the token
 app.get('/api/v1/stream/:token', streamLimiter, async (req, res) => {
   try {
     const { token } = req.params;
 
-    // One-Time Use Validation
     if (usedStreamTokens.has(token)) {
       return res.status(403).json({ error: 'Token already used or expired' });
     }
     usedStreamTokens.add(token);
 
-    // Verify & Decode Token
     const decoded = jwt.verify(token, STREAM_SECRET);
-
-    // Replay Attack & Fingerprint Validation
-    if (decoded.ip !== req.ip || decoded.ua !== req.headers['user-agent']) {
-      return res.status(403).json({ error: 'Invalid session fingerprint' });
-    }
-
     const { videoId, type } = decoded;
+    
     const { data: v } = await supabase.from('videos').select('*').eq('id', videoId).single();
     if (!v) return res.status(404).json({ error: 'Video not found' });
 
-    // Increment View Count
     await supabase.from('videos').update({ views: (v.views || 0) + 1 }).eq('id', videoId);
 
     let realUrl = resolveUrl(v);
 
-    // YouTube redirect (Proxy cannot proxy YouTube Iframes easily, redirect to nocookie)
     if (type === 'youtube') {
       const yid = v.url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1];
       return res.redirect(`https://www.youtube-nocookie.com/embed/${yid}?autoplay=1`);
@@ -202,7 +182,6 @@ app.get('/api/v1/stream/:token', streamLimiter, async (req, res) => {
 
     if (!realUrl) return res.status(404).json({ error: 'No source URL' });
 
-    // Fetch the real video and Proxy the stream back to the frontend
     const response = await fetch(realUrl, {
       headers: { Range: req.headers.range || '' }
     });
@@ -215,7 +194,6 @@ app.get('/api/v1/stream/:token', streamLimiter, async (req, res) => {
     response.body.pipe(res);
 
   } catch (err) {
-    console.error('Stream proxy error:', err);
     res.status(403).json({ error: 'Stream failed or token invalid' });
   }
 });
@@ -299,8 +277,7 @@ app.put('/api/v1/admin/credentials', auth, async (req, res) => {
     if (!Object.keys(u).length) return res.status(400);
     await supabase.from('admin_users').update(u).eq('id', req.admin.id);
     
-    const fingerprint = crypto.createHash('sha256').update(req.ip + req.headers['user-agent']).digest('hex');
-    const newToken = jwt.sign({ id: req.admin.id, username: new_username || req.admin.username, fp: fingerprint }, ADMIN_JWT_SECRET, { expiresIn: '24h' });
+    const newToken = jwt.sign({ id: req.admin.id, username: new_username || req.admin.username }, ADMIN_JWT_SECRET, { expiresIn: '24h' });
     res.cookie('token', newToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict', maxAge: 24 * 60 * 60 * 1000 }).json({ success: true });
   } catch { res.status(500); }
 });
@@ -318,4 +295,4 @@ app.get('/api/v1/admin/analytics', auth, async (req, res) => {
 });
 
 app.get('*', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.html')); });
-app.listen(PORT, () => console.log(`🚀 Maxaas.u Enterprise Security Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Maxaas.u Secure Server running on port ${PORT}`));
